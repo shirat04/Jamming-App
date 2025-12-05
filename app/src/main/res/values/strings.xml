@@ -78,6 +78,16 @@
     <string name="timeTag">⏰</string>
     <string name="musicTag">🎵</string>
     <string name="peopleTag">👥</string>
+    <string name="create_new_event">Create New Event</string>
+    <string name="business_dashboard">(Business Owner Dashboard)</string>
+    <string name="event_name">Event Name</string>
+    <string name="event_location">Venue / Location</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="max_capacity">Max Capacity</string>
+    <string name="event_description">Event Description</string>
+    <string name="publish_event">Publish Event</string>
+    <string name="cancel">Cancel</string>
 
 
 </resources>
