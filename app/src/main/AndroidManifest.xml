@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Jamming">
         <activity
+            android:name=".ExploreEventsActivity"
+            android:exported="false" />
+        <activity
             android:name=".OwnerActivity"
             android:exported="false" />
         <activity

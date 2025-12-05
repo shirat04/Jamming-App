@@ -43,4 +43,28 @@
     <string name="add_event_description">Add new event</string>
     <string name="edit_event_details">Edit event details</string>
 
+    <!-- Explore Events Screen -->
+    <string name="Hello_User_title">Hello "User Name"</string>
+    <string name="explore_location">Your location</string>
+
+    <!-- Filters -->
+    <string name="filter_near_me">Near Me</string>
+    <string name="filter_date_time">Date/Time</string>
+    <string name="filter_favorites">Favorites</string>
+
+    <!-- Event Cards -->
+    <string name="event_jazz_open_mic">Jazz Open Mic Night</string>
+    <string name="event_rock_night">Rock Night</string>
+
+    <!-- Event Locations -->
+    <string name="event_location_cafe_blue">Cafe Blue Note • 7 PM</string>
+    <string name="event_location_cavern_blues">The Cavern • Blues</string>
+
+    <!-- Accessibility -->
+    <string name="map_placeholder">Map Placeholder</string>
+    <string name="locationTag">📍</string>
+    <string name="boardTag">📅</string>
+    <string name="starTag">⭐</string>
+
+
 </resources>
