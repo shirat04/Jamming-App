@@ -65,6 +65,19 @@
     <string name="locationTag">📍</string>
     <string name="boardTag">📅</string>
     <string name="starTag">⭐</string>
+    <string name="events_near_me">Events Near Me</string>
+    <string name="jazz_open_mic">Jazz Open Mic</string>
+    <string name="cafe_blue_note_7_pm">Cafe Blue Note – 7 PM</string>
+    <string name="jazz">Jazz</string>
+    <string name="rock_night">Rock Night</string>
+    <string name="the_cavern_blues">The Cavern – Blues</string>
+    <string name="rock">Rock</string>
+    <string name="open_jam_session">Open Jam Session</string>
+    <string name="downtown_pub_19_30">Downtown Pub – 19:30</string>
+    <string name="mixed">Mixed</string>
+    <string name="timeTag">⏰</string>
+    <string name="musicTag">🎵</string>
+    <string name="peopleTag">👥</string>
 
 
 </resources>

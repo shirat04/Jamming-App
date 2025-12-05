@@ -61,11 +61,12 @@
                 style="?attr/borderlessButtonStyle"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:layout_margin="6dp"
                 android:backgroundTint="#FF6F6F"
-                android:text="📍"
-                android:textSize="20sp"
+                android:text="@string/locationTag"
                 android:textColor="@android:color/white"
-                android:layout_margin="6dp"/>
+                android:textSize="20sp"
+                tools:ignore="TextContrastCheck" />
 
             <!-- כפתור תאריך -->
             <Button
@@ -73,11 +74,12 @@
                 style="?attr/borderlessButtonStyle"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:layout_margin="6dp"
                 android:backgroundTint="#FFA84B"
-                android:text="📅"
-                android:textSize="20sp"
+                android:text="@string/boardTag"
                 android:textColor="@android:color/white"
-                android:layout_margin="6dp"/>
+                android:textSize="20sp"
+                tools:ignore="TextContrastCheck" />
 
             <!-- כפתור שעה -->
             <Button
@@ -85,11 +87,12 @@
                 style="?attr/borderlessButtonStyle"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:layout_margin="6dp"
                 android:backgroundTint="#FFCE47"
-                android:text="⏰"
-                android:textSize="20sp"
+                android:text="@string/timeTag"
                 android:textColor="@android:color/white"
-                android:layout_margin="6dp"/>
+                android:textSize="20sp"
+                tools:ignore="TextContrastCheck" />
 
             <!-- כפתור מוזיקה -->
             <Button
@@ -97,11 +100,12 @@
                 style="?attr/borderlessButtonStyle"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:layout_margin="6dp"
                 android:backgroundTint="#41C463"
-                android:text="🎵"
-                android:textSize="20sp"
+                android:text="@string/musicTag"
                 android:textColor="@android:color/white"
-                android:layout_margin="6dp"/>
+                android:textSize="20sp"
+                tools:ignore="TextContrastCheck" />
 
             <!-- כפתור גודל אירוע -->
             <Button
@@ -109,11 +113,12 @@
                 style="?attr/borderlessButtonStyle"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:layout_margin="6dp"
                 android:backgroundTint="#63A5FF"
-                android:text="👥"
-                android:textSize="20sp"
+                android:text="@string/peopleTag"
                 android:textColor="@android:color/white"
-                android:layout_margin="6dp"/>
+                android:textSize="20sp"
+                tools:ignore="TextContrastCheck" />
 
             <!-- כפתור מועדפים -->
             <Button
@@ -122,7 +127,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:backgroundTint="#2D7AD8"
-                android:text="⭐"
+                android:text="@string/starTag"
                 android:textSize="20sp"
                 android:textColor="@android:color/white"
                 android:layout_margin="6dp"/>
@@ -145,7 +150,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Events Near Me"
+            android:text="@string/events_near_me"
             android:textSize="20sp"
             android:textColor="#2E7D32"
             android:padding="4dp"/>
@@ -206,21 +211,21 @@
                     android:padding="16dp">
 
                     <TextView
-                        android:text="Jazz Open Mic"
+                        android:text="@string/jazz_open_mic"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="Cafe Blue Note – 7 PM"
+                        android:text="@string/cafe_blue_note_7_pm"
                         android:textSize="15sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"/>
 
                     <TextView
-                        android:text="Jazz"
+                        android:text="@string/jazz"
                         android:textColor="#E86A00"
                         android:textStyle="bold"
                         android:layout_width="wrap_content"
@@ -245,21 +250,21 @@
                     android:padding="16dp">
 
                     <TextView
-                        android:text="Rock Night"
+                        android:text="@string/rock_night"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="The Cavern – Blues"
+                        android:text="@string/the_cavern_blues"
                         android:textSize="15sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"/>
 
                     <TextView
-                        android:text="Rock"
+                        android:text="@string/rock"
                         android:textColor="#0057E7"
                         android:textStyle="bold"
                         android:layout_width="wrap_content"
@@ -283,21 +288,21 @@
                     android:padding="16dp">
 
                     <TextView
-                        android:text="Open Jam Session"
+                        android:text="@string/open_jam_session"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="Downtown Pub – 19:30"
+                        android:text="@string/downtown_pub_19_30"
                         android:textSize="15sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"/>
 
                     <TextView
-                        android:text="Mixed"
+                        android:text="@string/mixed"
                         android:textColor="#008744"
                         android:textStyle="bold"
                         android:layout_width="wrap_content"
