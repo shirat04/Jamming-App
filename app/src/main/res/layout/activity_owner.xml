@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".OwnerActivity">
+
+    <!-- Floating Add Event Button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addEventButton"
+        android:layout_margin="20dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:contentDescription="@string/add_event_description"
+        app:srcCompat="@android:drawable/ic_input_add"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Create Event Button -->
+    <Button
+        android:id="@+id/button"
+        android:layout_width="142dp"
+        android:layout_height="61dp"
+        android:layout_marginTop="90dp"
+        android:layout_marginEnd="26dp"
+        android:text="@string/add_event"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Owner Greeting -->
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hello_owner"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginTop="44dp"
+        android:layout_marginStart="56dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <!-- My Events Title -->
+    <TextView
+        android:id="@+id/myevent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/my_events"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Scrollable list of events -->
+    <ScrollView
+        android:id="@+id/eventList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="20dp"
+        app:layout_constraintTop_toBottomOf="@id/myevent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <!-- EVENT 2 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/event2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:contentPadding="16dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/titleEvent2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/jazz_open_mic_night"
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/locationEvent2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/cafe_jazz_downtown"
+                        android:layout_marginTop="30dp"/>
+
+                    <TextView
+                        android:id="@+id/dateEvent2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/date_15_01"
+                        android:layout_marginTop="60dp"/>
+
+                    <TextView
+                        android:id="@+id/musiceEvent2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/jazz_blues"
+                        android:layout_marginTop="90dp"/>
+
+                    <TextView
+                        android:id="@+id/seatsEvent2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/spots_50_50"
+                        android:layout_marginTop="120dp"/>
+
+                    <!-- Buttons -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginTop="160dp">
+
+                        <Button
+                            android:id="@+id/editdetailsEvent2"
+                            style="?attr/borderlessButtonStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_margin="4dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="#1E63E9"
+                            android:contentDescription="@string/edit_event_details"
+                            android:text="@string/edit_details"
+                            android:textColor="#FFFFFF"
+                            tools:ignore="DuplicateSpeakableTextCheck,VisualLintButtonSize" />
+
+                        <Button
+                            android:id="@+id/CancelEvent2"
+                            style="?attr/borderlessButtonStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_margin="4dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="#E53935"
+                            android:contentDescription="@string/cancel_event"
+                            android:text="@string/cancel_event"
+                            android:textColor="#FFFFFF"
+                            tools:ignore="DuplicateSpeakableTextCheck,TextContrastCheck,VisualLintButtonSize" />
+
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+
+            <!-- EVENT 1 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/event1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:contentPadding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/titleEvent1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/rock_band_thunder"
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/locationEvent1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/stadium_xxz"
+                        android:layout_marginTop="4dp"/>
+
+                    <TextView
+                        android:id="@+id/dateEvent1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/date_20_01"/>
+
+                    <TextView
+                        android:id="@+id/musicEvent1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/rock_metal"/>
+
+                    <TextView
+                        android:id="@+id/seatsEvent1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/spots_12_100"
+                        android:layout_marginTop="6dp"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#DDDDDD"
+                        android:layout_marginVertical="8dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <Button
+                            android:id="@+id/editDetailsEvent1"
+                            style="?attr/borderlessButtonStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:text="@string/edit_view_details"
+                            android:backgroundTint="#1E63E9"
+                            android:textColor="#FFFFFF"
+                            android:layout_margin="4dp"
+                            android:contentDescription="@string/edit_event_details"
+                            tools:ignore="VisualLintButtonSize" />
+
+                        <Button
+                            android:id="@+id/cancelEvent1"
+                            style="?attr/borderlessButtonStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_margin="4dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="#E53935"
+                            android:contentDescription="@string/cancel_event"
+                            android:text="@string/cancel_event"
+                            android:textColor="#FFFFFF"
+                            tools:ignore="TextContrastCheck,VisualLintButtonSize" />
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

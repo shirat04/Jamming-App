@@ -1,0 +1,46 @@
+<resources>
+
+    <!-- App -->
+    <string name="app_name">Jamming</string>
+
+    <!-- Login -->
+    <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+
+    <!-- Owner section -->
+    <string name="owner_greeting">שלום, בעל עסק</string>
+    <string name="hello_owner">Hello \"Owner Name\"</string>
+    <string name="add_event">+ Create Event</string>
+    <string name="my_events">My Events</string>
+
+    <!-- Event titles -->
+    <string name="jazz_open_mic_night">Jazz Open Mic Night</string>
+    <string name="rock_band_thunder">Rock Band – Thunderstruck</string>
+
+    <!-- Locations -->
+    <string name="cafe_jazz_downtown">📍 Cafe Jazz, Downtown</string>
+    <string name="stadium_xxz">📍 Stadium XXZ</string>
+
+    <!-- Dates -->
+    <string name="date_15_01">🕒 15.01.2026 • 20:00</string>
+    <string name="date_20_01">🕒 20.01.2026 • 21:00</string>
+
+    <!-- Music types -->
+    <string name="jazz_blues">🎵 Jazz, Blues</string>
+    <string name="rock_metal">🎵 Rock, Metal</string>
+
+    <!-- Seats -->
+    <string name="spots_50_50">👥 50/50 spots</string>
+    <string name="spots_12_100">👥 12/100 spots</string>
+
+    <!-- Buttons -->
+    <string name="edit_details">Edit Details</string>
+    <string name="edit_view_details">Edit / View Details</string>
+    <string name="cancel_event">Cancel Event</string>
+
+    <!-- Accessibility -->
+    <string name="add_event_description">Add new event</string>
+    <string name="edit_event_details">Edit event details</string>
+
+</resources>
