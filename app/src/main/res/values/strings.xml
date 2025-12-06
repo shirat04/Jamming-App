@@ -108,6 +108,7 @@
     <string name="jazz_rock">Jazz, Rock</string>
     <string name="distance">Distance</string>
     <string name="_25_km">25 km</string>
+    <string name="not_registered_create_an_account">Not registered? Create an account</string>
 
 
 </resources>
