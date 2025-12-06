@@ -12,22 +12,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Jamming">
         <activity
-            android:name=".profilePreferencesActivity"
+            android:name=".view.profilePreferencesActivity"
             android:exported="false" />
         <activity
-            android:name=".eventDetailActivity"
+            android:name=".view.eventDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".CreateNewEvent"
+            android:name=".view.CreateNewEvent"
             android:exported="false" />
         <activity
-            android:name=".ExploreEventsActivity"
+            android:name=".view.ExploreEventsActivity"
             android:exported="false" />
         <activity
-            android:name=".OwnerActivity"
+            android:name=".view.OwnerActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".view.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,7 +36,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".view.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Jamming">
             <intent-filter>
