@@ -95,6 +95,19 @@
     <string name="capacity_15_20_spots">Capacity: 15/20 spots</string>
     <string name="register_for_event">Register for Event</string>
     <string name="add_to_calendar">Add to Calendar</string>
+    <string name="profile_amp_preferences"><![CDATA[Profile & Preferences]]></string>
+    <string name="my_registered_events">My Registered Events</string>
+    <string name="logout">Logout</string>
+    <string name="notification_settings">Notification Settings</string>
+    <string name="john_smith">John Smith</string>
+    <string name="awesome_cafe">Awesome Cafe</string>
+    <string name="todo">TODO</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="favorite_genres">Favorite Genres</string>
+    <string name="_5_km">5 km</string>
+    <string name="jazz_rock">Jazz, Rock</string>
+    <string name="distance">Distance</string>
+    <string name="_25_km">25 km</string>
 
 
 </resources>
