@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F4F7"
+    tools:context=".eventDetailActivity">
+
+    <!-- תמונת האירוע -->
+    <ImageView
+        android:id="@+id/eventImage"
+        android:layout_width="0dp"
+        android:layout_height="220dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription,ImageContrastCheck" />
+
+    <!-- כרטיס לבן עם פרטים -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardEventDetails"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-40dp"
+        android:elevation="6dp"
+        app:cardCornerRadius="20dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintTop_toBottomOf="@id/eventImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- כותרת -->
+            <TextView
+                android:id="@+id/titleEvent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/jazz_open_mic_night"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#000000"/>
+
+            <TextView
+                android:id="@+id/subTitleEvent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cafe_bloute_9_pm"
+                android:textSize="15sp"
+                android:layout_marginTop="4dp"
+                android:textColor="#555555"/>
+
+            <!-- פרטי מיקום -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/_123_main_st"
+                    android:textSize="16sp"/>
+
+            </LinearLayout>
+
+            <!-- תאריך ושעה -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/_15_01_2024_19_00"
+                    android:textSize="16sp"/>
+
+            </LinearLayout>
+
+            <!-- קיבולת -->
+            <TextView
+                android:id="@+id/capacityEvent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/capacity_15_20_spots"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginTop="14dp"
+                android:textColor="#333333"/>
+
+            <!-- כפתור הרשמה -->
+            <Button
+                android:id="@+id/registerBtn"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:text="@string/register_for_event"
+                android:textSize="18sp"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#1E63E9"
+                android:layout_marginTop="20dp"
+                tools:ignore="VisualLintButtonSize" />
+
+            <!-- כפתור להוספה ליומן -->
+            <Button
+                android:id="@+id/addToCalendarBtn"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:text="@string/add_to_calendar"
+                android:textSize="16sp"
+                android:textColor="#444444"
+                android:backgroundTint="#E5E5E5"
+                android:layout_marginTop="10dp"
+                tools:ignore="VisualLintButtonSize" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

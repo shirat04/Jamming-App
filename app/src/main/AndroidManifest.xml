@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Jamming">
         <activity
+            android:name=".eventDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".CreateNewEvent"
             android:exported="false" />
         <activity
