@@ -1,4 +1,4 @@
-package com.example.jamming
+package com.example.jamming.view
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

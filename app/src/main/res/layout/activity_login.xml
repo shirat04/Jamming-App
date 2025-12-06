@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:padding="24dp"
     android:background="#F2F4F7"
-    tools:context=".LoginActivity">
+    tools:context=".view.LoginActivity">
 
     <!-- Title -->
     <TextView
