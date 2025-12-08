@@ -1,4 +1,5 @@
 package com.example.jamming.Repository;
+import com.example.jamming.model.Event;
 import com.example.jamming.model.User;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -8,6 +9,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import android.util.Patterns;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class AuthRepository {
@@ -102,7 +106,7 @@ public class AuthRepository {
     }
 
 
-     //Checks whether a username already exists in Firestore.
+    //Checks whether a username already exists in Firestore.
     public Task<Boolean> isUsernameTaken(String username) {
         return db.collection("users")
                 .whereEqualTo("username", username)
@@ -111,7 +115,7 @@ public class AuthRepository {
                 .continueWith(task -> !task.getResult().isEmpty());
     }
 
-     //Retrieves a user profile document from Firestore.
+    //Retrieves a user profile document from Firestore.
     public Task<DocumentSnapshot> getUserProfile(String uid) {
         return db.collection("users")
                 .document(uid)
@@ -119,7 +123,7 @@ public class AuthRepository {
     }
 
 
-     //Updates one or more fields in the user's Firestore profile.
+    //Updates one or more fields in the user's Firestore profile.
     public Task<Void> updateUserProfile(String uid, Map<String, Object> updates) {
         return db.collection("users")
                 .document(uid)
@@ -133,13 +137,13 @@ public class AuthRepository {
                 .delete();
     }
 
-     //Sends a password-reset email to the user.
+    //Sends a password-reset email to the user.
     public Task<Void> resetPassword(String email) {
         return auth.sendPasswordResetEmail(email);
     }
 
 
-     //Sends an email verification message to the current Firebase user.
+    //Sends an email verification message to the current Firebase user.
     public Task<Void> sendEmailVerification() {
         FirebaseUser user = auth.getCurrentUser();
         if (user != null) {
@@ -149,8 +153,13 @@ public class AuthRepository {
     }
 
     //Returns the currently authenticated Firebase user, if exists.
-    public FirebaseUser getCurrentUser() { return auth.getCurrentUser();}
+    public FirebaseUser getCurrentUser() {
+        return auth.getCurrentUser();
+    }
 
     //Logs out the current user.
-    public void logout() { auth.signOut(); }
+    public void logout() {
+        auth.signOut();
+    }
+
 }
