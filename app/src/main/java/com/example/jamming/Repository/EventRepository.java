@@ -1,50 +1,89 @@
-import com.example.jamming.model.Event;
+package com.example.jamming.Repository;
 
-import java.util.ArrayList;
+import com.example.jamming.model.Event;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EventRepository {
-    private static EventRepository instance;
-    private final List<Event> events = new ArrayList<>();
 
-    private EventRepository() {}
+    private final FirebaseFirestore db;
 
-    public static EventRepository getInstance() {
-        if (instance == null) {
-            instance = new EventRepository();
-        }
-        return instance;
+    public EventRepository() {
+        // Initialize Firestore instance
+        db = FirebaseFirestore.getInstance();
     }
 
-    public void addEvent(Event e) {
-        events.add(e);
-    }
-    public void removeEvent(Event e){
-        events.remove(e);
-    }
+    // Create new event in Firestore
+    public Task<Void> createEvent(Event event) {
 
-    public List<Event> getEventsByOwner(String ownerId) {
-        List<Event> result = new ArrayList<>();
-        for (Event e : events) {
-            if (e.getOwnerId().equals(ownerId)) {
-                result.add(e);
-            }
-        }
-        return result;
+        DocumentReference ref = db.collection("events").document();
+
+        event.setId(ref.getId());
+
+        return ref.set(event);
     }
 
-    public List<Event> getEventsByDate(Long date) {
-        List<Event> result = new ArrayList<>();
-        for (Event e : events) {
-            if (e.getDateTime() == date) {
-                result.add(e);
-            }
-        }
-        return result;
+    // Get an event by ID
+    public Task<DocumentSnapshot> getEventById(String eventId) {
+        return db.collection("events")
+                .document(eventId)
+                .get();
     }
 
+    // Get all events in the system
+    public Task<QuerySnapshot> getAllEvents() {
+        return db.collection("events")
+                .get();
+    }
 
+    // Get all events created by a specific owner
+    public Task<QuerySnapshot> getEventsByOwner(String ownerId) {
+        return db.collection("events")
+                .whereEqualTo("ownerId", ownerId)
+                .get();
+    }
 
+    // Update event fields (supports multiple updates)
+    public Task<Void> updateEvent(String eventId, Map<String, Object> updates) {
+        return db.collection("events")
+                .document(eventId)
+                .update(updates);
+    }
 
-}
+    // Delete an event completely
+    public Task<Void> deleteEvent(String eventId) {
+        return db.collection("events")
+                .document(eventId)
+                .delete();
+    }
+
+    // Increment reserved seats count
+    public Task<Void> incrementReserved(String eventId) {
+        return db.collection("events")
+                .document(eventId)
+                .update("reserved", FieldValue.increment(1));
+    }
+
+    // Decrement reserved seats count
+    public Task<Void> decrementReserved(String eventId) {
+        return db.collection("events")
+                .document(eventId)
+                .update("reserved", FieldValue.increment(-1));
+    }
+
+    // Replace entire event record (useful for cloning)
+    public Task<Void> overwriteEvent(String id, Event event) {
+        return db.collection("events")
+                .document(id)
+                .set(event);
+    }
 }
