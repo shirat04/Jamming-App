@@ -2,6 +2,7 @@ package com.example.jamming.Repository;
 
 import com.example.jamming.model.Event;
 import com.example.jamming.model.User;
+import com.example.jamming.utils.GeoUtils;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -140,7 +141,7 @@ public class UserRepository {
                             continue;
                         }
 
-                        double distance = calculateDistanceKm(userLat, userLng, eventLat, eventLng);
+                        double distance = GeoUtils.calculateDistanceKm(userLat, userLng, eventLat, eventLng);
 
                         // Add event if within allowed radius
                         if (distance <= radiusKm) {
@@ -152,22 +153,5 @@ public class UserRepository {
                 });
     }
 
-    // Calculate distance between two geo points using Haversine formula
-    private double calculateDistanceKm(double lat1, double lng1, double lat2, double lng2) {
-        double R = 6371; // Earth radius in KM
 
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLng = Math.toRadians(lng2 - lng1);
-
-        lat1 = Math.toRadians(lat1);
-        lat2 = Math.toRadians(lat2);
-
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(lat1) * Math.cos(lat2)
-                + Math.sin(dLng / 2) * Math.sin(dLng / 2);
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        return R * c;
-    }
 }
