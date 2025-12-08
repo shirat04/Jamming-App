@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "977440631678",
+    "project_id": "jamming-6d4f5",
+    "storage_bucket": "jamming-6d4f5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:977440631678:android:770a445a68a8e9ff15e12f",
+        "android_client_info": {
+          "package_name": "com.example.jamming"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAu8KHTNh2X6RNplB0Nqh4MNFYfNkGiA5Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
