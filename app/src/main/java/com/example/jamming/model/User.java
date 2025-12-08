@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User {
-    private String id;
+    private String firebaseId;
     private String fullName;
     private String email;
     private String phone;
+    private String username;
+
     private String profileImageUrl;
     private List<String> registeredEventIds;
 
@@ -23,11 +25,12 @@ public class User {
     }
 
     // Constructor מלא
-    public User(String id, String fullName, String email, String phone) {
-        this.id = id;
+    public User(String firebaseId, String fullName, String email, String phone, String username) {
+        this.firebaseId = firebaseId;
         this.fullName = fullName;
         this.email = email;
         this.phone = phone;
+        this.username = username;
         this.registeredEventIds = new ArrayList<>();
         this.favoriteMusicTypes = new ArrayList<>();
         this.searchRadiusKm = 10;
@@ -35,8 +38,8 @@ public class User {
     }
 
     // Getters
-    public String getId() {
-        return id;
+    public String getFirebaseId() {
+        return firebaseId;
     }
 
     public String getFullName() {
@@ -50,6 +53,10 @@ public class User {
     public String getPhone() {
         return phone;
     }
+    public String getUsername() { return username;}
+
+    public void setUsername(String username) {this.username = username;}
+
 
     public String getProfileImageUrl() {
         return profileImageUrl;
@@ -72,8 +79,8 @@ public class User {
     }
 
     // Setters - חובה ל-Firebase
-    public void setId(String id) {
-        this.id = id;
+    public void setFirebaseId(String id) {
+        this.firebaseId = firebaseId;
     }
 
     public void setFullName(String fullName) {

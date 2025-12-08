@@ -22,9 +22,9 @@ public class Owner extends User {
     }
 
     // Constructor מלא
-    public Owner(String id, String fullName, String email, String phone,
+    public Owner(String id, String fullName, String email, String phone, String username,
                  String locationName, String address, String city) {
-        super(id, fullName, email, phone);
+        super(id, fullName, email, phone, username);
         this.locationName = locationName;
         this.address = address;
         this.city = city;
