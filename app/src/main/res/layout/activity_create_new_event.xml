@@ -123,6 +123,10 @@
                 tools:ignore="Autofill,TextContrastCheck,VisualLintTextFieldSize" />
 
             <!-- תיאור אירוע -->
+
+
+            <!-- כפתור פרסום -->
+
             <EditText
                 android:id="@+id/eventDescriptionInput"
                 android:layout_width="match_parent"
@@ -134,8 +138,6 @@
                 android:padding="12dp"
                 tools:ignore="Autofill,TextContrastCheck,VisualLintTextFieldSize" />
 
-
-            <!-- כפתור פרסום -->
             <Button
                 android:id="@+id/publishEventBtn"
                 android:layout_width="match_parent"
