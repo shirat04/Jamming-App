@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Jamming">
         <activity
+            android:name=".view.RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.MyEventUserActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.profilePreferencesActivity"
             android:exported="false" />
         <activity

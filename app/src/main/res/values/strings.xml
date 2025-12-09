@@ -109,6 +109,23 @@
     <string name="distance">Distance</string>
     <string name="_25_km">25 km</string>
     <string name="not_registered_create_an_account">Not registered? Create an account</string>
+    <string name="profile">profile</string>
+    <string name="notifications">notifications</string>
+    <string name="my_events_subtitle">My Event</string>
+    <string name="sample_event_title">sample_event_title</string>
+    <string name="sample_event_location">sample_event_location</string>
+    <string name="sample_event_date">sample_event_date</string>
+    <string name="registered">registered</string>
+    <string name="view_details">view details</string>
+    <string name="cancel_registration">cancel registration</string>
+    <string name="register">register</string>
+    <string name="full_name">full name</string>
+    <string name="email">email</string>
+    <string name="confirm_password">confirm password</string>
+    <string name="select_user_type">Select user type:</string>
+    <string name="user">User</string>
+    <string name="event_manager">Event Manager</string>
+    <string name="already_have_an_account_login">Already have an account? Login</string>
 
 
 </resources>
