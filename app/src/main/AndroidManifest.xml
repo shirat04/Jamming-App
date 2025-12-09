@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Jamming">
         <activity
+            android:name=".view.EditEventActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.NotificationsOwnerActivity"
             android:exported="false" />
         <activity
