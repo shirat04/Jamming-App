@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Jamming">
         <activity
+            android:name=".view.NotificationsUserActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.RegisterActivity"
             android:exported="false" />
         <activity

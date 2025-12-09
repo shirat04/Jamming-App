@@ -126,6 +126,14 @@
     <string name="user">User</string>
     <string name="event_manager">Event Manager</string>
     <string name="already_have_an_account_login">Already have an account? Login</string>
+    <string name="sample_notification_body_user">sample notification body user</string>
+    <string name="sample_notification_title_user">sample notification title user</string>
+    <string name="event_cancelled">Event Cancelled</string>
+    <string name="the_event_jazz_open_mic_has_been_cancelled_by_the_event_owner">The event \'Jazz Open Mic\' has been cancelled by the event owner.</string>
+    <string name="today_14_32">Today • 14:32</string>
+    <string name="event_updated">Event Updated</string>
+    <string name="the_event_rock_night_has_been_updated_the_new_start_time_is_20_30">The event \'Rock Night\' has been updated. The new start time is 20:30.</string>
+    <string name="yesterday_21_10">Yesterday • 21:10</string>
 
 
 </resources>
