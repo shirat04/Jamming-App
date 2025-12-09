@@ -134,6 +134,17 @@
     <string name="event_updated">Event Updated</string>
     <string name="the_event_rock_night_has_been_updated_the_new_start_time_is_20_30">The event \'Rock Night\' has been updated. The new start time is 20:30.</string>
     <string name="yesterday_21_10">Yesterday • 21:10</string>
+    <string name="_05_01_2025_16_57">05/01/2025 • 16:57</string>
+    <string name="you_updated_details_for_acoustic_night_all_registered_users_were_notified">You updated details for \'Acoustic Night\'. All registered users were notified.</string>
+    <string name="yesterday_10_22">Yesterday • 10:22</string>
+    <string name="a_new_attendee_has_registered_for_your_event_indie_vibes">A new attendee has registered for your event \'Indie Vibes\'.</string>
+    <string name="new_registration">New Registration</string>
+    <string name="yesterday_18_45">Yesterday • 18:45</string>
+    <string name="several_seats_have_opened_for_your_event_rock_night_following_cancellations">Several seats have opened for your event \'Rock Night\' following cancellations.</string>
+    <string name="seats_available">Seats Available</string>
+    <string name="today_13_10">Today • 13:10</string>
+    <string name="your_event_jazz_open_mic_has_reached_full_capacity_sold_out">Your event \'Jazz Open Mic\' has reached full capacity (sold out).</string>
+    <string name="event_sold_out">Event Sold Out</string>
 
 
 </resources>
