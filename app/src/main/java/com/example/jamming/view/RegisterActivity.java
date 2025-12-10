@@ -5,20 +5,20 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.jamming.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.example.jamming.viewmodel.AuthViewModel;
 
 public class RegisterActivity extends AppCompatActivity {
     private EditText fullName, password, confirmPassword, email, userName;
     private RadioButton owner;
-    private FirebaseAuth auth;
+
+    private AuthViewModel viewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,62 +33,51 @@ public class RegisterActivity extends AppCompatActivity {
 
         Button register = findViewById(R.id.btnRegister);
         Button backLogin = findViewById(R.id.btnAlreadyHaveAccount);
+        viewModel = new ViewModelProvider(this).get(AuthViewModel.class);
+
         backLogin.setOnClickListener(v ->
                 startActivity(new Intent(this, LoginActivity.class))
         );
 
         register.setOnClickListener(v -> handleRegister());
+
+        observeViewModel();
     }
-    private void handleRegister(){
-        String emailText = email.getText().toString().trim();
+    private void handleRegister() {
+
+        String fName = fullName.getText().toString().trim();
+        String emailTxt = email.getText().toString().trim();
         String pass = password.getText().toString().trim();
         String confPass = confirmPassword.getText().toString().trim();
-        String fllName = fullName.getText().toString().trim();
-        String userType = owner.isChecked() ? "owner" : "user";
-        String username = userName.getText().toString().trim();
+        String uName = userName.getText().toString().trim();
+        String type = owner.isChecked() ? "owner" : "user";
 
-        auth = FirebaseAuth.getInstance();
-        auth.createUserWithEmailAndPassword(emailText, pass)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
+        if (!pass.equals(confPass)) {
+            // תוסיפי טיפוס או Toast אם תרצי
+            return;
+        }
 
-                        assert auth.getCurrentUser() != null;
-                        String uid = auth.getCurrentUser().getUid();
-                        saveUserToFirestore(uid, emailText, fllName, userType, username);
-
-                    } else {
-                        // בינתיים לא מטפלים בשגיאה
-                    }
-                });
+        viewModel.register(fName, emailTxt, pass, uName, type);
     }
 
-    private void saveUserToFirestore(String uid, String email, String fullName, String userType, String userName) {
+    private void observeViewModel() {
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        viewModel.getError().observe(this, err -> {
+            if (err != null) {
+                 Toast.makeText(this, err, Toast.LENGTH_SHORT).show();
+            }
+        });
 
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("email", email);
-        userData.put("fullName", fullName);
-        userData.put("userName", userName);
-        userData.put("userType", userType);
+        viewModel.getUserType().observe(this, type -> {
+            if (type == null) return;
 
-        db.collection("users").document(uid)
-                .set(userData)
-                .addOnSuccessListener(aVoid -> {
-
-                    // מעבר למסך מתאים
-                    if (userType.equals("owner")) {
-                        startActivity(new Intent(this, OwnerActivity.class));
-                    } else {
-                        startActivity(new Intent(this, ExploreEventsActivity.class));
-                    }
-
-                    finish();
-
-                })
-                .addOnFailureListener(e -> {
-                    // כרגע לא מטפלים בשגיאה
-                });
+            if (type.equals("owner")) {
+                startActivity(new Intent(this, OwnerActivity.class));
+            } else {
+                startActivity(new Intent(this, ExploreEventsActivity.class));
+            }
+            finish();
+        });
     }
 
 }

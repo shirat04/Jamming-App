@@ -4,75 +4,60 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.Objects;
+import com.example.jamming.viewmodel.AuthViewModel;
 
 public class LoginActivity extends AppCompatActivity {
 
 
-    private EditText username, password;
-    private FirebaseAuth auth;
+    private EditText usernameInput, passwordInput;
+    private AuthViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        username = findViewById(R.id.usernameInput);
-        password = findViewById(R.id.passwordInput);
+        usernameInput = findViewById(R.id.usernameInput);   // יכול להיות אימייל או username
+        passwordInput = findViewById(R.id.passwordInput);
         Button loginBtn = findViewById(R.id.loginButton);
         Button registerBtn = findViewById(R.id.registerText);
-        auth = FirebaseAuth.getInstance();
-        registerBtn.setOnClickListener(view -> {
-            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-        startActivity(intent);});
-        loginBtn.setOnClickListener(v -> handleLogin());
+
+        viewModel = new ViewModelProvider(this).get(AuthViewModel.class);
+
+        loginBtn.setOnClickListener(v -> {
+            String identifier = usernameInput.getText().toString().trim();
+            String pass = passwordInput.getText().toString().trim();
+            viewModel.login(identifier, pass);
+        });
+
+        registerBtn.setOnClickListener(v ->
+                startActivity(new Intent(this, RegisterActivity.class))
+        );
+
+        observeViewModel();
     }
 
-    private void handleLogin() {
-        String email = username.getText().toString().trim();
-        String pass = password.getText().toString().trim();
+    private void observeViewModel() {
 
-        if (email.isEmpty() || pass.isEmpty()) {
-        //למלא פה
-        return;
-        }
+        viewModel.getError().observe(this, err -> {
+            if (err != null) {
+                // כרגע אפשר רק להדפיס או Toast, ואת יכולה ללטש אחר כך
+                // Toast.makeText(this, err, Toast.LENGTH_SHORT).show();
+            }
+        });
 
-        auth.signInWithEmailAndPassword(email, pass)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
+        viewModel.getUserType().observe(this, type -> {
+            if (type == null) return;
 
-                        assert auth.getCurrentUser() != null;
-                        String uid = auth.getCurrentUser().getUid();
-                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-                        db.collection("users").document(uid).get()
-                                .addOnSuccessListener(doc -> {
-                                    if (doc.exists()) {
-                                        String type = doc.getString("userType");
-
-                                        if ("owner".equals(type)) {
-                                            startActivity(new Intent(this, OwnerActivity.class));
-                                        } else {
-                                            startActivity(new Intent(this, ExploreEventsActivity.class));
-                                        }
-
-                                        finish();
-                                    } else {
-                                        //לטפל
-                                    }
-                                });
-
-                    } else {
-                        //לטפל
-                    }
-                });
+            if ("owner".equals(type)) {
+                startActivity(new Intent(this, OwnerActivity.class));
+            } else {
+                startActivity(new Intent(this, ExploreEventsActivity.class));
+            }
+            finish();
+        });
     }
 }
