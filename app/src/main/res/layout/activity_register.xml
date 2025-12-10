@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.RegisterActivity">
+    tools:context=".view.RegisterActivity"
+    app:layout_constraintBottom_toBottomOf="parent">
 
     <TextView
         android:id="@+id/registerTitle"
@@ -35,6 +36,15 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:hint="@string/full_name"
+            android:inputType="textPersonName"
+            tools:ignore="Autofill,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+
+        <EditText
+            android:id="@+id/usName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:hint="user name"
             android:inputType="textPersonName"
             tools:ignore="Autofill,TouchTargetSizeCheck,VisualLintTextFieldSize" />
 

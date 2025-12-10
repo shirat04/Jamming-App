@@ -72,7 +72,7 @@
         tools:ignore="DuplicateSpeakableTextCheck,VisualLintButtonSize" />
 
     <!-- Register Button -->
-    <TextView
+    <Button
         android:id="@+id/registerText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
