@@ -14,8 +14,6 @@ public class AuthViewModel extends ViewModel {
     private final AuthRepository repo = new AuthRepository();
     public MutableLiveData<String> error = new MutableLiveData<>();
     public MutableLiveData<String> userType = new MutableLiveData<>();
-    public MutableLiveData<Boolean> loginSuccess = new MutableLiveData<>();
-
     public void login(String identifier, String password) {
 
         if (identifier.isEmpty() || password.isEmpty()) {
@@ -48,13 +46,20 @@ public class AuthViewModel extends ViewModel {
         }
     }
 
-    public void register(String fullName, String email, String pass, String userName, String type) {
+    public void register(String fullName, String email, String pass,String confPass, String userName, String type) {
 
         if (fullName.isEmpty() || email.isEmpty() || pass.isEmpty() || userName.isEmpty()) {
             error.setValue("נא למלא את כל השדות");
             return;
         }
-
+        if (!pass.equals(confPass)) {
+            error.setValue("הסיסמאות אינן תואמות");
+            return;
+        }
+        if(pass.length()<6){
+            error.setValue("הסיסמא צריכה להיות בת שישה תווים לפחות");
+            return;
+        }
         repo.isUsernameTaken(userName)
                 .addOnSuccessListener(query -> {
 
@@ -99,7 +104,6 @@ public class AuthViewModel extends ViewModel {
                     String type = doc.getString("userType");
 
                     userType.setValue(type);  // שולח לאקטיביטי
-                    loginSuccess.setValue(true);
 
                 })
                 .addOnFailureListener(e -> error.setValue(e.getMessage()));

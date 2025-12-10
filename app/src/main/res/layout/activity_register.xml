@@ -113,6 +113,19 @@
             android:textStyle="bold"
             tools:ignore="DuplicateSpeakableTextCheck,HardcodedText,VisualLintButtonSize" />
 
+        <TextView
+            android:id="@+id/errorText"
+            android:layout_width="366dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textAlignment="center"
+            android:textColor="#7f0532"
+            android:textSize="18sp"
+            android:visibility="gone"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
         <Button
             android:id="@+id/btnAlreadyHaveAccount"
             android:layout_width="wrap_content"

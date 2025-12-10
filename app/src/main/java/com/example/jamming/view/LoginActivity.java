@@ -2,9 +2,10 @@ package com.example.jamming.view;
 
 import android.os.Bundle;
 import android.content.Intent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -16,7 +17,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText usernameInput, passwordInput;
     private AuthViewModel viewModel;
-    private ProgressBar progress;
+    private TextView errorText;
 
 
     @Override
@@ -28,8 +29,7 @@ public class LoginActivity extends AppCompatActivity {
         passwordInput = findViewById(R.id.passwordInput);
         Button loginBtn = findViewById(R.id.loginButton);
         Button registerBtn = findViewById(R.id.registerText);
-        ProgressBar progress = findViewById(R.id.loginProgressBar);
-
+        errorText = findViewById(R.id.errorTextView);
 
         viewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
@@ -50,10 +50,13 @@ public class LoginActivity extends AppCompatActivity {
 
         viewModel.getError().observe(this, err -> {
             if (err != null) {
-                // כרגע אפשר רק להדפיס או Toast, ואת יכולה ללטש אחר כך
-                // Toast.makeText(this, err, Toast.LENGTH_SHORT).show();
+                errorText.setText(err);
+                errorText.setVisibility(View.VISIBLE);
+            } else {
+                errorText.setVisibility(View.GONE);
             }
         });
+
 
         viewModel.getUserType().observe(this, type -> {
             if (type == null) return;

@@ -2,9 +2,11 @@ package com.example.jamming.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +18,7 @@ import com.example.jamming.viewmodel.AuthViewModel;
 public class RegisterActivity extends AppCompatActivity {
     private EditText fullName, password, confirmPassword, email, userName;
     private RadioButton owner;
+    private TextView errorText;
 
     private AuthViewModel viewModel;
 
@@ -30,6 +33,7 @@ public class RegisterActivity extends AppCompatActivity {
         email = findViewById(R.id.etEmail);
         owner = findViewById(R.id.rbOwner);
         userName = findViewById(R.id.usName);
+        errorText = findViewById(R.id.errorText);
 
         Button register = findViewById(R.id.btnRegister);
         Button backLogin = findViewById(R.id.btnAlreadyHaveAccount);
@@ -52,19 +56,17 @@ public class RegisterActivity extends AppCompatActivity {
         String uName = userName.getText().toString().trim();
         String type = owner.isChecked() ? "owner" : "user";
 
-        if (!pass.equals(confPass)) {
-            // תוסיפי טיפוס או Toast אם תרצי
-            return;
-        }
-
-        viewModel.register(fName, emailTxt, pass, uName, type);
+        viewModel.register(fName, emailTxt, pass, confPass, uName, type);
     }
 
     private void observeViewModel() {
 
         viewModel.getError().observe(this, err -> {
             if (err != null) {
-                 Toast.makeText(this, err, Toast.LENGTH_SHORT).show();
+                errorText.setText(err);
+                errorText.setVisibility(View.VISIBLE);
+            } else {
+                errorText.setVisibility(View.GONE);
             }
         });
 
