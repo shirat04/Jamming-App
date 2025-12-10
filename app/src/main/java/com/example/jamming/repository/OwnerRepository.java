@@ -1,4 +1,4 @@
-package com.example.jamming.Repository;
+package com.example.jamming.repository;
 
 import com.example.jamming.model.Owner;
 import com.google.android.gms.tasks.Task;

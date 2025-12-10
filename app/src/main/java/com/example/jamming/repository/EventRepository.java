@@ -1,4 +1,4 @@
-package com.example.jamming.Repository;
+package com.example.jamming.repository;
 import com.example.jamming.model.Event;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;

@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.jamming.Repository.AuthRepository;
+import com.example.jamming.repository.AuthRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +25,7 @@ public class AuthViewModel extends ViewModel {
 
         if (identifier.contains("@")) {
             // אימייל
-            repo.loginWithEmail(identifier, password)
+            repo.login(identifier, password)
                     .addOnSuccessListener(auth -> checkUserType(repo.getCurrentUid()))
                     .addOnFailureListener(e -> error.setValue(e.getMessage()));
         } else {
@@ -39,7 +39,7 @@ public class AuthViewModel extends ViewModel {
 
                         String email = query.getDocuments().get(0).getString("email");
 
-                        repo.loginWithEmail(email, password)
+                        repo.login(email, password)
                                 .addOnSuccessListener(auth -> checkUserType(repo.getCurrentUid()))
                                 .addOnFailureListener(e -> error.setValue(e.getMessage()));
 
@@ -88,7 +88,7 @@ public class AuthViewModel extends ViewModel {
 
     private void checkUserType(String uid) {
 
-        repo.getUserProfile(uid)
+        repo.getUserUId(uid)
                 .addOnSuccessListener(doc -> {
 
                     if (!doc.exists()) {

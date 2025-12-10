@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
@@ -14,6 +16,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText usernameInput, passwordInput;
     private AuthViewModel viewModel;
+    private ProgressBar progress;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +28,8 @@ public class LoginActivity extends AppCompatActivity {
         passwordInput = findViewById(R.id.passwordInput);
         Button loginBtn = findViewById(R.id.loginButton);
         Button registerBtn = findViewById(R.id.registerText);
+        ProgressBar progress = findViewById(R.id.loginProgressBar);
+
 
         viewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
@@ -57,6 +63,7 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 startActivity(new Intent(this, ExploreEventsActivity.class));
             }
+
             finish();
         });
     }

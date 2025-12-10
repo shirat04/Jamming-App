@@ -1,4 +1,4 @@
-package com.example.jamming.Repository;
+package com.example.jamming.repository;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -15,7 +15,7 @@ public class AuthRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     // Login with email
-    public Task<AuthResult> loginWithEmail(String email, String pass) {
+    public Task<AuthResult> login(String email, String pass) {
         return auth.signInWithEmailAndPassword(email, pass);
     }
 
@@ -38,7 +38,7 @@ public class AuthRepository {
     }
 
     // Get profile from Firestore
-    public Task<DocumentSnapshot> getUserProfile(String uid) {
+    public Task<DocumentSnapshot> getUserUId(String uid) {
         return db.collection("users").document(uid).get();
     }
 

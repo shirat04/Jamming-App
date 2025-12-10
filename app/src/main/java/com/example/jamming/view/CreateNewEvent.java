@@ -13,10 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.model.Owner;
-import com.example.jamming.Repository.EventRepository;
-import com.example.jamming.Repository.UserRepository;
+import com.example.jamming.repository.EventRepository;
+import com.example.jamming.repository.UserRepository;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
