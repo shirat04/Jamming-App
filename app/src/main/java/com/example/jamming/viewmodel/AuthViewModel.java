@@ -60,6 +60,10 @@ public class AuthViewModel extends ViewModel {
             error.setValue("הסיסמא צריכה להיות בת שישה תווים לפחות");
             return;
         }
+        if (!email.contains("@")) {
+            error.setValue("נא להזין כתובת מייל חוקית");
+            return;
+        }
         repo.isUsernameTaken(userName)
                 .addOnSuccessListener(query -> {
 
