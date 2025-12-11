@@ -1,5 +1,6 @@
 package com.example.jamming.view;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -35,6 +36,7 @@ public class OwnerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_owner);
+        TextView greeting = findViewById(R.id.ownerGreeting);
 
         createEventButton = findViewById(R.id.createEventButton);
         createEventButton.setOnClickListener(v -> {
@@ -44,6 +46,7 @@ public class OwnerActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+        loadOwnerName();
         eventsContainer = findViewById(R.id.eventsContainer);
 
     }
@@ -53,6 +56,28 @@ public class OwnerActivity extends AppCompatActivity {
         super.onResume();
         loadOwnerEvents();
     }
+
+    @SuppressLint("SetTextI18n")
+    private void loadOwnerName() {
+        if (auth.getCurrentUser() == null) return;
+
+        String uid = auth.getCurrentUser().getUid();
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        TextView greeting = findViewById(R.id.ownerGreeting);
+
+        db.collection("users").document(uid).get()
+                .addOnSuccessListener(document -> {
+                    if (document.exists()) {
+                        String name = document.getString("fullName"); // או "username" לפי מה ששמרת
+                        greeting.setText("Hello " + name);
+                    } else {
+                        greeting.setText("Hello Owner");
+                    }
+                })
+                .addOnFailureListener(e -> greeting.setText("Hello Owner"));
+    }
+
 
     private void loadOwnerEvents() {
         if (auth.getCurrentUser() == null) {
