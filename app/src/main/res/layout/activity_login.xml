@@ -37,7 +37,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/loginTitle"
-        tools:ignore="Autofill,TextContrastCheck" />
+        tools:ignore="Autofill,TextContrastCheck,VisualLintTextFieldSize" />
 
     <!-- Password Field -->
     <EditText
@@ -90,25 +90,26 @@
         android:id="@+id/registerText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:padding="10dp"
         android:text="@string/not_registered_create_an_account"
         android:textColor="#0B375E"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:padding="10dp"
-        app:layout_constraintTop_toBottomOf="@id/loginButton"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/loginButton"
+        tools:ignore="TextContrastCheck" />
 
     <TextView
         android:id="@+id/errorTextView"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:textAlignment="center"
-        android:textColor="#4818C1"
+        android:textColor="#7f0532"
         android:textSize="18sp"
-        android:visibility="gone"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passwordInput" />
