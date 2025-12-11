@@ -5,8 +5,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.jamming.repository.AuthRepository;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,9 +49,7 @@ public class AuthViewModel extends ViewModel {
 
                         repo.login(email, password)
                                 .addOnSuccessListener(auth -> checkUserType(repo.getCurrentUid()))
-                                .addOnFailureListener(e -> {
-                                    error.setValue("שם משתמש או סיסמה אינם נכונים");
-                                });
+                                .addOnFailureListener(e -> error.setValue("שם משתמש או סיסמה אינם נכונים"));
                     })
                     .addOnFailureListener(e -> error.setValue(e.getMessage()));
         }
