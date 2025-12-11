@@ -1,33 +1,33 @@
 package com.example.jamming.view;
 
-
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
+import android.util.Log;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.repository.UserRepository;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 
 public class ExploreEventsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -37,13 +37,18 @@ public class ExploreEventsActivity extends AppCompatActivity implements OnMapRea
     private FusedLocationProviderClient fusedLocationClient;
     private TextView title;
 
+    private TextView radiusLabel;          // תצוגת רדיוס
+    private int eventRadiusKm = 10;        // רדיוס התחלתי בק״מ
+    private Location lastKnownLocation;    // נשמור את מיקום המשתמש האחרון
+    private FirebaseFirestore db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_explore_events);
 
-        // Hello <username>
+        // --- כותרת Hello <username> ---
         title = findViewById(R.id.exploreTitle);
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -54,7 +59,10 @@ public class ExploreEventsActivity extends AppCompatActivity implements OnMapRea
                     title.setText("Hello " + name);
                 });
 
+
+        // --- מיקום + מפה + Firestore ---
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        db = FirebaseFirestore.getInstance();
 
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapFragment);
@@ -63,11 +71,50 @@ public class ExploreEventsActivity extends AppCompatActivity implements OnMapRea
         }
     }
 
+    // ודא שאת מייבאת את Activity היעד בתחילת הקובץ:
+// import com.example.jamming.view.EventDetailActivity;
+
+    private void handleMarkerClick(Marker marker) {
+
+        // 1. קוראים את ה-ID מתוך תגית המרקר
+        Object tag = marker.getTag();
+        if (tag == null || !(tag instanceof String)) {
+            // המרקר הזה לא מכיל ID של אירוע (אולי זה מרקר "You are here")
+            return;
+        }
+
+        String eventId = (String) tag;
+
+        // 2. יוצרים Intent למסך פרטי האירוע
+        Intent intent = new Intent(this, eventDetailActivity.class);
+
+        // 3. **חובה:** מעבירים את מזהה האירוע למסך הבא
+        // המסך הבא ישתמש ב-ID זה כדי לטעון את פרטי האירוע מ-Firestore
+        intent.putExtra("EVENT_ID", eventId);
+
+        // 4. מבצעים את המעבר
+        startActivity(intent);
+    }
+
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
-        enableMyLocation();   // גם מרכז על המשתמש וגם קורא לטעינת אירועים
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        enableMyLocation();   // גם מרכז על המשתמש וגם טוען אירועים
+        // **הוספת המאזין ללחיצות על מרקרים**
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(@NonNull Marker marker) {
+
+                // נקרא לשלב הבא
+                handleMarkerClick(marker);
+
+                // מחזירים false כדי שהמפה תבצע גם את פעולת ברירת המחדל (הצגת חלון מידע)
+                return false;
+            }
+        });
     }
+
 
     private void enableMyLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -88,13 +135,30 @@ public class ExploreEventsActivity extends AppCompatActivity implements OnMapRea
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(location -> {
                     if (location != null) {
+                        lastKnownLocation = location;
                         moveCameraToLocation(location);
-                        loadEventsMarkers(location);   // ← כאן אנחנו מוסיפים את האירועים
+                        loadEventsMarkers(location);
                     } else {
-                        // אם אין מיקום – עדיין נטען אירועים למפה
+                        // אם אין מיקום – עדיין נטען אירועים (ללא סינון רדיוס)
                         loadEventsMarkers(null);
                     }
                 });
+    }
+
+    private void updateRadiusAndReload() {
+        radiusLabel.setText(eventRadiusKm + " km");
+
+        if (mMap == null) return;
+
+        mMap.clear(); // מוחקים מרקרים ישנים
+
+        if (lastKnownLocation != null) {
+            // נוסיף שוב \"You are here\" וניטען אירועים ברדיוס החדש
+            moveCameraToLocation(lastKnownLocation);
+            loadEventsMarkers(lastKnownLocation);
+        } else {
+            loadEventsMarkers(null);
+        }
     }
 
     private void moveCameraToLocation(Location location) {
@@ -115,25 +179,33 @@ public class ExploreEventsActivity extends AppCompatActivity implements OnMapRea
         }
     }
 
-    // ⚪️ טעינת אירועים מפיירסטור והצגת מרקרים
+    // --- טעינת אירועים כפונקציה של רדיוס ---
     private void loadEventsMarkers(Location userLocation) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         db.collection("events")
                 .get()
                 .addOnSuccessListener(query -> {
                     for (DocumentSnapshot doc : query) {
                         Event event = doc.toObject(Event.class);
-                        if (event == null) continue;
-                        if (!event.isActive()) continue;
+                        if (event == null) {
+                            Log.e("EVENTS_LOADER", "Failed to convert document to Event object.");
+                            continue;
+                        }
+
+
+                        if (!event.isActive()) {
+                            Log.d("EVENTS_LOADER", "Skipping inactive event: " + event.getName());
+                            continue;
+                        }
 
                         double lat = event.getLatitude();
                         double lng = event.getLongitude();
 
-                        // אם אין קואורדינטות – מדלגים
-                        if (lat == 0 && lng == 0) continue;
+                        if (lat == 0 && lng == 0){
+                            Log.w("EVENTS_LOADER", "Skipping event with 0,0 coordinates: " + event.getName());
+                            continue;
+                        }
 
-                        // אופציונלי: סינון לפי רדיוס מהמיקום של המשתמש (למשל 10 ק"מ)
+                        // סינון לפי רדיוס דינמי
                         if (userLocation != null) {
                             float[] results = new float[1];
                             Location.distanceBetween(
@@ -142,15 +214,21 @@ public class ExploreEventsActivity extends AppCompatActivity implements OnMapRea
                                     results
                             );
                             float distanceMeters = results[0];
-                            if (distanceMeters > 10000) { // 10km
-                                continue;
-                            }
+
                         }
 
+
                         LatLng pos = new LatLng(lat, lng);
-                        mMap.addMarker(new MarkerOptions()
+
+                        // 2. שומרים את המרקר שנוצר במשתנה Marker
+                        Marker marker = mMap.addMarker(new MarkerOptions()
                                 .position(pos)
                                 .title(event.getName()));
+                        String eventId = doc.getId();
+                        // 3. משתמשים במשתנה זה כדי להוסיף את מזהה האירוע
+                        if (marker != null) {
+                            marker.setTag(eventId);
+                        }
                     }
                 });
     }
