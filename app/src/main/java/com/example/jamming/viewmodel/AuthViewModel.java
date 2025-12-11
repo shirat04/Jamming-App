@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.jamming.repository.AuthRepository;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +24,18 @@ public class AuthViewModel extends ViewModel {
             // אימייל
             repo.login(identifier, password)
                     .addOnSuccessListener(auth -> checkUserType(repo.getCurrentUid()))
-                    .addOnFailureListener(e -> error.setValue(e.getMessage()));
+                    .addOnFailureListener(e -> {
+
+                        String msg = e.getMessage();
+
+                        if (msg != null && msg.contains("credential") ) {
+                            error.setValue("שם משתמש או סיסמה אינם נכונים");
+                        } else {
+                            error.setValue("שגיאה בהתחברות, נסה שוב");
+                        }
+                    });
+
+
         } else {
             repo.getUserByUsername(identifier)
                     .addOnSuccessListener(query -> {
@@ -39,8 +49,7 @@ public class AuthViewModel extends ViewModel {
 
                         repo.login(email, password)
                                 .addOnSuccessListener(auth -> checkUserType(repo.getCurrentUid()))
-                                .addOnFailureListener(e -> error.setValue(e.getMessage()));
-
+                                .addOnFailureListener(e -> error.setValue("שם משתמש או סיסמה אינם נכונים"));
                     })
                     .addOnFailureListener(e -> error.setValue(e.getMessage()));
         }
@@ -58,6 +67,10 @@ public class AuthViewModel extends ViewModel {
         }
         if(pass.length()<6){
             error.setValue("הסיסמא צריכה להיות בת שישה תווים לפחות");
+            return;
+        }
+        if (!email.contains("@")) {
+            error.setValue("נא להזין כתובת מייל חוקית");
             return;
         }
         repo.isUsernameTaken(userName)
