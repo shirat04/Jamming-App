@@ -84,7 +84,7 @@
                 android:focusable="false"
                 android:clickable="true"
                 android:inputType="none"
-                tools:ignore="Autofill,TextFields,VisualLintTextFieldSize" />
+                tools:ignore="Autofill,KeyboardInaccessibleWidget,TextFields,VisualLintTextFieldSize" />
 
             <!-- שדה: שעה -->
             <EditText
@@ -97,7 +97,7 @@
                 android:focusable="false"
                 android:clickable="true"
                 android:inputType="none"
-                tools:ignore="Autofill,TextFields,VisualLintTextFieldSize" />
+                tools:ignore="Autofill,KeyboardInaccessibleWidget,TextFields,VisualLintTextFieldSize" />
             <!-- בחירת ז'אנר -->
             <EditText
                 android:id="@+id/genreSpinner"
@@ -130,13 +130,25 @@
             <EditText
                 android:id="@+id/eventDescriptionInput"
                 android:layout_width="match_parent"
-                android:layout_height="88dp"
+                android:layout_height="69dp"
                 android:layout_marginBottom="20dp"
                 android:gravity="top"
                 android:hint="@string/event_description"
                 android:inputType="textMultiLine"
                 android:padding="12dp"
                 tools:ignore="Autofill,TextContrastCheck,VisualLintTextFieldSize" />
+
+            <TextView
+                android:id="@+id/errorMessageBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:padding="12dp"
+                android:textColor="#7f0532"
+                android:textSize="14sp"
+                android:visibility="gone"
+                android:textAlignment="center"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/publishEventBtn"
