@@ -80,7 +80,7 @@ public class User {
 
     // Setters - חובה ל-Firebase
     public void setFirebaseId(String id) {
-        this.firebaseId = firebaseId;
+        this.firebaseId = id;
     }
 
     public void setFullName(String fullName) {

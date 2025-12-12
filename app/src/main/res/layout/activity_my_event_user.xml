@@ -77,10 +77,11 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="16dp"
-        app:layout_constraintTop_toBottomOf="@id/myEventsSubtitle"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/myEventsSubtitle"
+        app:layout_constraintVertical_bias="1.0">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -114,8 +115,8 @@
                         android:id="@+id/myEventLocation1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/sample_event_location"
-                        android:layout_marginTop="4dp" />
+                        android:layout_marginTop="4dp"
+                        android:text="@string/sample_event_location" />
 
                     <TextView
                         android:id="@+id/myEventDate1"
@@ -127,34 +128,34 @@
                         android:id="@+id/myEventStatus1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
                         android:text="@string/registered"
-                        android:textStyle="bold"
                         android:textColor="#2E7D32"
-                        android:layout_marginTop="6dp" />
+                        android:textStyle="bold" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="#DDDDDD"
-                        android:layout_marginVertical="8dp" />
+                        android:layout_marginVertical="8dp"
+                        android:background="#DDDDDD" />
 
                     <LinearLayout
                         style="?android:attr/buttonBarStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:orientation="horizontal">
 
                         <Button
                             android:id="@+id/btnMyEventDetails1"
                             style="?android:attr/buttonBarButtonStyle"
                             android:layout_width="0dp"
                             android:layout_height="48dp"
+                            android:layout_margin="4dp"
                             android:layout_weight="1"
+                            android:backgroundTint="#1E63E9"
                             android:text="@string/view_details"
                             android:textColor="@android:color/white"
-                            android:backgroundTint="#1E63E9"
-                            android:layout_margin="4dp"
                             tools:ignore="VisualLintButtonSize" />
 
                         <Button
