@@ -67,7 +67,7 @@
                 android:layout_marginTop="16dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/locationTextView"  android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/_123_main_st"
                     android:textSize="16sp"/>
@@ -83,7 +83,7 @@
                 android:layout_marginTop="10dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/dateTextView"  android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/_15_01_2024_19_00"
                     android:textSize="16sp"/>
@@ -100,6 +100,15 @@
                 android:textSize="16sp"
                 android:layout_marginTop="14dp"
                 android:textColor="#333333"/>
+
+            <TextView
+                android:id="@+id/descriptionEvent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/sample_event_description"
+                android:textSize="15sp"
+                android:textColor="#333333" />
 
             <!-- כפתור הרשמה -->
             <Button
