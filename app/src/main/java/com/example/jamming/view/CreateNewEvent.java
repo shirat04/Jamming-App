@@ -29,7 +29,7 @@ public class CreateNewEvent extends AppCompatActivity {
     private EditText eventNameInput, genreInput, capacityInput, descriptionInput, dateInput, timeInput;
 
     private Button publishBtn;
-    private TextView cancelBtn, errorMessage;
+    private TextView cancelBtn;
 
 
     private Calendar selectedDateTime = Calendar.getInstance();
@@ -60,8 +60,6 @@ public class CreateNewEvent extends AppCompatActivity {
         timeInput = findViewById(R.id.timeInput);
         publishBtn = findViewById(R.id.publishEventBtn);
         cancelBtn = findViewById(R.id.cancelBtn);
-        errorMessage = findViewById(R.id.errorMessageBox);
-
     }
 
     private void setupListeners() {
@@ -83,10 +81,13 @@ public class CreateNewEvent extends AppCompatActivity {
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             dateInput.setText(sdf.format(selectedDateTime.getTime()));
+            dateInput.setError(null);
         }, year, month, day);
 
         dialog.getDatePicker().setMinDate(System.currentTimeMillis());
         dialog.show();
+
+
     }
 
     private void showTimePicker() {
@@ -99,14 +100,13 @@ public class CreateNewEvent extends AppCompatActivity {
 
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
             timeInput.setText(sdf.format(selectedDateTime.getTime()));
+            timeInput.setError(null);
         }, hour, minute, true);
 
         dialog.show();
     }
 
     private void publishEvent() {
-        errorMessage.setVisibility(View.GONE);
-        errorMessage.setText("");
 
         String name = eventNameInput.getText().toString().trim();
         String genreStr = genreInput.getText().toString().trim();
@@ -164,51 +164,45 @@ public class CreateNewEvent extends AppCompatActivity {
     }
 
     private boolean validateInputs(String name, String genre, String capacity) {
-        errorMessage.setVisibility(View.GONE);
-        errorMessage.setText("");
 
         if (name.isEmpty()) {
-            errorMessage.setText("נא להזין שם אירוע");
-            errorMessage.setVisibility(View.VISIBLE);
+            eventNameInput.setError("נא להזין שם אירוע");
+            capacityInput.requestFocus();
             return false;
         }
         if (dateInput.getText().toString().isEmpty()) {
-            errorMessage.setText("נא להזין את תאריך האירוע");
-            errorMessage.setVisibility(View.VISIBLE);
+            dateInput.setError("נא להזין את תאריך האירוע");
+            capacityInput.requestFocus();
             return false;
         }
         if( timeInput.getText().toString().isEmpty()){
-            errorMessage.setText("נא להזין את שעת האירוע");
-            errorMessage.setVisibility(View.VISIBLE);
+            timeInput.setError("נא להזין את שעת האירוע");
+            capacityInput.requestFocus();
             return false;
         }
 
         if (genre.isEmpty()) {
-            errorMessage.setText("נא להזין ז'אנר");
-            errorMessage.setVisibility(View.VISIBLE);
             genreInput.setError("נא להזין ז'אנר");
+            capacityInput.requestFocus();
             return false;
         }
 
         if (capacity.isEmpty()) {
-            errorMessage.setText("נא להזין מספר מקומות");
-            errorMessage.setVisibility(View.VISIBLE);
             capacityInput.setError("נא להזין מספר מקומות");
+            capacityInput.requestFocus();
             return false;
         }
 
         try {
             int cap = Integer.parseInt(capacity);
             if (cap <= 0) {
-                errorMessage.setText("מספר המקומות חייב להיות חיובי");
-                errorMessage.setVisibility(View.VISIBLE);
                 capacityInput.setError("מספר המקומות חייב להיות חיובי");
+                capacityInput.requestFocus();
                 return false;
             }
         } catch (Exception e) {
-            errorMessage.setText("נא להזין מספר תקין");
-            errorMessage.setVisibility(View.VISIBLE);
             capacityInput.setError("נא להזין מספר תקין");
+            capacityInput.requestFocus();
             return false;
         }
 
