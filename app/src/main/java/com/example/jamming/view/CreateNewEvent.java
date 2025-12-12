@@ -167,23 +167,23 @@ public class CreateNewEvent extends AppCompatActivity {
 
         if (name.isEmpty()) {
             eventNameInput.setError("נא להזין שם אירוע");
-            capacityInput.requestFocus();
+            eventNameInput.requestFocus();
             return false;
         }
         if (dateInput.getText().toString().isEmpty()) {
             dateInput.setError("נא להזין את תאריך האירוע");
-            capacityInput.requestFocus();
+            dateInput.requestFocus();
             return false;
         }
         if( timeInput.getText().toString().isEmpty()){
             timeInput.setError("נא להזין את שעת האירוע");
-            capacityInput.requestFocus();
+            timeInput.requestFocus();
             return false;
         }
 
         if (genre.isEmpty()) {
             genreInput.setError("נא להזין ז'אנר");
-            capacityInput.requestFocus();
+            genreInput.requestFocus();
             return false;
         }
 
