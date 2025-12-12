@@ -150,7 +150,10 @@ public class EditEventActivity extends AppCompatActivity {
         updatedEvent.put("address", location);
         updatedEvent.put("maxCapacity", Integer.parseInt(capacityStr));
         updatedEvent.put("dateTime", selectedDateTime.getTimeInMillis());
-        updatedEvent.put("musicTypes", genreMusic);
+        List<String> genres =
+                List.of(genreMusic.split("\\s*,\\s*"));
+        updatedEvent.put("musicTypes", genres);
+
 
         db.collection("events").document(eventId).update(updatedEvent)
                 .addOnSuccessListener(aVoid -> {
