@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class EditEventActivity extends AppCompatActivity {
     private String eventId;
     private FirebaseFirestore db;
 
-    private EditText etEventTitle, etEventDescription, etEventLocation, etEventDate, etEventTime, etEventCapacity;
+    private EditText etEventTitle, etEventDescription, etEventLocation, etEventDate, etEventGenre, etEventTime, etEventCapacity;
     private Button btnSaveEvent, btnDeleteEvent;
 
     private Calendar selectedDateTime = Calendar.getInstance();
@@ -48,6 +49,7 @@ public class EditEventActivity extends AppCompatActivity {
         }
 
         setupListeners();
+
     }
 
     private void initViews() {
@@ -59,6 +61,7 @@ public class EditEventActivity extends AppCompatActivity {
         etEventCapacity = findViewById(R.id.etEventCapacity);
         btnSaveEvent = findViewById(R.id.btnSaveEvent);
         btnDeleteEvent = findViewById(R.id.btnDeleteEvent);
+        etEventGenre = findViewById(R.id.editMusicgenre);
     }
 
     private void setupListeners() {
@@ -79,6 +82,13 @@ public class EditEventActivity extends AppCompatActivity {
                             etEventDescription.setText(event.getDescription());
                             etEventLocation.setText(event.getAddress()); // Assuming location is address
                             etEventCapacity.setText(String.valueOf(event.getMaxCapacity()));
+                            List<String> genres = event.getMusicTypes();
+
+                            if (genres != null && !genres.isEmpty()) {
+                                etEventGenre.setText(String.join(", ", genres));
+                            } else {
+                                etEventGenre.setText("");
+                            }
 
                             selectedDateTime.setTimeInMillis(event.getDateTime());
                             SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -127,8 +137,9 @@ public class EditEventActivity extends AppCompatActivity {
         String description = etEventDescription.getText().toString().trim();
         String location = etEventLocation.getText().toString().trim();
         String capacityStr = etEventCapacity.getText().toString().trim();
+        String genreMusic = etEventGenre.getText().toString().trim();
 
-        if (title.isEmpty() || description.isEmpty() || location.isEmpty() || capacityStr.isEmpty()) {
+        if (title.isEmpty() || description.isEmpty() || location.isEmpty() || capacityStr.isEmpty() || genreMusic.isEmpty()) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -138,7 +149,8 @@ public class EditEventActivity extends AppCompatActivity {
         updatedEvent.put("description", description);
         updatedEvent.put("address", location);
         updatedEvent.put("maxCapacity", Integer.parseInt(capacityStr));
-        updatedEvent.put("date", selectedDateTime.getTimeInMillis());
+        updatedEvent.put("dateTime", selectedDateTime.getTimeInMillis());
+        updatedEvent.put("musicTypes", genreMusic);
 
         db.collection("events").document(eventId).update(updatedEvent)
                 .addOnSuccessListener(aVoid -> {

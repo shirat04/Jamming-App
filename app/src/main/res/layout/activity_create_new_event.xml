@@ -79,11 +79,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginBottom="12dp"
-                android:clickable="true"
-                android:focusable="true"
                 android:hint="@string/date"
-                android:inputType="datetime"
                 android:padding="12dp"
+                android:focusable="false"
+                android:clickable="true"
+                android:inputType="none"
                 tools:ignore="Autofill,TextFields,VisualLintTextFieldSize" />
 
             <!-- שדה: שעה -->
@@ -92,12 +92,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginBottom="12dp"
-                android:clickable="true"
-                android:focusable="true"
                 android:hint="@string/time"
                 android:padding="12dp"
+                android:focusable="false"
+                android:clickable="true"
+                android:inputType="none"
                 tools:ignore="Autofill,TextFields,VisualLintTextFieldSize" />
-
             <!-- בחירת ז'אנר -->
             <EditText
                 android:id="@+id/genreSpinner"

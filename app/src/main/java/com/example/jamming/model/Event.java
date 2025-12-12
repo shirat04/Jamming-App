@@ -20,6 +20,7 @@ public class Event {
     private double latitude;
     private double longitude;
 
+
     public Event() {
         this.musicTypes = new ArrayList<>();
     }
