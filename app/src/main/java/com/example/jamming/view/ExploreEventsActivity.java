@@ -6,6 +6,9 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -36,6 +39,7 @@ public class ExploreEventsActivity extends AppCompatActivity implements OnMapRea
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     private TextView title;
+    private ImageButton btnMenu;
 
     private TextView radiusLabel;          // תצוגת רדיוס
     private int eventRadiusKm = 10;        // רדיוס התחלתי בק״מ
@@ -47,6 +51,30 @@ public class ExploreEventsActivity extends AppCompatActivity implements OnMapRea
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_explore_events);
+        btnMenu = findViewById(R.id.btnMore);
+
+        btnMenu.setOnClickListener(view -> {
+        PopupMenu popupMenu = new PopupMenu(this, view, Gravity.START);
+            popupMenu.getMenuInflater().inflate(R.menu.user_menu, popupMenu.getMenu());
+
+            popupMenu.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+
+                if (id == R.id.menu_preferences) {
+                    startActivity(new Intent(this, profilePreferencesActivity.class));
+                    return true;
+
+                } else if (id == R.id.menu_notifications) {
+                    startActivity(new Intent(this, NotificationsUserActivity.class));
+                    return true;
+
+                }
+
+                return false;
+            });
+
+            popupMenu.show();
+        });
 
         // --- כותרת Hello <username> ---
         title = findViewById(R.id.exploreTitle);
