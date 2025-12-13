@@ -41,40 +41,8 @@ public class OwnerActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_owner);
         TextView greeting = findViewById(R.id.ownerGreeting);
-
         DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
         ImageButton btnMenu = findViewById(R.id.btnMore);
-
-        btnMenu.setOnClickListener(v -> {
-            drawerLayout.openDrawer(GravityCompat.START);
-        });
-
-        NavigationView navigationView = findViewById(R.id.navigationView);
-
-        navigationView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-
-            if (id == R.id.menu_owner_dashboard) {
-
-            }
-            else if (id == R.id.menu_notifications) {
-                startActivity(new Intent(this, NotificationsUserActivity.class));
-            }
-            else if (id == R.id.menu_logout) {
-                FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(this, LoginActivity.class));
-                finish();
-            }
-
-            drawerLayout.closeDrawer(GravityCompat.START);
-            return true;
-        });
-
-        createEventButton = findViewById(R.id.createEventButton);
-        createEventButton.setOnClickListener(v -> {
-            Intent intent = new Intent(OwnerActivity.this, CreateNewEvent.class);
-            startActivity(intent);
-        });
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
