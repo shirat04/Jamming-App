@@ -21,6 +21,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <ImageButton
+            android:id="@+id/btnMore"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/outline_menu_24"
+            android:contentDescription="@string/menu"
+            app:tint="@android:color/white" />
+        <Space
+            android:layout_width="12dp"
+            android:layout_height="wrap_content" />
+
         <TextView
             android:id="@+id/userNotificationsTitle"
             android:layout_width="0dp"
@@ -30,16 +42,6 @@
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
-
-        <ImageButton
-            android:id="@+id/btnProfileFromNotifications"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/profile"
-            app:srcCompat="@drawable/baseline_person"
-            app:tint="@android:color/white"
-            tools:ignore="TouchTargetSizeCheck" />
 
     </LinearLayout>
 

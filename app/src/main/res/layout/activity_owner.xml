@@ -21,6 +21,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- ☰ תפריט -->
+        <ImageButton
+            android:id="@+id/btnMore"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/outline_menu_24"
+            android:contentDescription="@string/menu"
+            app:tint="@android:color/white" />
+
+        <!-- רווח -->
+        <Space
+            android:layout_width="12dp"
+            android:layout_height="wrap_content" />
+        <!-- Profile Icon -->
+        <ImageButton
+            android:id="@+id/btnOwnerProfile"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@android:color/transparent"
+            android:tint="@android:color/white"
+            app:srcCompat="@drawable/baseline_person"
+            tools:ignore="ContentDescription,SpeakableTextPresentCheck,UseAppTint,TouchTargetSizeCheck" />
+
         <!-- Greeting -->
         <TextView
             android:id="@+id/ownerGreeting"
@@ -32,15 +56,6 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <!-- Profile Icon -->
-        <ImageButton
-            android:id="@+id/btnOwnerProfile"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@android:color/transparent"
-            android:tint="@android:color/white"
-            app:srcCompat="@drawable/baseline_person"
-            tools:ignore="ContentDescription,SpeakableTextPresentCheck,UseAppTint,TouchTargetSizeCheck" />
 
         <Space
             android:layout_width="12dp"
