@@ -122,15 +122,10 @@
                 android:padding="12dp"
                 tools:ignore="Autofill,TextContrastCheck,VisualLintTextFieldSize" />
 
-            <!-- תיאור אירוע -->
-
-
-            <!-- כפתור פרסום -->
-
             <EditText
                 android:id="@+id/eventDescriptionInput"
                 android:layout_width="match_parent"
-                android:layout_height="69dp"
+                android:layout_height="150dp"
                 android:layout_marginBottom="20dp"
                 android:gravity="top"
                 android:hint="@string/event_description"
@@ -138,6 +133,7 @@
                 android:padding="12dp"
                 tools:ignore="Autofill,TextContrastCheck,VisualLintTextFieldSize" />
 
+            <!-- כפתור ביטול -->
             <Button
                 android:id="@+id/publishEventBtn"
                 android:layout_width="match_parent"
@@ -148,7 +144,6 @@
                 android:textSize="18sp"
                 tools:ignore="VisualLintButtonSize" />
 
-            <!-- כפתור ביטול -->
             <TextView
                 android:id="@+id/cancelBtn"
                 android:layout_width="wrap_content"
