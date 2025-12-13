@@ -55,10 +55,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                 if (id == R.id.menu_owner_dashboard) {
                     startActivity(new Intent(this, OwnerActivity.class));
                     return true;
-                }
-                if (id == R.id.menu_my_event) {
-                    startActivity(new Intent(this, CreateNewEvent.class));
-                    return true;
+
+
                 }
             }
 
