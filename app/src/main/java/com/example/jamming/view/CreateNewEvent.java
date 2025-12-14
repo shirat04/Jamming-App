@@ -3,6 +3,7 @@ package com.example.jamming.view;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -25,14 +26,11 @@ import java.util.Locale;
 
 public class CreateNewEvent extends AppCompatActivity {
 
-    private EditText eventNameInput;
-    private EditText genreInput;
-    private EditText capacityInput;
-    private EditText descriptionInput;
-    private EditText dateInput;
-    private EditText timeInput;
+    private EditText eventNameInput, genreInput, capacityInput, descriptionInput, dateInput, timeInput;
+
     private Button publishBtn;
     private TextView cancelBtn;
+
 
     private Calendar selectedDateTime = Calendar.getInstance();
 
@@ -83,10 +81,13 @@ public class CreateNewEvent extends AppCompatActivity {
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             dateInput.setText(sdf.format(selectedDateTime.getTime()));
+            dateInput.setError(null);
         }, year, month, day);
 
         dialog.getDatePicker().setMinDate(System.currentTimeMillis());
         dialog.show();
+
+
     }
 
     private void showTimePicker() {
@@ -99,6 +100,7 @@ public class CreateNewEvent extends AppCompatActivity {
 
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
             timeInput.setText(sdf.format(selectedDateTime.getTime()));
+            timeInput.setError(null);
         }, hour, minute, true);
 
         dialog.show();
@@ -162,35 +164,45 @@ public class CreateNewEvent extends AppCompatActivity {
     }
 
     private boolean validateInputs(String name, String genre, String capacity) {
+
         if (name.isEmpty()) {
             eventNameInput.setError("נא להזין שם אירוע");
+            eventNameInput.requestFocus();
+            return false;
+        }
+        if (dateInput.getText().toString().isEmpty()) {
+            dateInput.setError("נא להזין את תאריך האירוע");
+            dateInput.requestFocus();
+            return false;
+        }
+        if( timeInput.getText().toString().isEmpty()){
+            timeInput.setError("נא להזין את שעת האירוע");
+            timeInput.requestFocus();
             return false;
         }
 
         if (genre.isEmpty()) {
             genreInput.setError("נא להזין ז'אנר");
+            genreInput.requestFocus();
             return false;
         }
 
         if (capacity.isEmpty()) {
-            capacityInput.setError("נא להזין קיבולת");
+            capacityInput.setError("נא להזין מספר מקומות");
+            capacityInput.requestFocus();
             return false;
         }
 
         try {
             int cap = Integer.parseInt(capacity);
             if (cap <= 0) {
-                capacityInput.setError("מספר חייב להיות חיובי");
+                capacityInput.setError("מספר המקומות חייב להיות חיובי");
+                capacityInput.requestFocus();
                 return false;
             }
         } catch (Exception e) {
             capacityInput.setError("נא להזין מספר תקין");
-            return false;
-        }
-
-        if (dateInput.getText().toString().isEmpty() ||
-                timeInput.getText().toString().isEmpty()) {
-            Toast.makeText(this, "נא לבחור תאריך ושעה", Toast.LENGTH_SHORT).show();
+            capacityInput.requestFocus();
             return false;
         }
 

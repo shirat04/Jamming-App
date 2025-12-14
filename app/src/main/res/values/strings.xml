@@ -160,6 +160,7 @@
     <string name="_50">50</string>
     <string name="save_changes">Save Changes</string>
     <string name="delete_event">Delete Event</string>
+    <string name="menu">menu</string>
 
 
 </resources>

@@ -1,9 +1,11 @@
 package com.example.jamming.view;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -11,11 +13,14 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -35,15 +40,13 @@ public class OwnerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_owner);
-
-        createEventButton = findViewById(R.id.createEventButton);
-        createEventButton.setOnClickListener(v -> {
-            Intent intent = new Intent(OwnerActivity.this, CreateNewEvent.class);
-            startActivity(intent);
-        });
+        TextView greeting = findViewById(R.id.ownerGreeting);
+        DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
+        ImageButton btnMenu = findViewById(R.id.btnMore);
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+        loadOwnerName();
         eventsContainer = findViewById(R.id.eventsContainer);
 
     }
@@ -53,6 +56,28 @@ public class OwnerActivity extends AppCompatActivity {
         super.onResume();
         loadOwnerEvents();
     }
+
+    @SuppressLint("SetTextI18n")
+    private void loadOwnerName() {
+        if (auth.getCurrentUser() == null) return;
+
+        String uid = auth.getCurrentUser().getUid();
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        TextView greeting = findViewById(R.id.ownerGreeting);
+
+        db.collection("users").document(uid).get()
+                .addOnSuccessListener(document -> {
+                    if (document.exists()) {
+                        String name = document.getString("fullName"); // או "username" לפי מה ששמרת
+                        greeting.setText("Hello " + name);
+                    } else {
+                        greeting.setText("Hello Owner");
+                    }
+                })
+                .addOnFailureListener(e -> greeting.setText("Hello Owner"));
+    }
+
 
     private void loadOwnerEvents() {
         if (auth.getCurrentUser() == null) {

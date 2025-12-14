@@ -6,6 +6,9 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -36,6 +39,7 @@ public class ExploreEventsActivity extends AppCompatActivity implements OnMapRea
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     private TextView title;
+    private ImageButton btnMenu;
 
     private TextView radiusLabel;          // תצוגת רדיוס
     private int eventRadiusKm = 10;        // רדיוס התחלתי בק״מ
@@ -47,6 +51,8 @@ public class ExploreEventsActivity extends AppCompatActivity implements OnMapRea
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_explore_events);
+        btnMenu = findViewById(R.id.btnMore);
+
 
         // --- כותרת Hello <username> ---
         title = findViewById(R.id.exploreTitle);

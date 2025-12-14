@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class EditEventActivity extends AppCompatActivity {
     private String eventId;
     private FirebaseFirestore db;
 
-    private EditText etEventTitle, etEventDescription, etEventLocation, etEventDate, etEventTime, etEventCapacity;
+    private EditText etEventTitle, etEventDescription, etEventLocation, etEventDate, etEventGenre, etEventTime, etEventCapacity;
     private Button btnSaveEvent, btnDeleteEvent;
 
     private Calendar selectedDateTime = Calendar.getInstance();
@@ -48,6 +49,7 @@ public class EditEventActivity extends AppCompatActivity {
         }
 
         setupListeners();
+
     }
 
     private void initViews() {
@@ -59,6 +61,7 @@ public class EditEventActivity extends AppCompatActivity {
         etEventCapacity = findViewById(R.id.etEventCapacity);
         btnSaveEvent = findViewById(R.id.btnSaveEvent);
         btnDeleteEvent = findViewById(R.id.btnDeleteEvent);
+        etEventGenre = findViewById(R.id.editMusicgenre);
     }
 
     private void setupListeners() {
@@ -79,6 +82,13 @@ public class EditEventActivity extends AppCompatActivity {
                             etEventDescription.setText(event.getDescription());
                             etEventLocation.setText(event.getAddress()); // Assuming location is address
                             etEventCapacity.setText(String.valueOf(event.getMaxCapacity()));
+                            List<String> genres = event.getMusicTypes();
+
+                            if (genres != null && !genres.isEmpty()) {
+                                etEventGenre.setText(String.join(", ", genres));
+                            } else {
+                                etEventGenre.setText("");
+                            }
 
                             selectedDateTime.setTimeInMillis(event.getDateTime());
                             SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -105,6 +115,7 @@ public class EditEventActivity extends AppCompatActivity {
             selectedDateTime.set(Calendar.DAY_OF_MONTH, d);
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             etEventDate.setText(sdf.format(selectedDateTime.getTime()));
+            etEventDate.setError(null);
         }, year, month, day);
         dialog.getDatePicker().setMinDate(System.currentTimeMillis());
         dialog.show();
@@ -119,6 +130,7 @@ public class EditEventActivity extends AppCompatActivity {
             selectedDateTime.set(Calendar.MINUTE, m);
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
             etEventTime.setText(sdf.format(selectedDateTime.getTime()));
+            etEventTime.setError(null);
         }, hour, minute, true).show();
     }
 
@@ -127,18 +139,73 @@ public class EditEventActivity extends AppCompatActivity {
         String description = etEventDescription.getText().toString().trim();
         String location = etEventLocation.getText().toString().trim();
         String capacityStr = etEventCapacity.getText().toString().trim();
+        String genreMusic = etEventGenre.getText().toString().trim();
 
-        if (title.isEmpty() || description.isEmpty() || location.isEmpty() || capacityStr.isEmpty()) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+
+        if (title.isEmpty()) {
+            etEventTitle.setError("נא להזין שם אירוע");
+            etEventTitle.requestFocus();
             return;
         }
+        if (description.isEmpty()){
+            etEventDescription.setError("נא להזין תיאור האירוע");
+            etEventDescription.requestFocus();
+            return;
+        }
+        if (genreMusic.isEmpty()) {
+            etEventGenre.setError("נא להזין ז'אנר");
+            etEventGenre.requestFocus();
+            return;
+        }
+        if (location.isEmpty()) {
+            etEventLocation.setError("נא להזין את מיקום האירוע");
+            etEventLocation.requestFocus();
+            return;
+        }
+
+        if (etEventDate.getText().toString().isEmpty()) {
+            etEventDate.setError("נא להזין את תאריך האירוע");
+            etEventDate.requestFocus();
+            return;
+        }
+        if (etEventTime.getText().toString().isEmpty()){
+            etEventTime.setError("נא להזין את שעת האירוע");
+            etEventTime.requestFocus();
+            return;
+        }
+
+
+
+        if (capacityStr.isEmpty()) {
+            etEventCapacity.setError("נא להזין מספר מקומות");
+            etEventCapacity.requestFocus();
+            return;
+        }
+
+        try {
+            int cap = Integer.parseInt(capacityStr);
+            if (cap <= 0) {
+                etEventCapacity.setError("מספר המקומות חייב להיות חיובי");
+                etEventCapacity.requestFocus();
+                return;
+            }
+        } catch (Exception e) {
+            etEventCapacity.setError("נא להזין מספר תקין");
+            etEventCapacity.requestFocus();
+            return;
+        }
+
 
         Map<String, Object> updatedEvent = new HashMap<>();
         updatedEvent.put("name", title);
         updatedEvent.put("description", description);
         updatedEvent.put("address", location);
         updatedEvent.put("maxCapacity", Integer.parseInt(capacityStr));
-        updatedEvent.put("date", selectedDateTime.getTimeInMillis());
+        updatedEvent.put("dateTime", selectedDateTime.getTimeInMillis());
+        List<String> genres =
+                List.of(genreMusic.split("\\s*,\\s*"));
+        updatedEvent.put("musicTypes", genres);
+
 
         db.collection("events").document(eventId).update(updatedEvent)
                 .addOnSuccessListener(aVoid -> {
