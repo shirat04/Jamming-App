@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +39,7 @@ public class CreateNewEvent extends AppCompatActivity {
     private double selectedLat = 0.0;
     private double selectedLng = 0.0;
     private String selectedAddress = "";
+    private ImageButton mapButton;
 
     private Button publishBtn;
     private TextView cancelBtn;
@@ -73,6 +75,8 @@ public class CreateNewEvent extends AppCompatActivity {
         publishBtn = findViewById(R.id.publishEventBtn);
         cancelBtn = findViewById(R.id.cancelBtn);
         locationInput = findViewById(R.id.eventLocationInput);
+        mapButton = findViewById(R.id.mapButton);
+
     }
 
     private void setupListeners() {
@@ -80,6 +84,11 @@ public class CreateNewEvent extends AppCompatActivity {
         timeInput.setOnClickListener(v -> showTimePicker());
         publishBtn.setOnClickListener(v -> publishEvent());
         cancelBtn.setOnClickListener(v -> finish());
+
+        mapButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MapPickerActivity.class);
+            startActivityForResult(intent, 1001);
+        });
 
 
         locationInput.setOnTouchListener((v, event) -> {

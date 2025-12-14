@@ -73,18 +73,39 @@
                 android:layout_marginBottom="12dp"
                 tools:ignore="Autofill,TextFields,VisualLintTextFieldSize" />
 
-            <!-- שדה: מיקום -->
-            <EditText
-                android:id="@+id/eventLocationInput"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:hint="@string/location"
-                android:drawableEnd="@drawable/outline_map_24"
-                android:drawablePadding="8dp"
-                android:padding="12dp"
-                android:textSize="16sp"
+                android:orientation="horizontal"
+                android:padding="8dp"
                 android:layout_marginBottom="12dp"
-                tools:ignore="Autofill,TextFields,VisualLintTextFieldSize" />
+                android:layout_marginTop="2dp"
+                android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/eventLocationInput"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:hint="@string/location"
+                    android:inputType="textPostalAddress"
+                    android:background="@android:color/transparent"
+                    android:padding="8dp"/>
+
+                <ImageButton
+                    android:id="@+id/mapButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/outline_map_24"/>
+            </LinearLayout>
+            <!-- הפס שמתחת למיקום -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#9E9E9E"
+                android:layout_marginTop="-8dp"
+                android:layout_marginBottom="10dp"/>
 
 
             <!-- שדה: תאריך -->
