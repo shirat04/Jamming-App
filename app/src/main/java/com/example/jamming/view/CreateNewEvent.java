@@ -7,6 +7,8 @@ import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -90,6 +92,22 @@ public class CreateNewEvent extends AppCompatActivity {
             startActivityForResult(intent, 1001);
         });
 
+        locationInput.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                locationVerified = false;
+                selectedAddress = "";
+                selectedLat = 0.0;
+                selectedLng = 0.0;
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         locationInput.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -113,6 +131,34 @@ public class CreateNewEvent extends AppCompatActivity {
             return false; // מאפשר הקלדה רגילה
         });
 
+    }
+    private boolean verifyLocationIfNeeded(String locationText) {
+        if (locationVerified) return true;
+
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> results =
+                    geocoder.getFromLocationName(locationText, 1);
+
+            if (results != null && !results.isEmpty()) {
+                Address addr = results.get(0);
+                selectedLat = addr.getLatitude();
+                selectedLng = addr.getLongitude();
+                selectedAddress = addr.getAddressLine(0);
+                locationVerified = true;
+                locationInput.setError(null);
+                return true;
+            } else {
+                locationInput.setError("הכתובת לא נמצאה. נא לבחור מהמפה");
+                locationInput.requestFocus();
+                return false;
+            }
+
+        } catch (IOException e) {
+            locationInput.setError("לא ניתן לאמת כתובת. נא לבחור מהמפה");
+            locationInput.requestFocus();
+            return false;
+        }
     }
 
 
@@ -177,6 +223,9 @@ public class CreateNewEvent extends AppCompatActivity {
         if (!validateInputs(name, genreStr, capacityStr, location)) {
             return;
         }
+        if (!verifyLocationIfNeeded(location)) {
+            return;
+        }
 
         int capacity = Integer.parseInt(capacityStr);
         List<String> musicTypes = Arrays.asList(genreStr.split(","));
@@ -194,32 +243,6 @@ public class CreateNewEvent extends AppCompatActivity {
             if (owner == null) {
                 Toast.makeText(this, "שגיאה בפרטי הבעלים", Toast.LENGTH_SHORT).show();
                 return;
-            }
-
-            if (!locationVerified) {
-                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-                try {
-                    List<Address> results =
-                            geocoder.getFromLocationName(location, 1);
-
-                    if (results != null && !results.isEmpty()) {
-                        Address addr = results.get(0);
-
-                        selectedLat = addr.getLatitude();
-                        selectedLng = addr.getLongitude();
-                        selectedAddress = addr.getAddressLine(0);
-                        locationVerified = true;
-                    } else {
-                        locationInput.setError("Address not found. Please select from the map.");
-                        locationInput.requestFocus();
-                        return;
-                    }
-
-                } catch (IOException e) {
-                    locationInput.setError("Address cannot be verified. Please select from the map.");
-                    locationInput.requestFocus();
-                    return;
-                }
             }
 
 

@@ -3,7 +3,11 @@ package com.example.jamming.view;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -14,9 +18,9 @@ import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -29,6 +33,12 @@ public class EditEventActivity extends AppCompatActivity {
 
     private EditText etEventTitle, etEventDescription, etEventLocation, etEventDate, etEventGenre, etEventTime, etEventCapacity;
     private Button btnSaveEvent, btnDeleteEvent;
+    private boolean locationVerified = false;
+
+    private double selectedLat = 0.0;
+    private double selectedLng = 0.0;
+    private String selectedAddress = "";
+
 
     private Calendar selectedDateTime = Calendar.getInstance();
 
@@ -70,6 +80,43 @@ public class EditEventActivity extends AppCompatActivity {
 
         btnSaveEvent.setOnClickListener(v -> saveEventChanges());
         btnDeleteEvent.setOnClickListener(v -> deleteEvent());
+
+        etEventLocation.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                locationVerified = false;
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        });
+
+
+
+        etEventLocation.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+
+                Drawable drawableEnd =
+                        etEventLocation.getCompoundDrawablesRelative()[2];
+
+                if (drawableEnd != null) {
+                    int drawableWidth = drawableEnd.getBounds().width();
+
+                    if (event.getRawX() >=
+                            (etEventLocation.getRight() - drawableWidth)) {
+
+                        Intent intent = new Intent(this, MapPickerActivity.class);
+                        startActivityForResult(intent, 2001);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
+
     }
 
     private void loadEventData(String eventId) {
@@ -80,7 +127,12 @@ public class EditEventActivity extends AppCompatActivity {
                         if (event != null) {
                             etEventTitle.setText(event.getName());
                             etEventDescription.setText(event.getDescription());
-                            etEventLocation.setText(event.getAddress()); // Assuming location is address
+                            selectedLat = event.getLatitude();
+                            selectedLng = event.getLongitude();
+                            selectedAddress = event.getAddress();
+                            locationVerified = true;
+
+                            etEventLocation.setText(selectedAddress);
                             etEventCapacity.setText(String.valueOf(event.getMaxCapacity()));
                             List<String> genres = event.getMusicTypes();
 
@@ -174,6 +226,9 @@ public class EditEventActivity extends AppCompatActivity {
             return;
         }
 
+        if (!verifyLocationIfNeeded(location)) {
+            return;
+        }
 
 
         if (capacityStr.isEmpty()) {
@@ -199,7 +254,9 @@ public class EditEventActivity extends AppCompatActivity {
         Map<String, Object> updatedEvent = new HashMap<>();
         updatedEvent.put("name", title);
         updatedEvent.put("description", description);
-        updatedEvent.put("address", location);
+        updatedEvent.put("address", selectedAddress);
+        updatedEvent.put("latitude", selectedLat);
+        updatedEvent.put("longitude", selectedLng);
         updatedEvent.put("maxCapacity", Integer.parseInt(capacityStr));
         updatedEvent.put("dateTime", selectedDateTime.getTimeInMillis());
         List<String> genres =
@@ -215,6 +272,66 @@ public class EditEventActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Error updating event.", Toast.LENGTH_SHORT).show();
                 });
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 2001 && resultCode == RESULT_OK && data != null) {
+            selectedLat = data.getDoubleExtra("lat", 0.0);
+            selectedLng = data.getDoubleExtra("lng", 0.0);
+            selectedAddress = data.getStringExtra("address");
+
+            locationVerified = true;
+            etEventLocation.setText(selectedAddress);
+            etEventLocation.setError(null);
+        }
+    }
+    private boolean verifyLocationIfNeeded(String locationText) {
+        if (locationText.isEmpty()) {
+            etEventLocation.setError("נא להזין מיקום");
+            etEventLocation.requestFocus();
+            return false;
+        }
+
+        if (locationVerified) return true;
+
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> results =
+                    geocoder.getFromLocationName(locationText, 1);
+
+            if (results != null && !results.isEmpty()) {
+                Address addr = results.get(0);
+
+// בדיקה: האם זו כתובת מלאה ולא רק עיר
+                String street = addr.getThoroughfare();       // שם רחוב
+                String houseNumber = addr.getSubThoroughfare(); // מספר בית
+
+                if (street == null && houseNumber == null) {
+                    etEventLocation.setError("נא להזין כתובת מדויקת (רחוב ומספר) או לבחור מהמפה");
+                    etEventLocation.requestFocus();
+                    return false;
+                }
+
+                selectedLat = addr.getLatitude();
+                selectedLng = addr.getLongitude();
+                selectedAddress = addr.getAddressLine(0);
+                locationVerified = true;
+                etEventLocation.setError(null);
+                return true;
+
+            } else {
+                etEventLocation.setError("הכתובת לא נמצאה. נא לבחור מהמפה");
+                etEventLocation.requestFocus();
+                return false;
+            }
+
+        } catch (IOException e) {
+            etEventLocation.setError("לא ניתן לאמת כתובת. נא לבחור מהמפה");
+            etEventLocation.requestFocus();
+            return false;
+        }
     }
 
     private void deleteEvent() {
