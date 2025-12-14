@@ -2,6 +2,9 @@ package com.example.jamming.view;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +21,7 @@ import com.example.jamming.repository.EventRepository;
 import com.example.jamming.repository.UserRepository;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -26,7 +30,12 @@ import java.util.Locale;
 
 public class CreateNewEvent extends AppCompatActivity {
 
-    private EditText eventNameInput, genreInput, capacityInput, descriptionInput, dateInput, timeInput;
+    private EditText eventNameInput, genreInput, capacityInput, descriptionInput, dateInput, timeInput,locationInput;
+    private boolean locationVerified = false;
+
+    private double selectedLat = 0.0;
+    private double selectedLng = 0.0;
+    private String selectedAddress = "";
 
     private Button publishBtn;
     private TextView cancelBtn;
@@ -46,8 +55,9 @@ public class CreateNewEvent extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         userRepository = new UserRepository();
         eventRepository = new EventRepository();
-
         initViews();
+
+
         setupListeners();
     }
 
@@ -60,6 +70,7 @@ public class CreateNewEvent extends AppCompatActivity {
         timeInput = findViewById(R.id.timeInput);
         publishBtn = findViewById(R.id.publishEventBtn);
         cancelBtn = findViewById(R.id.cancelBtn);
+        locationInput = findViewById(R.id.eventLocationInput);
     }
 
     private void setupListeners() {
@@ -67,6 +78,11 @@ public class CreateNewEvent extends AppCompatActivity {
         timeInput.setOnClickListener(v -> showTimePicker());
         publishBtn.setOnClickListener(v -> publishEvent());
         cancelBtn.setOnClickListener(v -> finish());
+
+        locationInput.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MapPickerActivity.class);
+            startActivityForResult(intent, 1001);
+        });
     }
 
     private void showDatePicker() {
@@ -105,6 +121,18 @@ public class CreateNewEvent extends AppCompatActivity {
 
         dialog.show();
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1001 && resultCode == RESULT_OK && data != null) {
+            selectedLat = data.getDoubleExtra("lat", 0.0);
+            selectedLng = data.getDoubleExtra("lng", 0.0);
+            selectedAddress = data.getStringExtra("address");
+            locationVerified = true;
+            locationInput.setText(selectedAddress);
+        }
+    }
 
     private void publishEvent() {
 
@@ -112,6 +140,8 @@ public class CreateNewEvent extends AppCompatActivity {
         String genreStr = genreInput.getText().toString().trim();
         String capacityStr = capacityInput.getText().toString().trim();
         String description = descriptionInput.getText().toString().trim();
+        String location = locationInput.getText().toString().trim();
+
 
         if (!validateInputs(name, genreStr, capacityStr)) {
             return;
@@ -135,19 +165,49 @@ public class CreateNewEvent extends AppCompatActivity {
                 return;
             }
 
+            if (location.isEmpty()) {
+                locationInput.setError("נא להזין מיקום לאירוע");
+                locationInput.requestFocus();
+                return;
+            }
+            if (!locationVerified) {
+                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+                try {
+                    List<Address> results =
+                            geocoder.getFromLocationName(location, 1);
+
+                    if (results != null && !results.isEmpty()) {
+                        Address addr = results.get(0);
+
+                        selectedLat = addr.getLatitude();
+                        selectedLng = addr.getLongitude();
+                        selectedAddress = addr.getAddressLine(0);
+                        locationVerified = true;
+                    } else {
+                        locationInput.setError("כתובת לא נמצאה. נא לבחור מהמפה");
+                        return;
+                    }
+
+                } catch (IOException e) {
+                    locationInput.setError("לא ניתן לאמת כתובת. נא לבחור מהמפה");
+                    return;
+                }
+            }
+
+
             Event event = new Event(
                     ownerId,
                     name,
-                    "",
                     description,
                     musicTypes,
-                    owner.getAddress(),
-                    owner.getCity(),
+                    selectedAddress,
+                    selectedAddress,
                     selectedDateTime.getTimeInMillis(),
                     capacity,
-                    owner.getLatitude(),
-                    owner.getLongitude()
+                    selectedLat,
+                    selectedLng
             );
+
 
             eventRepository.createEvent(event)
                     .addOnSuccessListener(a -> {

@@ -10,13 +10,14 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
-import com.example.jamming.viewmodel.AuthViewModel;
+import com.example.jamming.viewmodel.LoginViewModel;
 
 public class LoginActivity extends AppCompatActivity {
 
 
     private EditText usernameInput, passwordInput;
-    private AuthViewModel viewModel;
+    private LoginViewModel loginViewModel;
+
     private TextView errorText;
 
 
@@ -31,12 +32,12 @@ public class LoginActivity extends AppCompatActivity {
         Button registerBtn = findViewById(R.id.registerText);
         errorText = findViewById(R.id.errorTextView);
 
-        viewModel = new ViewModelProvider(this).get(AuthViewModel.class);
+        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
         loginBtn.setOnClickListener(v -> {
             String identifier = usernameInput.getText().toString().trim();
             String pass = passwordInput.getText().toString().trim();
-            viewModel.login(identifier, pass);
+            loginViewModel.login(identifier, pass);
         });
 
         registerBtn.setOnClickListener(v ->
@@ -48,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void observeViewModel() {
 
-        viewModel.getError().observe(this, err -> {
+        loginViewModel.getError().observe(this, err -> {
             if (err != null) {
                 errorText.setText(err);
                 errorText.setVisibility(View.VISIBLE);
@@ -58,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
-        viewModel.getUserType().observe(this, type -> {
+        loginViewModel.getUserType().observe(this, type -> {
             if (type == null) return;
 
             if ("owner".equals(type)) {

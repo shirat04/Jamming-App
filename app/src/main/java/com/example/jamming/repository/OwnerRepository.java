@@ -47,14 +47,6 @@ public class OwnerRepository {
                 .update("logoImageUrl", logoUrl);
     }
 
-    // Update owner location (latitude & longitude)
-    public Task<Void> updateLocation(String uid, double lat, double lng) {
-        return db.collection("owners")
-                .document(uid)
-                .update("latitude", lat,
-                        "longitude", lng);
-    }
-
     // Add a new event ID to the owner's event list
     public Task<Void> addOwnedEvent(String uid, String eventId) {
         return db.collection("owners")

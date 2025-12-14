@@ -159,6 +159,7 @@
     <string name="save_changes">Save Changes</string>
     <string name="delete_event">Delete Event</string>
     <string name="menu">menu</string>
+    <string name="owner_name">owner name</string>
 
 
 </resources>

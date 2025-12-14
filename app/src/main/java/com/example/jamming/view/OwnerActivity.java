@@ -43,6 +43,11 @@ public class OwnerActivity extends AppCompatActivity {
         TextView greeting = findViewById(R.id.ownerGreeting);
         DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
         ImageButton btnMenu = findViewById(R.id.btnMore);
+        createEventButton = findViewById(R.id.createEventButton);
+        createEventButton.setOnClickListener(v -> {
+            Intent intent = new Intent(OwnerActivity.this, CreateNewEvent.class);
+            startActivity(intent);
+        });
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();

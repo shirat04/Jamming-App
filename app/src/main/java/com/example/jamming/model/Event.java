@@ -8,7 +8,6 @@ public class Event {
     private String id;
     private String ownerId;
     private String name;
-    private String artistName;
     private String description;
     private List<String> musicTypes;
     private String address;
@@ -25,14 +24,13 @@ public class Event {
         this.musicTypes = new ArrayList<>();
     }
 
-    public Event(String ownerId, String name, String artistName, String description,
+    public Event(String ownerId, String name, String description,
                  List<String> musicTypes, String address, String city,
                  long dateTime, int maxCapacity,
                  double latitude, double longitude) {
 
         this.ownerId = ownerId;
         this.name = name;
-        this.artistName = artistName;
         this.description = description;
         this.musicTypes = musicTypes != null ? musicTypes : new ArrayList<>();
         this.address = address;
@@ -48,7 +46,6 @@ public class Event {
     public String getId() { return id; }
     public String getOwnerId() { return ownerId; }
     public String getName() { return name; }
-    public String getArtistName() { return artistName; }
     public String getDescription() { return description; }
     public List<String> getMusicTypes() { return musicTypes; }
     public String getAddress() { return address; }
@@ -62,8 +59,8 @@ public class Event {
 
     public void setId(String id) { this.id = id; }
     public void setOwnerId(String ownerId) { this.ownerId = ownerId; }
+
     public void setName(String name) { this.name = name; }
-    public void setArtistName(String artistName) { this.artistName = artistName; }
     public void setDescription(String description) { this.description = description; }
     public void setMusicTypes(List<String> musicTypes) { this.musicTypes = musicTypes; }
     public void setAddress(String address) { this.address = address; }
