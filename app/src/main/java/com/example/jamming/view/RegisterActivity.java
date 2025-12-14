@@ -7,20 +7,19 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.jamming.R;
-import com.example.jamming.viewmodel.AuthViewModel;
+import com.example.jamming.viewmodel.RegisterViewModel;
 
 public class RegisterActivity extends AppCompatActivity {
     private EditText fullName, password, confirmPassword, email, userName;
     private RadioButton owner;
     private TextView errorText;
 
-    private AuthViewModel viewModel;
+    private RegisterViewModel viewModel;
 
 
     @Override
@@ -37,7 +36,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         Button register = findViewById(R.id.btnRegister);
         Button backLogin = findViewById(R.id.btnAlreadyHaveAccount);
-        viewModel = new ViewModelProvider(this).get(AuthViewModel.class);
+        viewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
         backLogin.setOnClickListener(v ->
                 startActivity(new Intent(this, LoginActivity.class))

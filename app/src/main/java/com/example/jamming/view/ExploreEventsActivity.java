@@ -60,7 +60,7 @@ public class ExploreEventsActivity extends AppCompatActivity implements OnMapRea
 
         new UserRepository().getUserById(uid)
                 .addOnSuccessListener(snapshot -> {
-                    String name = snapshot.getString("username");
+                    String name = snapshot.getString("fullName");
                     if (name == null) name = "";
                     title.setText("Hello " + name);
                 });

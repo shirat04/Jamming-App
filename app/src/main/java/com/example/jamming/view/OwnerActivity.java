@@ -43,6 +43,11 @@ public class OwnerActivity extends AppCompatActivity {
         TextView greeting = findViewById(R.id.ownerGreeting);
         DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
         ImageButton btnMenu = findViewById(R.id.btnMore);
+        createEventButton = findViewById(R.id.createEventButton);
+        createEventButton.setOnClickListener(v -> {
+            Intent intent = new Intent(OwnerActivity.this, CreateNewEvent.class);
+            startActivity(intent);
+        });
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
@@ -120,7 +125,7 @@ public class OwnerActivity extends AppCompatActivity {
 
         // Populate the views
         eventName.setText(event.getName());
-        eventLocation.setText("📍 " + event.getAddress() + ", " + event.getCity());
+        eventLocation.setText("📍 " + event.getAddress() );
         eventDate.setText("🕒 " + formattedDate);
         eventGenre.setText("🎵 " + String.join(", ", event.getMusicTypes()));
         eventSpots.setText("👥 " + event.getReserved() + "/" + event.getMaxCapacity() + " spots");

@@ -21,14 +21,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
+
         <ImageButton
             android:id="@+id/btnMore"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/outline_menu_24"
             android:contentDescription="@string/menu"
-            app:tint="@android:color/white" />
+            android:src="@drawable/outline_menu_24"
+            app:tint="@android:color/white"
+            tools:ignore="TouchTargetSizeCheck" />
 
         <Space
             android:layout_width="12dp"
