@@ -125,7 +125,7 @@ public class OwnerActivity extends AppCompatActivity {
 
         // Populate the views
         eventName.setText(event.getName());
-        eventLocation.setText("📍 " + event.getAddress() + ", " + event.getCity());
+        eventLocation.setText("📍 " + event.getAddress() );
         eventDate.setText("🕒 " + formattedDate);
         eventGenre.setText("🎵 " + String.join(", ", event.getMusicTypes()));
         eventSpots.setText("👥 " + event.getReserved() + "/" + event.getMaxCapacity() + " spots");

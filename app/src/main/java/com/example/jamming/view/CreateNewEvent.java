@@ -3,9 +3,11 @@ package com.example.jamming.view;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -79,11 +81,31 @@ public class CreateNewEvent extends AppCompatActivity {
         publishBtn.setOnClickListener(v -> publishEvent());
         cancelBtn.setOnClickListener(v -> finish());
 
-        locationInput.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MapPickerActivity.class);
-            startActivityForResult(intent, 1001);
+
+        locationInput.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+
+                Drawable drawableEnd =
+                        locationInput.getCompoundDrawablesRelative()[2];
+
+                if (drawableEnd != null) {
+                    int drawableWidth = drawableEnd.getBounds().width();
+
+                    // בדיקה אם הלחיצה הייתה על האייקון בלבד
+                    if (event.getRawX() >=
+                            (locationInput.getRight() - drawableWidth)) {
+
+                        Intent intent = new Intent(this, MapPickerActivity.class);
+                        startActivityForResult(intent, 1001);
+                        return true; // חשוב! מונע המשך טיפול
+                    }
+                }
+            }
+            return false; // מאפשר הקלדה רגילה
         });
+
     }
+
 
     private void showDatePicker() {
         int year = selectedDateTime.get(Calendar.YEAR);
@@ -143,7 +165,7 @@ public class CreateNewEvent extends AppCompatActivity {
         String location = locationInput.getText().toString().trim();
 
 
-        if (!validateInputs(name, genreStr, capacityStr)) {
+        if (!validateInputs(name, genreStr, capacityStr, location)) {
             return;
         }
 
@@ -165,11 +187,6 @@ public class CreateNewEvent extends AppCompatActivity {
                 return;
             }
 
-            if (location.isEmpty()) {
-                locationInput.setError("נא להזין מיקום לאירוע");
-                locationInput.requestFocus();
-                return;
-            }
             if (!locationVerified) {
                 Geocoder geocoder = new Geocoder(this, Locale.getDefault());
                 try {
@@ -184,12 +201,14 @@ public class CreateNewEvent extends AppCompatActivity {
                         selectedAddress = addr.getAddressLine(0);
                         locationVerified = true;
                     } else {
-                        locationInput.setError("כתובת לא נמצאה. נא לבחור מהמפה");
+                        locationInput.setError("Address not found. Please select from the map.");
+                        locationInput.requestFocus();
                         return;
                     }
 
                 } catch (IOException e) {
-                    locationInput.setError("לא ניתן לאמת כתובת. נא לבחור מהמפה");
+                    locationInput.setError("Address cannot be verified. Please select from the map.");
+                    locationInput.requestFocus();
                     return;
                 }
             }
@@ -200,7 +219,6 @@ public class CreateNewEvent extends AppCompatActivity {
                     name,
                     description,
                     musicTypes,
-                    selectedAddress,
                     selectedAddress,
                     selectedDateTime.getTimeInMillis(),
                     capacity,
@@ -223,11 +241,16 @@ public class CreateNewEvent extends AppCompatActivity {
         });
     }
 
-    private boolean validateInputs(String name, String genre, String capacity) {
+    private boolean validateInputs(String name, String genre, String capacity ,String location) {
 
         if (name.isEmpty()) {
             eventNameInput.setError("נא להזין שם אירוע");
             eventNameInput.requestFocus();
+            return false;
+        }
+        if (location.isEmpty()) {
+            locationInput.setError("נא להזין מיקום לאירוע");
+            locationInput.requestFocus();
             return false;
         }
         if (dateInput.getText().toString().isEmpty()) {

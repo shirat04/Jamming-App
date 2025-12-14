@@ -11,7 +11,6 @@ public class Event {
     private String description;
     private List<String> musicTypes;
     private String address;
-    private String city;
     private long dateTime;
     private int maxCapacity;
     private int reserved;
@@ -25,7 +24,7 @@ public class Event {
     }
 
     public Event(String ownerId, String name, String description,
-                 List<String> musicTypes, String address, String city,
+                 List<String> musicTypes, String address,
                  long dateTime, int maxCapacity,
                  double latitude, double longitude) {
 
@@ -34,7 +33,6 @@ public class Event {
         this.description = description;
         this.musicTypes = musicTypes != null ? musicTypes : new ArrayList<>();
         this.address = address;
-        this.city = city;
         this.dateTime = dateTime;
         this.maxCapacity = maxCapacity;
         this.reserved = 0;
@@ -49,7 +47,6 @@ public class Event {
     public String getDescription() { return description; }
     public List<String> getMusicTypes() { return musicTypes; }
     public String getAddress() { return address; }
-    public String getCity() { return city; }
     public long getDateTime() { return dateTime; }
     public int getMaxCapacity() { return maxCapacity; }
     public int getReserved() { return reserved; }
@@ -64,7 +61,6 @@ public class Event {
     public void setDescription(String description) { this.description = description; }
     public void setMusicTypes(List<String> musicTypes) { this.musicTypes = musicTypes; }
     public void setAddress(String address) { this.address = address; }
-    public void setCity(String city) { this.city = city; }
     public void setDateTime(long dateTime) { this.dateTime = dateTime; }
     public void setMaxCapacity(int maxCapacity) { this.maxCapacity = maxCapacity; }
     public void setReserved(int reserved) { this.reserved = reserved; }

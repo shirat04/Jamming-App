@@ -78,11 +78,14 @@
                 android:id="@+id/eventLocationInput"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:hint="Type an address or double-click to open a map"
+                android:hint="@string/location"
+                android:drawableEnd="@drawable/outline_map_24"
+                android:drawablePadding="8dp"
                 android:padding="12dp"
                 android:textSize="16sp"
                 android:layout_marginBottom="12dp"
                 tools:ignore="Autofill,TextFields,VisualLintTextFieldSize" />
+
 
             <!-- שדה: תאריך -->
             <EditText
