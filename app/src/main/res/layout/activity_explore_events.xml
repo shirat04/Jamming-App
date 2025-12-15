@@ -249,6 +249,22 @@
         app:layout_constraintVertical_bias="0.0"
         tools:ignore="FragmentTagUsage" />
 
+    <TextView
+        android:id="@+id/emptyText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="אין אירועים להצגה"
+        android:textSize="18sp"
+        android:textColor="#777777"
+        android:background="@android:color/white"
+        android:padding="12dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/mapFragment"
+        app:layout_constraintBottom_toBottomOf="@id/mapFragment"
+        app:layout_constraintStart_toStartOf="@id/mapFragment"
+        app:layout_constraintEnd_toEndOf="@id/mapFragment"/>
+
+
     <LinearLayout
         android:id="@+id/radiusControls"
         android:layout_width="wrap_content"

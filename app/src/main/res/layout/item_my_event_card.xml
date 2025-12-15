@@ -17,7 +17,7 @@
 
         <!-- שם האירוע -->
         <TextView
-            android:id="@+id/eventName"
+            android:id="@+id/myEventTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Event Name"
@@ -27,7 +27,7 @@
 
         <!-- מיקום -->
         <TextView
-            android:id="@+id/eventLocation"
+            android:id="@+id/myEventLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -35,27 +35,21 @@
 
         <!-- תאריך ושעה -->
         <TextView
-            android:id="@+id/eventDate"
+            android:id="@+id/myEventDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="🕒 Date and Time" />
 
-        <!-- ז'אנר -->
+        <!-- סטטוס -->
         <TextView
-            android:id="@+id/eventGenre"
+            android:id="@+id/myEventStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="🎵 Genre" />
-
-        <!-- מספר משתתפים -->
-        <TextView
-            android:id="@+id/eventSpots"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="👥 Spots" />
+            android:layout_marginTop="6dp"
+            android:text="Registered"
+            android:textColor="#2E7D32"
+            android:textStyle="bold" />
 
         <!-- קו מפריד -->
         <View
@@ -71,20 +65,23 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btnEditEvent"
+                android:id="@+id/btnMyEventDetails"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:text="Edit Details" />
+                android:backgroundTint="#1E63E9"
+                android:text="View Details"
+                android:textColor="@android:color/white" />
 
             <Button
-                android:id="@+id/btnCancelEvent"
-                style="?attr/materialButtonOutlinedStyle"
+                android:id="@+id/btnCancelMyEvent"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_weight="1"
-                android:text="Cancel Event" />
+                android:backgroundTint="#E53935"
+                android:text="Cancel Registration"
+                android:textColor="@android:color/white" />
         </LinearLayout>
 
     </LinearLayout>

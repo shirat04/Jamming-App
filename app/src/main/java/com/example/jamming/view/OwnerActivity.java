@@ -109,15 +109,14 @@ public class OwnerActivity extends AppCompatActivity {
     }
 
     private void addEventCardToView(Event event, String eventId) {
-        View eventCardView = getLayoutInflater().inflate(R.layout.item_event_card, eventsContainer, false);
+        View eventCardView = getLayoutInflater().inflate(R.layout.item_my_event_card, eventsContainer, false);
 
-        TextView eventName = eventCardView.findViewById(R.id.eventName);
-        TextView eventLocation = eventCardView.findViewById(R.id.eventLocation);
-        TextView eventDate = eventCardView.findViewById(R.id.eventDate);
-        TextView eventGenre = eventCardView.findViewById(R.id.eventGenre);
-        TextView eventSpots = eventCardView.findViewById(R.id.eventSpots);
-        Button btnEdit = eventCardView.findViewById(R.id.btnEditEvent);
-        Button btnCancel = eventCardView.findViewById(R.id.btnCancelEvent);
+        TextView eventName = eventCardView.findViewById(R.id.myEventTitle);
+        TextView eventLocation = eventCardView.findViewById(R.id.myEventLocation);
+        TextView eventDate = eventCardView.findViewById(R.id.myEventDate);
+        TextView eventGenre = eventCardView.findViewById(R.id.myEventStatus);
+        Button btnEdit = eventCardView.findViewById(R.id.btnMyEventDetails);
+        Button btnCancel = eventCardView.findViewById(R.id.btnCancelMyEvent);
 
         // Format date and time
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy • HH:mm", Locale.getDefault());
@@ -128,7 +127,7 @@ public class OwnerActivity extends AppCompatActivity {
         eventLocation.setText("📍 " + event.getAddress() );
         eventDate.setText("🕒 " + formattedDate);
         eventGenre.setText("🎵 " + String.join(", ", event.getMusicTypes()));
-        eventSpots.setText("👥 " + event.getReserved() + "/" + event.getMaxCapacity() + " spots");
+        //eventSpots.setText("👥 " + event.getReserved() + "/" + event.getMaxCapacity() + " spots");
 
         btnEdit.setOnClickListener(v -> {
             Intent intent = new Intent(OwnerActivity.this, EditEventActivity.class);

@@ -32,6 +32,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import android.view.View;
+import android.widget.Button;
+
+import com.google.firebase.firestore.FieldPath;
+
+import java.util.List;
+import java.util.ArrayList;
+
 public class ExploreEventsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final int LOCATION_REQUEST_CODE = 1001;
@@ -45,13 +53,23 @@ public class ExploreEventsActivity extends AppCompatActivity implements OnMapRea
     private int eventRadiusKm = 10;        // רדיוס התחלתי בק״מ
     private Location lastKnownLocation;    // נשמור את מיקום המשתמש האחרון
     private FirebaseFirestore db;
+    private TextView emptyText;
+    private Button btnMyEvents;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_explore_events);
+
+
         btnMenu = findViewById(R.id.btnMore);
+        btnMyEvents = findViewById(R.id.btnMyEvents);
+        btnMyEvents.setOnClickListener(v -> {
+            startActivity(new Intent(this, MyEventUserActivity.class));
+        });
+
 
 
         // --- כותרת Hello <username> ---
@@ -238,4 +256,84 @@ public class ExploreEventsActivity extends AppCompatActivity implements OnMapRea
                     }
                 });
     }
+
+    private void showEmpty(String msg) {
+        emptyText.setText(msg);
+        emptyText.setVisibility(View.VISIBLE);
+    }
+
+    private void hideEmpty() {
+        emptyText.setVisibility(View.GONE);
+    }
+
+    private void loadMyEventsOnMap() {
+        if (mMap == null) return;
+
+        showEmpty("טוען...");
+        mMap.clear();
+
+        // אם יש מיקום - תחזיר את ה-"You are here"
+        if (lastKnownLocation != null) {
+            moveCameraToLocation(lastKnownLocation);
+        }
+
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        db.collection("users").document(uid).get()
+                .addOnSuccessListener(doc -> {
+                    List<String> ids = (List<String>) doc.get("registeredEventIds");
+
+                    if (ids == null || ids.isEmpty()) {
+                        showEmpty("עוד לא נרשמת לאירועים 🙂");
+                        return;
+                    }
+
+                    loadEventsByIdsAndDrawMarkers(ids);
+                })
+                .addOnFailureListener(e -> showEmpty("שגיאה בטעינת My Events"));
+    }
+    private void loadEventsByIdsAndDrawMarkers(List<String> ids) {
+        final int totalChunks = (ids.size() + 9) / 10;
+        final int[] done = {0};
+        final int[] markersCount = {0};
+
+        for (int i = 0; i < ids.size(); i += 10) {
+            List<String> chunk = ids.subList(i, Math.min(i + 10, ids.size()));
+
+            db.collection("events")
+                    .whereIn(FieldPath.documentId(), chunk)
+                    .get()
+                    .addOnSuccessListener(snapshot -> {
+                        for (DocumentSnapshot d : snapshot.getDocuments()) {
+                            Event event = d.toObject(Event.class);
+                            if (event == null) continue;
+                            if (!event.isActive()) continue;
+
+                            double lat = event.getLatitude();
+                            double lng = event.getLongitude();
+                            if (lat == 0 && lng == 0) continue;
+
+                            LatLng pos = new LatLng(lat, lng);
+                            Marker marker = mMap.addMarker(new MarkerOptions().position(pos).title(event.getName()));
+                            if (marker != null) marker.setTag(d.getId()); // <-- זה מה שמאפשר details בלחיצה
+                            markersCount[0]++;
+                        }
+
+                        done[0]++;
+                        if (done[0] == totalChunks) {
+                            if (markersCount[0] == 0) showEmpty("אין אירועים להצגה");
+                            else hideEmpty();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        done[0]++;
+                        if (done[0] == totalChunks) {
+                            if (markersCount[0] == 0) showEmpty("שגיאה בטעינת אירועים");
+                            else hideEmpty();
+                        }
+                    });
+        }
+    }
+
+
 }

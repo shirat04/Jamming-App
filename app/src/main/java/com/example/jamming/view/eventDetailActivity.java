@@ -1,5 +1,7 @@
 package com.example.jamming.view;// קובץ: EventDetailActivity.java
 import android.util.Log;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -9,9 +11,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.google.firebase.firestore.FirebaseFirestore;
-
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FieldValue;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 // ... (ייבוא מחלקת Event ורכיבי UI כמו TextView)
 
 public class eventDetailActivity extends AppCompatActivity {
@@ -19,14 +23,15 @@ public class eventDetailActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String eventId;
 
-    // רכיבי UI שצריך לעדכן (לפי activity_event_detail.xml)
-    private TextView titleTextView;
-    private TextView artistTextView;
-    private TextView dateTextView;
-    private TextView locationTextView;
-    private TextView capacityTextView;
-    private TextView descriptionTextView;
-    // ... הוסף את כל הרכיבים שתרצי לעדכן
+    private TextView titleEvent;        // מותאם ל-R.id.titleEvent
+    private TextView subTitleEvent;     // מותאם ל-R.id.subTitleEvent
+    private TextView dateTextView;      // מותאם ל-R.id.dateTextView
+    private TextView locationTextView;  // מותאם ל-R.id.locationTextView
+    private TextView eventDescription;  // מותאם ל-R.id.eventDescription
+    private TextView capacityEvent;     // מותאם ל-R.id.capacityEvent
+    private Button registerBtn;
+    private Button addToCalendarBtn;
+    private ImageView eventImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,35 +40,49 @@ public class eventDetailActivity extends AppCompatActivity {
 
         // אתחול Firebase ורכיבי UI
         db = FirebaseFirestore.getInstance();
-        initUI(); // קריאה לפונקציה שתאתחל את ה-TextViews
+        initUI(); // קריאה לפונקציה שתאתחל את ה-TextViews והכפתורים
 
         // 1. קליטת ה-EVENT_ID מה-Intent
+        //intent כלי להעברת מסכים
         Bundle extras = getIntent().getExtras();
         if (extras != null && extras.containsKey("EVENT_ID")) {
             eventId = extras.getString("EVENT_ID");
 
             // 2. אם יש ID, נתחיל לטעון את הנתונים
-            if (eventId != null) {
+            if (eventId != null && !eventId.isEmpty()) {
                 loadEventDetails(eventId);
+                registerBtn.setOnClickListener(v -> registerToEvent());
             } else {
-                Toast.makeText(this, "שגיאה: ID אירוע חסר.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "שגיאה: ID אירוע חסר או ריק.", Toast.LENGTH_LONG).show();
                 finish(); // סגור את המסך אם אין ID
             }
         } else {
-            Toast.makeText(this, "שגיאה: לא נשלח ID אירוע.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "שגיאה: לא נשלח ID אירוע ב-Intent.", Toast.LENGTH_LONG).show();
             finish();
         }
     }
 
+
     // פונקציה לאתחול רכיבי ה-UI
     private void initUI() {
-        titleTextView = findViewById(R.id.titleEvent);      // לפי ה-XML שלך
-        artistTextView = findViewById(R.id.subTitleEvent);
-        locationTextView = findViewById(R.id.locationTextView);  // @+id/locationText
+        // 1. אתחול TextViews
+        titleEvent = findViewById(R.id.titleEvent);
+        subTitleEvent = findViewById(R.id.subTitleEvent);
+        locationTextView = findViewById(R.id.locationTextView);
         dateTextView = findViewById(R.id.dateTextView);
-        capacityTextView = findViewById(R.id.capacityEvent);
-        descriptionTextView = findViewById(R.id.descriptionEvent);
-        // ... אתחל רכיבים נוספים
+        eventDescription = findViewById(R.id.eventDescription);
+        capacityEvent = findViewById(R.id.capacityEvent); // שימו לב ל-ID capacityEvent
+
+        // 2. אתחול Buttons
+        registerBtn = findViewById(R.id.registerBtn);
+        addToCalendarBtn = findViewById(R.id.addToCalendarBtn);
+
+        // 3. אתחול ImageView
+        eventImage = findViewById(R.id.eventImage);
+
+        // ניתן להוסיף כאן מאזיני לחיצות (Click Listeners) לכפתורים
+        // registerBtn.setOnClickListener(v -> handleRegistration());
+        // addToCalendarBtn.setOnClickListener(v -> addToCalendar());
     }
     private void loadEventDetails(String eventId) {
         db.collection("events").document(eventId).get() // גישה ישירה למסמך לפי ה-ID
@@ -87,31 +106,62 @@ public class eventDetailActivity extends AppCompatActivity {
                 });
     }
 
+    private void registerToEvent() {
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        db.collection("users")
+                .document(uid)
+                .set(new java.util.HashMap<String, Object>() {{
+                    put("firebaseId", uid);
+                }}, com.google.firebase.firestore.SetOptions.merge())   // מוודא שמסמך משתמש קיים
+                .continueWithTask(task ->
+                        db.collection("users").document(uid)
+                                .update("registeredEventIds", FieldValue.arrayUnion(eventId))
+                )
+                .addOnSuccessListener(unused ->
+                        Toast.makeText(this, "נרשמת לאירוע 🎉", Toast.LENGTH_SHORT).show()
+                )
+                .addOnFailureListener(e -> {
+                    Log.e("REGISTER", "failed", e);
+                    Toast.makeText(this, "שגיאה בהרשמה", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
     // קובץ: EventDetailActivity.java (המשך)
 
     private void displayEventData(Event event) {
         // 1. שדות טקסט רגילים
-        titleTextView.setText(event.getName());
-        artistTextView.setText(event.getArtistName());
-        descriptionTextView.setText(event.getDescription());
-        locationTextView.setText(event.getAddress() + ", " + event.getCity());
-        descriptionTextView.setText(event.getDescription());
+
+        // מתאים ל-@+id/titleEvent
+        titleEvent.setText(event.getName());
+
+        // מתאים ל-@+id/subTitleEvent (נניח שזה האמן/סוג מוזיקה)
+        List<String> musicTypes = event.getMusicTypes();
+        subTitleEvent.setText(musicTypes == null ? "" : String.join(", ", musicTypes));
+
+        // מתאים ל-@+id/locationTextView
+        locationTextView.setText(event.getAddress());
 
         // 2. תאריך ושעה (דורש פירמוט)
-        // הערה: יש צורך להמיר את long dateTime לפורמט תאריך נקי
         String formattedDate = DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(event.getDateTime()));
+        // מתאים ל-@+id/dateTextView
         dateTextView.setText(formattedDate);
+
+        // מתאים ל-@+id/eventDescription - שימוש נכון בשם ה-ID
+        eventDescription.setText(event.getDescription());
+
+        // יש שדה תיאור נוסף ב-XML: descriptionEvent.
+        // נראה שזה מיותר ב-XML, או שצריך להחליט איזה מהם הוא התיאור הראשי.
+
+
 
         // 3. קיבולת
         String capacity = event.getReserved() + " / " + event.getMaxCapacity() + " משתתפים";
-        capacityTextView.setText(capacity);
+        // מתאים ל-@+id/capacityEvent
+        capacityEvent.setText(capacity);
 
-        // 4. (אופציונלי) טעינת תמונה
-        // אם יש לך URL של תמונה בשדה כלשהו ב-Event, תוכלי להשתמש בספרייה כמו Glide או Picasso
-        // כדי לטעון אותה לתוך ה-ImageView (eventImage).
-
-        // ... טיפול בכפתורי הרשמה (registerBtn) בהתאם ל-event.canRegister()
+        // 4. (אופציונלי) טעינת תמונה...
     }
-    // ...
-}   // קובץ: EventDetailActivity.java (המשך)
+}
 
