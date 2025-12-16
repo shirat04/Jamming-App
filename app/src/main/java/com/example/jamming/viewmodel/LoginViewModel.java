@@ -5,31 +5,57 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.jamming.repository.AuthRepository;
+import com.example.jamming.repository.UserRepository;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class LoginViewModel extends ViewModel {
 
 
-private final AuthRepository repo = new AuthRepository();
-public MutableLiveData<String> error = new MutableLiveData<>();
-public MutableLiveData<String> userType = new MutableLiveData<>();
-public void login(String identifier, String password) {
+    private final AuthRepository authRepo;
+    private final UserRepository userRepo;
 
-    if (identifier.isEmpty() || password.isEmpty()) {
-        error.setValue("נא למלא את כל השדות");
-        return;
+    public MutableLiveData<String> identifierError = new MutableLiveData<>();
+    public MutableLiveData<String> passwordError = new MutableLiveData<>();
+    public MutableLiveData<String> error = new MutableLiveData<>();
+
+    public MutableLiveData<String> userType = new MutableLiveData<>();
+    public LoginViewModel() {
+        authRepo = new AuthRepository();
+        userRepo = new UserRepository();
     }
+    public void login(String identifier, String password) {
 
-    if (identifier.contains("@")) {
+        boolean hasError = false;
+
+        if (identifier == null || identifier.isEmpty()) {
+            identifierError.setValue("חובה להזין שם משתמש או אימייל");
+            hasError = true;
+        } else {
+            identifierError.setValue(null);
+        }
+
+        if (password == null || password.isEmpty()) {
+            passwordError.setValue("חובה להזין סיסמה");
+            hasError = true;
+        } else {
+            passwordError.setValue(null);
+        }
+
+        if (hasError) return;
+
+
+        if (identifier.contains("@")) {
         // אימייל
-        repo.login(identifier, password)
-                .addOnSuccessListener(auth -> checkUserType(repo.getCurrentUid()))
+        authRepo.login(identifier, password)
+                .addOnSuccessListener(auth -> checkUserType( authRepo.getCurrentUid()))
                 .addOnFailureListener(e -> {
 
                     String msg = e.getMessage();
 
-                    if (msg != null && msg.contains("credential")) {
+                    if (e instanceof FirebaseAuthInvalidCredentialsException) {
                         error.setValue("שם משתמש או סיסמה אינם נכונים");
                     } else {
                         error.setValue("שגיאה בהתחברות, נסה שוב");
@@ -38,18 +64,18 @@ public void login(String identifier, String password) {
 
 
     } else {
-        repo.getUserByUsername(identifier)
+        authRepo.getUserByUsername(identifier)
                 .addOnSuccessListener(query -> {
 
                     if (query.isEmpty()) {
-                        error.setValue("שם המשתמש לא קיים");
+                        identifierError.setValue("שם המשתמש לא קיים");
                         return;
                     }
 
                     String email = query.getDocuments().get(0).getString("email");
 
-                    repo.login(email, password)
-                            .addOnSuccessListener(auth -> checkUserType(repo.getCurrentUid()))
+                    authRepo.login(email, password)
+                            .addOnSuccessListener(auth -> checkUserType( authRepo.getCurrentUid()))
                             .addOnFailureListener(e -> error.setValue("שם משתמש או סיסמה אינם נכונים"));
                 })
                 .addOnFailureListener(e -> error.setValue(e.getMessage()));
@@ -57,7 +83,11 @@ public void login(String identifier, String password) {
 }
     private void checkUserType(String uid) {
 
-        repo.getUserUId(uid)
+        if (uid == null) {
+            error.setValue("משתמש לא מחובר");
+            return;
+        }
+        userRepo.getUserById(uid)
                 .addOnSuccessListener(doc -> {
 
                     if (!doc.exists()) {
@@ -67,7 +97,7 @@ public void login(String identifier, String password) {
 
                     String type = doc.getString("userType");
 
-                    userType.setValue(type);  // שולח לאקטיביטי
+                    userType.setValue(type);
 
                 })
                 .addOnFailureListener(e -> error.setValue(e.getMessage()));
