@@ -127,6 +127,10 @@ public class MyEventUserActivity extends AppCompatActivity {
 
         db.collection("users").document(uid)
                 .update("registeredEventIds", FieldValue.arrayRemove(eventId))
+                .continueWithTask(task ->
+                        db.collection("events").document(eventId)
+                                .update("reserved", FieldValue.increment(-1))
+                )
                 .addOnSuccessListener(unused -> {
                     Toast.makeText(this, "ההרשמה בוטלה", Toast.LENGTH_SHORT).show();
                     loadMyEvents(); // ריענון
