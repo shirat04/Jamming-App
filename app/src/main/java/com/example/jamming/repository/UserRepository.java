@@ -26,8 +26,14 @@ public class UserRepository {
     public Task<DocumentSnapshot> getUserById(String uid) {
         return db.collection("users")
                 .document(uid)
-                .get();
-    }
+                .get()
+                .continueWith(task -> {
+                            DocumentSnapshot doc = task.getResult();
+                            if (doc == null || !doc.exists()) {
+                                throw new RuntimeException("User not found");
+                            }
+                    return doc;
+                }); }
 
     // Update a single field of the user document
     public Task<Void> updateUserField(String uid, String fieldName, Object value) {
@@ -70,7 +76,7 @@ public class UserRepository {
 
                     User user = doc.toObject(User.class);
 
-                    List<String> events = user != null && user.getRegisteredEventIds() != null
+                    List<String> events = (user != null && user.getRegisteredEventIds() != null)
                             ? user.getRegisteredEventIds() : new ArrayList<>();
 
                     return Tasks.forResult(events);
