@@ -16,19 +16,18 @@ import com.google.firebase.firestore.FieldValue;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
-// ... (ייבוא מחלקת Event ורכיבי UI כמו TextView)
 
 public class eventDetailActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private String eventId;
 
-    private TextView titleEvent;        // מותאם ל-R.id.titleEvent
-    private TextView subTitleEvent;     // מותאם ל-R.id.subTitleEvent
-    private TextView dateTextView;      // מותאם ל-R.id.dateTextView
-    private TextView locationTextView;  // מותאם ל-R.id.locationTextView
-    private TextView eventDescription;  // מותאם ל-R.id.eventDescription
-    private TextView capacityEvent;     // מותאם ל-R.id.capacityEvent
+    private TextView titleEvent;
+    private TextView subTitleEvent;
+    private TextView dateTextView;
+    private TextView locationTextView;
+    private TextView eventDescription;
+    private TextView capacityEvent;
     private Button registerBtn;
     private Button addToCalendarBtn;
     private ImageView eventImage;
@@ -38,23 +37,19 @@ public class eventDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_detail);
 
-        // אתחול Firebase ורכיבי UI
         db = FirebaseFirestore.getInstance();
-        initUI(); // קריאה לפונקציה שתאתחל את ה-TextViews והכפתורים
+        initUI();
 
-        // 1. קליטת ה-EVENT_ID מה-Intent
-        //intent כלי להעברת מסכים
         Bundle extras = getIntent().getExtras();
         if (extras != null && extras.containsKey("EVENT_ID")) {
             eventId = extras.getString("EVENT_ID");
 
-            // 2. אם יש ID, נתחיל לטעון את הנתונים
             if (eventId != null && !eventId.isEmpty()) {
                 loadEventDetails(eventId);
                 registerBtn.setOnClickListener(v -> registerToEvent());
             } else {
                 Toast.makeText(this, "שגיאה: ID אירוע חסר או ריק.", Toast.LENGTH_LONG).show();
-                finish(); // סגור את המסך אם אין ID
+                finish();
             }
         } else {
             Toast.makeText(this, "שגיאה: לא נשלח ID אירוע ב-Intent.", Toast.LENGTH_LONG).show();
@@ -63,7 +58,6 @@ public class eventDetailActivity extends AppCompatActivity {
     }
 
 
-    // פונקציה לאתחול רכיבי ה-UI
     private void initUI() {
         // 1. אתחול TextViews
         titleEvent = findViewById(R.id.titleEvent);
@@ -71,7 +65,7 @@ public class eventDetailActivity extends AppCompatActivity {
         locationTextView = findViewById(R.id.locationTextView);
         dateTextView = findViewById(R.id.dateTextView);
         eventDescription = findViewById(R.id.eventDescription);
-        capacityEvent = findViewById(R.id.capacityEvent); // שימו לב ל-ID capacityEvent
+        capacityEvent = findViewById(R.id.capacityEvent);
 
         // 2. אתחול Buttons
         registerBtn = findViewById(R.id.registerBtn);
@@ -127,8 +121,6 @@ public class eventDetailActivity extends AppCompatActivity {
                 });
     }
 
-
-    // קובץ: EventDetailActivity.java (המשך)
 
     private void displayEventData(Event event) {
         // 1. שדות טקסט רגילים
