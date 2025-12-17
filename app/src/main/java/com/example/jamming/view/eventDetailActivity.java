@@ -103,11 +103,13 @@ public class eventDetailActivity extends AppCompatActivity {
     private void registerToEvent() {
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        db.collection("users")
-                .document(uid)
-                .set(new java.util.HashMap<String, Object>() {{
-                    put("firebaseId", uid);
-                }}, com.google.firebase.firestore.SetOptions.merge())   // מוודא שמסמך משתמש קיים
+        db.collection("users").document(uid).set(new java.util.HashMap<String, Object>()
+                {{put("firebaseId", uid);}}
+                        ,com.google.firebase.firestore.SetOptions.merge())   // מוודא שמסמך משתמש קיים
+                .continueWithTask(task ->
+                        db.collection("events").document(eventId)
+                                .update("reserved", FieldValue.increment(1))
+                )
                 .continueWithTask(task ->
                         db.collection("users").document(uid)
                                 .update("registeredEventIds", FieldValue.arrayUnion(eventId))

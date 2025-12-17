@@ -1,6 +1,5 @@
 package com.example.jamming.view;
 
-import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
@@ -11,6 +10,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -81,7 +81,6 @@ public class CreateNewEvent extends AppCompatActivity {
 
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private void setupListeners() {
         dateInput.setOnClickListener(v -> showDatePicker());
         timeInput.setOnClickListener(v -> showTimePicker());

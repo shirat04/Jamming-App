@@ -11,14 +11,8 @@ import java.util.Map;
 
 public class AuthRepository {
 
-
-    private final FirebaseAuth auth;
-    private final FirebaseFirestore db;
-
-    public AuthRepository() {
-        auth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
-    }
+    private final FirebaseAuth auth = FirebaseAuth.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     // Login with email
     public Task<AuthResult> login(String email, String pass) {
@@ -41,6 +35,11 @@ public class AuthRepository {
     // Save user profile in Firestore
     public Task<Void> saveUserProfile(String uid, Map<String, Object> data) {
         return db.collection("users").document(uid).set(data);
+    }
+
+    // Get profile from Firestore
+    public Task<DocumentSnapshot> getUserUId(String uid) {
+        return db.collection("users").document(uid).get();
     }
 
     // Check if username exists

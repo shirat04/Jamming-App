@@ -19,8 +19,11 @@ public class EventRepository {
 
     // Create new event in Firestore
     public Task<Void> createEvent(Event event) {
+
         DocumentReference ref = db.collection("events").document();
+
         event.setId(ref.getId());
+
         return ref.set(event);
     }
 
@@ -72,4 +75,10 @@ public class EventRepository {
                 .update("reserved", FieldValue.increment(-1));
     }
 
+    // Replace entire event record (useful for cloning)
+    public Task<Void> overwriteEvent(String id, Event event) {
+        return db.collection("events")
+                .document(id)
+                .set(event);
+    }
 }
