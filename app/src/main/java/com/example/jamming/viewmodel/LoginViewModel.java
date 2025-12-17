@@ -5,57 +5,31 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.jamming.repository.AuthRepository;
-import com.example.jamming.repository.UserRepository;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class LoginViewModel extends ViewModel {
 
 
-    private final AuthRepository authRepo;
-    private final UserRepository userRepo;
+private final AuthRepository repo = new AuthRepository();
+public MutableLiveData<String> error = new MutableLiveData<>();
+public MutableLiveData<String> userType = new MutableLiveData<>();
+public void login(String identifier, String password) {
 
-    public MutableLiveData<String> identifierError = new MutableLiveData<>();
-    public MutableLiveData<String> passwordError = new MutableLiveData<>();
-    public MutableLiveData<String> error = new MutableLiveData<>();
-
-    public MutableLiveData<String> userType = new MutableLiveData<>();
-    public LoginViewModel() {
-        authRepo = new AuthRepository();
-        userRepo = new UserRepository();
+    if (identifier.isEmpty() || password.isEmpty()) {
+        error.setValue("נא למלא את כל השדות");
+        return;
     }
-    public void login(String identifier, String password) {
 
-        boolean hasError = false;
-
-        if (identifier == null || identifier.isEmpty()) {
-            identifierError.setValue("חובה להזין שם משתמש או אימייל");
-            hasError = true;
-        } else {
-            identifierError.setValue(null);
-        }
-
-        if (password == null || password.isEmpty()) {
-            passwordError.setValue("חובה להזין סיסמה");
-            hasError = true;
-        } else {
-            passwordError.setValue(null);
-        }
-
-        if (hasError) return;
-
-
-        if (identifier.contains("@")) {
+    if (identifier.contains("@")) {
         // אימייל
-        authRepo.login(identifier, password)
-                .addOnSuccessListener(auth -> checkUserType( authRepo.getCurrentUid()))
+        repo.login(identifier, password)
+                .addOnSuccessListener(auth -> checkUserType(repo.getCurrentUid()))
                 .addOnFailureListener(e -> {
 
                     String msg = e.getMessage();
 
-                    if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                    if (msg != null && msg.contains("credential")) {
                         error.setValue("שם משתמש או סיסמה אינם נכונים");
                     } else {
                         error.setValue("שגיאה בהתחברות, נסה שוב");
@@ -64,18 +38,18 @@ public class LoginViewModel extends ViewModel {
 
 
     } else {
-        authRepo.getUserByUsername(identifier)
+        repo.getUserByUsername(identifier)
                 .addOnSuccessListener(query -> {
 
                     if (query.isEmpty()) {
-                        identifierError.setValue("שם המשתמש לא קיים");
+                        error.setValue("שם המשתמש לא קיים");
                         return;
                     }
 
                     String email = query.getDocuments().get(0).getString("email");
 
-                    authRepo.login(email, password)
-                            .addOnSuccessListener(auth -> checkUserType( authRepo.getCurrentUid()))
+                    repo.login(email, password)
+                            .addOnSuccessListener(auth -> checkUserType(repo.getCurrentUid()))
                             .addOnFailureListener(e -> error.setValue("שם משתמש או סיסמה אינם נכונים"));
                 })
                 .addOnFailureListener(e -> error.setValue(e.getMessage()));
@@ -83,11 +57,7 @@ public class LoginViewModel extends ViewModel {
 }
     private void checkUserType(String uid) {
 
-        if (uid == null) {
-            error.setValue("משתמש לא מחובר");
-            return;
-        }
-        userRepo.getUserById(uid)
+        repo.getUserUId(uid)
                 .addOnSuccessListener(doc -> {
 
                     if (!doc.exists()) {
@@ -97,7 +67,7 @@ public class LoginViewModel extends ViewModel {
 
                     String type = doc.getString("userType");
 
-                    userType.setValue(type);
+                    userType.setValue(type);  // שולח לאקטיביטי
 
                 })
                 .addOnFailureListener(e -> error.setValue(e.getMessage()));

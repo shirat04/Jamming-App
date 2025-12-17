@@ -26,7 +26,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        usernameInput = findViewById(R.id.usernameInput);
+        usernameInput = findViewById(R.id.usernameInput);   // יכול להיות אימייל או username
         passwordInput = findViewById(R.id.passwordInput);
         Button loginBtn = findViewById(R.id.loginButton);
         Button registerBtn = findViewById(R.id.registerText);
@@ -49,21 +49,15 @@ public class LoginActivity extends AppCompatActivity {
 
     private void observeViewModel() {
 
-        loginViewModel.identifierError.observe(this, err ->
-                usernameInput.setError(err)
-        );
-        loginViewModel.passwordError.observe(this, err ->
-                passwordInput.setError(err)
-        );
-
         loginViewModel.getError().observe(this, err -> {
             if (err != null) {
                 errorText.setText(err);
                 errorText.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 errorText.setVisibility(View.GONE);
             }
         });
+
 
         loginViewModel.getUserType().observe(this, type -> {
             if (type == null) return;
