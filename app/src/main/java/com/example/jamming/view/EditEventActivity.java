@@ -3,11 +3,9 @@ package com.example.jamming.view;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -45,7 +43,7 @@ public class EditEventActivity extends AppCompatActivity {
     private String selectedAddress = "";
 
 
-    private Calendar selectedDateTime = Calendar.getInstance();
+    private final Calendar selectedDateTime = Calendar.getInstance();
     private final ActivityResultLauncher<Intent> mapPickerLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
@@ -274,20 +272,6 @@ public class EditEventActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Error updating event.", Toast.LENGTH_SHORT).show();
                 });
-    }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 2001 && resultCode == RESULT_OK && data != null) {
-            selectedLat = data.getDoubleExtra("lat", 0.0);
-            selectedLng = data.getDoubleExtra("lng", 0.0);
-            selectedAddress = data.getStringExtra("address");
-
-            locationVerified = true;
-            etEventLocation.setText(selectedAddress);
-            etEventLocation.setError(null);
-        }
     }
     private boolean verifyLocationIfNeeded(String locationText) {
         if (locationText.isEmpty()) {

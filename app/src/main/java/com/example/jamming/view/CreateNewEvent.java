@@ -51,7 +51,7 @@ public class CreateNewEvent extends AppCompatActivity {
     private FirebaseAuth auth;
     private UserRepository userRepository;
     private EventRepository eventRepository;
-    private ActivityResultLauncher<Intent> mapPickerLauncher =
+    private final ActivityResultLauncher<Intent> mapPickerLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
                     result -> {
@@ -204,18 +204,6 @@ public class CreateNewEvent extends AppCompatActivity {
         }, hour, minute, true);
 
         dialog.show();
-    }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 1001 && resultCode == RESULT_OK && data != null) {
-            selectedLat = data.getDoubleExtra("lat", 0.0);
-            selectedLng = data.getDoubleExtra("lng", 0.0);
-            selectedAddress = data.getStringExtra("address");
-            locationVerified = true;
-            locationInput.setText(selectedAddress);
-        }
     }
 
     private void publishEvent() {

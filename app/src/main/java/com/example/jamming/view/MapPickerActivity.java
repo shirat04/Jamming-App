@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.jamming.R;
@@ -23,10 +24,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class MapPickerActivity extends AppCompatActivity
-        implements OnMapReadyCallback {
+public class MapPickerActivity extends BaseMapActivity {
 
-    private GoogleMap googleMap;
     private double selectedLat = Double.NaN;
     private double selectedLng = Double.NaN;
     private String selectedAddress = "";
@@ -70,24 +69,21 @@ public class MapPickerActivity extends AppCompatActivity
     }
 
     @Override
-    public void onMapReady(GoogleMap map) {
-        this.googleMap = map;
-        map.getUiSettings().setZoomControlsEnabled(true);
-
-        // מיקום התחלתי – ישראל (אפשר לשנות)
+    protected void onMapReadyCustom() {
+        // מיקום התחלתי – ישראל
         LatLng israel = new LatLng(31.0461, 34.8516);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(israel, 7f));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(israel, 7f));
 
-        googleMap.setOnMapClickListener(latLng -> {
-            googleMap.clear();
-            googleMap.clear();
-            googleMap.addMarker(
+        mMap.setOnMapClickListener(latLng -> {
+            mMap.clear();
+
+            mMap.addMarker(
                     new MarkerOptions()
                             .position(latLng)
-                            .title(selectedAddress)
+                            .title("מיקום נבחר")
             );
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
 
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
 
             selectedLat = latLng.latitude;
             selectedLng = latLng.longitude;
@@ -98,18 +94,16 @@ public class MapPickerActivity extends AppCompatActivity
                         geocoder.getFromLocation(selectedLat, selectedLng, 1);
 
                 if (addresses != null && !addresses.isEmpty()) {
-                    Address address = addresses.get(0);
-                    selectedAddress = address.getAddressLine(0);
+                    selectedAddress = addresses.get(0).getAddressLine(0);
                 } else {
                     selectedAddress = "מיקום נבחר";
                 }
-
             } catch (IOException e) {
                 selectedAddress = "מיקום נבחר";
             }
         });
-
     }
+
 
     private void confirmLocation() {
         if (Double.isNaN(selectedLat) || Double.isNaN(selectedLng)) {
@@ -153,9 +147,9 @@ public class MapPickerActivity extends AppCompatActivity
                         address.getLongitude()
                 );
 
-                googleMap.clear();
-                googleMap.addMarker(new MarkerOptions().position(latLng));
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                mMap.clear();
+                mMap.addMarker(new MarkerOptions().position(latLng));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
 
                 selectedLat = latLng.latitude;
                 selectedLng = latLng.longitude;
