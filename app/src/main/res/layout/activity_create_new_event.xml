@@ -42,6 +42,7 @@
             android:textColor="@android:color/white"
             android:textSize="22sp"
             android:textStyle="bold" />
+
     </LinearLayout>
 
     <!-- תוכן המסך בגלילה -->
@@ -70,8 +71,7 @@
                 android:hint="@string/event_name"
                 android:padding="12dp"
                 android:textSize="16sp"
-                android:layout_marginBottom="12dp"
-                tools:ignore="Autofill,TextFields,VisualLintTextFieldSize" />
+                android:layout_marginBottom="12dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -85,12 +85,17 @@
                 <EditText
                     android:id="@+id/eventLocationInput"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="60dp"
                     android:layout_weight="1"
+                    android:autofillHints="postalAddress"
+                    android:background="@android:color/transparent"
+                    android:gravity="center_vertical"
                     android:hint="@string/location"
                     android:inputType="textPostalAddress"
-                    android:background="@android:color/transparent"
-                    android:padding="8dp"/>
+                    android:paddingStart="8dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="6dp" />
 
                 <ImageButton
                     android:id="@+id/mapButton"
@@ -98,6 +103,7 @@
                     android:layout_height="40dp"
                     android:background="@android:color/transparent"
                     android:src="@drawable/outline_map_24"/>
+
             </LinearLayout>
             <!-- הפס שמתחת למיקום -->
             <View
@@ -118,8 +124,7 @@
                 android:padding="12dp"
                 android:focusable="false"
                 android:clickable="true"
-                android:inputType="none"
-                tools:ignore="Autofill,KeyboardInaccessibleWidget,TextFields,VisualLintTextFieldSize" />
+                android:inputType="none" />
 
             <!-- שדה: שעה -->
             <EditText
@@ -131,8 +136,7 @@
                 android:padding="12dp"
                 android:focusable="false"
                 android:clickable="true"
-                android:inputType="none"
-                tools:ignore="Autofill,KeyboardInaccessibleWidget,TextFields,VisualLintTextFieldSize" />
+                android:inputType="none" />
             <!-- בחירת ז'אנר -->
             <EditText
                 android:id="@+id/genreSpinner"
@@ -142,8 +146,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:hint="@string/music_genre"
-                android:padding="8dp"
-                tools:ignore="Autofill,TextFields,VisualLintTextFieldSize,TextContrastCheck" />
+                android:padding="8dp" />
 
 
             <!-- שדה: קהל מקסימלי -->
@@ -154,8 +157,7 @@
                 android:layout_marginBottom="12dp"
                 android:hint="@string/max_capacity"
                 android:inputType="number"
-                android:padding="12dp"
-                tools:ignore="Autofill,TextContrastCheck,VisualLintTextFieldSize" />
+                android:padding="12dp" />
 
             <EditText
                 android:id="@+id/eventDescriptionInput"
@@ -165,8 +167,7 @@
                 android:gravity="top"
                 android:hint="@string/event_description"
                 android:inputType="textMultiLine"
-                android:padding="12dp"
-                tools:ignore="Autofill,TextContrastCheck,VisualLintTextFieldSize" />
+                android:padding="12dp" />
 
             <!-- כפתור ביטול -->
             <Button
@@ -176,8 +177,7 @@
                 android:layout_marginBottom="12dp"
                 android:text="@string/publish_event"
                 android:textColor="@android:color/white"
-                android:textSize="18sp"
-                tools:ignore="VisualLintButtonSize" />
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/cancelBtn"
