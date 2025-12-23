@@ -5,6 +5,8 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,11 +30,19 @@ public class MapPickerActivity extends AppCompatActivity
     private double selectedLat = Double.NaN;
     private double selectedLng = Double.NaN;
     private String selectedAddress = "";
+    private EditText etSearchLocation;
+    private ImageButton btnSearch;
+    private boolean locationSelected = false;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_picker);
+
+        etSearchLocation = findViewById(R.id.etSearchLocation);
+        btnSearch = findViewById(R.id.btnSearch);
 
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager()
@@ -44,6 +54,19 @@ public class MapPickerActivity extends AppCompatActivity
 
         Button confirmBtn = findViewById(R.id.confirmLocationBtn);
         confirmBtn.setOnClickListener(v -> confirmLocation());
+
+        btnSearch.setOnClickListener(v -> {
+            String query = etSearchLocation.getText().toString().trim();
+            if (query.isEmpty()) {
+                etSearchLocation.setError("נא להזין מיקום לחיפוש");
+                etSearchLocation.requestFocus();
+
+                return;
+            }
+
+            searchLocationOnMap(query);
+        });
+
     }
 
     @Override
@@ -56,7 +79,14 @@ public class MapPickerActivity extends AppCompatActivity
 
         googleMap.setOnMapClickListener(latLng -> {
             googleMap.clear();
-            googleMap.addMarker(new MarkerOptions().position(latLng));
+            googleMap.clear();
+            googleMap.addMarker(
+                    new MarkerOptions()
+                            .position(latLng)
+                            .title(selectedAddress)
+            );
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+
 
             selectedLat = latLng.latitude;
             selectedLng = latLng.longitude;
@@ -94,4 +124,49 @@ public class MapPickerActivity extends AppCompatActivity
         setResult(RESULT_OK, result);
         finish();
     }
+
+    private void searchLocationOnMap(String query) {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> results = geocoder.getFromLocationName(query, 1);
+
+            if (results != null && !results.isEmpty()) {
+                Address address = results.get(0);
+
+                String street = address.getThoroughfare();
+                String house = address.getSubThoroughfare();
+                boolean missingStreet = (street == null || street.trim().isEmpty());
+                boolean missingHouse  = (house == null  || house.trim().isEmpty());
+
+                if (missingStreet || missingHouse) {
+                    Toast.makeText(
+                            this,
+                            "הכתובת לא נמצאה במדויק. נא לבחור נקודה ידנית במפה",
+                            Toast.LENGTH_LONG
+                    ).show();
+                    return;
+                }
+
+                LatLng latLng = new LatLng(
+                        address.getLatitude(),
+                        address.getLongitude()
+                );
+
+                googleMap.clear();
+                googleMap.addMarker(new MarkerOptions().position(latLng));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+
+                selectedLat = latLng.latitude;
+                selectedLng = latLng.longitude;
+                selectedAddress = address.getAddressLine(0);
+                locationSelected = true;
+            } else {
+                Toast.makeText(this, "לא נמצאה תוצאה", Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (IOException e) {
+            Toast.makeText(this, "שגיאה בחיפוש", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }

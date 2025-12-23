@@ -3,20 +3,19 @@ package com.example.jamming.view;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.jamming.R;
@@ -47,11 +46,29 @@ public class CreateNewEvent extends AppCompatActivity {
     private TextView cancelBtn;
 
 
-    private Calendar selectedDateTime = Calendar.getInstance();
+    private final Calendar selectedDateTime = Calendar.getInstance();
 
     private FirebaseAuth auth;
     private UserRepository userRepository;
     private EventRepository eventRepository;
+    private ActivityResultLauncher<Intent> mapPickerLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                            Intent data = result.getData();
+
+                            selectedLat = data.getDoubleExtra("lat", 0.0);
+                            selectedLng = data.getDoubleExtra("lng", 0.0);
+                            selectedAddress = data.getStringExtra("address");
+
+                            locationVerified = true;
+                            locationInput.setText(selectedAddress);
+                            locationInput.setError(null);
+                        }
+                    }
+            );
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +106,7 @@ public class CreateNewEvent extends AppCompatActivity {
 
         mapButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, MapPickerActivity.class);
-            startActivityForResult(intent, 1001);
+            mapPickerLauncher.launch(intent);
         });
 
         locationInput.addTextChangedListener(new TextWatcher() {
@@ -108,30 +125,8 @@ public class CreateNewEvent extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {}
         });
-
-        locationInput.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_UP) {
-
-                Drawable drawableEnd =
-                        locationInput.getCompoundDrawablesRelative()[2];
-
-                if (drawableEnd != null) {
-                    int drawableWidth = drawableEnd.getBounds().width();
-
-                    // בדיקה אם הלחיצה הייתה על האייקון בלבד
-                    if (event.getRawX() >=
-                            (locationInput.getRight() - drawableWidth)) {
-
-                        Intent intent = new Intent(this, MapPickerActivity.class);
-                        startActivityForResult(intent, 1001);
-                        return true; // חשוב! מונע המשך טיפול
-                    }
-                }
-            }
-            return false; // מאפשר הקלדה רגילה
-        });
-
     }
+
     private boolean verifyLocationIfNeeded(String locationText) {
         if (locationVerified) return true;
 
@@ -142,6 +137,18 @@ public class CreateNewEvent extends AppCompatActivity {
 
             if (results != null && !results.isEmpty()) {
                 Address addr = results.get(0);
+
+                String street = addr.getThoroughfare();
+                String house = addr.getSubThoroughfare();
+                boolean missingStreet = (street == null || street.trim().isEmpty());
+                boolean missingHouse  = (house == null  || house.trim().isEmpty());
+
+
+                if (missingStreet || missingHouse) {
+                    locationInput.setError("נא להזין כתובת מדויקת (רחוב ומספר) או לבחור מהמפה");
+                    locationInput.requestFocus();
+                    return false;
+                }
                 selectedLat = addr.getLatitude();
                 selectedLng = addr.getLongitude();
                 selectedAddress = addr.getAddressLine(0);

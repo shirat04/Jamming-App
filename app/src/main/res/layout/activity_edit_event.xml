@@ -20,14 +20,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
+
         <ImageButton
             android:id="@+id/btnMore"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/outline_menu_24"
             android:contentDescription="@string/menu"
-            app:tint="@android:color/white" />
+            android:src="@drawable/outline_menu_24"
+            app:tint="@android:color/white"
+            tools:ignore="TouchTargetSizeCheck" />
         <Space
             android:layout_width="12dp"
             android:layout_height="wrap_content" />
@@ -90,15 +92,33 @@
                 android:hint="@string/music_genre"
                 tools:ignore="Autofill,SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
 
-            <EditText
-                android:id="@+id/etEventLocation"
+            <!-- Location row -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_marginBottom="12dp"
-                android:hint="@string/location"
-                android:drawableEnd="@drawable/outline_map_24"
-                android:drawablePadding="8dp"
-                tools:ignore="Autofill,TextFields,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+                android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/etEventLocation"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/location"
+                    tools:ignore="Autofill,TextFields,TouchTargetSizeCheck,VisualLintTextFieldSize,DuplicateSpeakableTextCheck" />
+
+                <ImageButton
+                    android:id="@+id/btnOpenMap"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/outline_map_24"
+                    android:contentDescription="@string/location"
+                    app:tint="#0B375E" />
+
+            </LinearLayout>
 
             <!-- Date -->
             <EditText

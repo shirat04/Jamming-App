@@ -10,8 +10,11 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.jamming.R;
@@ -30,6 +33,8 @@ public class EditEventActivity extends AppCompatActivity {
 
     private String eventId;
     private FirebaseFirestore db;
+    private ImageButton btnOpenMap;
+
 
     private EditText etEventTitle, etEventDescription, etEventLocation, etEventDate, etEventGenre, etEventTime, etEventCapacity;
     private Button btnSaveEvent, btnDeleteEvent;
@@ -41,6 +46,24 @@ public class EditEventActivity extends AppCompatActivity {
 
 
     private Calendar selectedDateTime = Calendar.getInstance();
+    private final ActivityResultLauncher<Intent> mapPickerLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+
+                            Intent data = result.getData();
+                            selectedLat = data.getDoubleExtra("lat", 0.0);
+                            selectedLng = data.getDoubleExtra("lng", 0.0);
+                            selectedAddress = data.getStringExtra("address");
+
+                            locationVerified = true;
+                            etEventLocation.setText(selectedAddress);
+                            etEventLocation.setError(null);
+                        }
+                    }
+            );
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +80,7 @@ public class EditEventActivity extends AppCompatActivity {
                 loadEventData(eventId);
             }
         }
-
         setupListeners();
-
     }
 
     private void initViews() {
@@ -72,6 +93,7 @@ public class EditEventActivity extends AppCompatActivity {
         btnSaveEvent = findViewById(R.id.btnSaveEvent);
         btnDeleteEvent = findViewById(R.id.btnDeleteEvent);
         etEventGenre = findViewById(R.id.editMusicgenre);
+        btnOpenMap = findViewById(R.id.btnOpenMap);
     }
 
     private void setupListeners() {
@@ -80,6 +102,10 @@ public class EditEventActivity extends AppCompatActivity {
 
         btnSaveEvent.setOnClickListener(v -> saveEventChanges());
         btnDeleteEvent.setOnClickListener(v -> deleteEvent());
+        btnOpenMap.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MapPickerActivity.class);
+            mapPickerLauncher.launch(intent);
+        });
 
         etEventLocation.addTextChangedListener(new android.text.TextWatcher() {
             @Override
@@ -93,30 +119,6 @@ public class EditEventActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(android.text.Editable s) {}
         });
-
-
-
-        etEventLocation.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_UP) {
-
-                Drawable drawableEnd =
-                        etEventLocation.getCompoundDrawablesRelative()[2];
-
-                if (drawableEnd != null) {
-                    int drawableWidth = drawableEnd.getBounds().width();
-
-                    if (event.getRawX() >=
-                            (etEventLocation.getRight() - drawableWidth)) {
-
-                        Intent intent = new Intent(this, MapPickerActivity.class);
-                        startActivityForResult(intent, 2001);
-                        return true;
-                    }
-                }
-            }
-            return false;
-        });
-
     }
 
     private void loadEventData(String eventId) {
@@ -304,11 +306,13 @@ public class EditEventActivity extends AppCompatActivity {
             if (results != null && !results.isEmpty()) {
                 Address addr = results.get(0);
 
-// בדיקה: האם זו כתובת מלאה ולא רק עיר
-                String street = addr.getThoroughfare();       // שם רחוב
-                String houseNumber = addr.getSubThoroughfare(); // מספר בית
+                String street = addr.getThoroughfare();
+                String house = addr.getSubThoroughfare();
+                boolean missingStreet = (street == null || street.trim().isEmpty());
+                boolean missingHouse  = (house == null  || house.trim().isEmpty());
 
-                if (street == null && houseNumber == null) {
+
+                if (missingStreet || missingHouse) {
                     etEventLocation.setError("נא להזין כתובת מדויקת (רחוב ומספר) או לבחור מהמפה");
                     etEventLocation.requestFocus();
                     return false;
