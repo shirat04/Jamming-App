@@ -72,6 +72,7 @@ public class MapPickerActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap map) {
         this.googleMap = map;
+        map.getUiSettings().setZoomControlsEnabled(true);
 
         // מיקום התחלתי – ישראל (אפשר לשנות)
         LatLng israel = new LatLng(31.0461, 34.8516);

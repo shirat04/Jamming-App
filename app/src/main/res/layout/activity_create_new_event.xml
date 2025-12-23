@@ -26,9 +26,10 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/outline_menu_24"
             android:contentDescription="@string/menu"
-            app:tint="@android:color/white" />
+            android:src="@drawable/outline_menu_24"
+            app:tint="@android:color/white"
+            tools:ignore="TouchTargetSizeCheck" />
         <Space
             android:layout_width="12dp"
             android:layout_height="wrap_content" />
@@ -99,8 +100,9 @@
 
                 <ImageButton
                     android:id="@+id/mapButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="@string/open_map"
                     android:background="@android:color/transparent"
                     android:src="@drawable/outline_map_24"/>
 
@@ -124,7 +126,8 @@
                 android:padding="12dp"
                 android:focusable="false"
                 android:clickable="true"
-                android:inputType="none" />
+                android:inputType="none"
+                tools:ignore="KeyboardInaccessibleWidget,TextFields" />
 
             <!-- שדה: שעה -->
             <EditText
@@ -136,7 +139,8 @@
                 android:padding="12dp"
                 android:focusable="false"
                 android:clickable="true"
-                android:inputType="none" />
+                android:inputType="none"
+                tools:ignore="KeyboardInaccessibleWidget" />
             <!-- בחירת ז'אנר -->
             <EditText
                 android:id="@+id/genreSpinner"
