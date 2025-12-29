@@ -13,8 +13,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-
         android:theme="@style/Theme.Jamming">
+        <activity
+            android:name=".view.EditProfileUserActivity"
+            android:exported="false" />
         <activity
             android:name=".view.MapPickerActivity"
             android:exported="false" />
@@ -40,7 +42,7 @@
             android:name=".view.profilePreferencesActivity"
             android:exported="false" />
         <activity
-            android:name=".view.eventDetailActivity"
+            android:name=".view.EventDetailActivity"
             android:exported="false" />
         <activity
             android:name=".view.CreateNewEvent"
@@ -54,7 +56,6 @@
         <activity
             android:name=".view.LoginActivity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -74,7 +75,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="${MAPS_API_KEY}"  />
+            android:value="${MAPS_API_KEY}" />
     </application>
 
 </manifest>

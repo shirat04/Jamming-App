@@ -114,9 +114,10 @@ public class OwnerActivity extends AppCompatActivity {
         TextView eventName = eventCardView.findViewById(R.id.myEventTitle);
         TextView eventLocation = eventCardView.findViewById(R.id.myEventLocation);
         TextView eventDate = eventCardView.findViewById(R.id.myEventDate);
-        TextView eventGenre = eventCardView.findViewById(R.id.myEventStatus);
+        TextView eventGenre = eventCardView.findViewById(R.id.myEventGenre);
         Button btnEdit = eventCardView.findViewById(R.id.btnMyEventDetails);
         Button btnCancel = eventCardView.findViewById(R.id.btnCancelMyEvent);
+        TextView eventSpots =  eventCardView.findViewById(R.id.myEventCapacity);
 
         // Format date and time
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy • HH:mm", Locale.getDefault());
@@ -124,10 +125,10 @@ public class OwnerActivity extends AppCompatActivity {
 
         // Populate the views
         eventName.setText(event.getName());
-        eventLocation.setText("📍 " + event.getAddress() );
-        eventDate.setText("🕒 " + formattedDate);
-        eventGenre.setText("🎵 " + String.join(", ", event.getMusicTypes()));
-        //eventSpots.setText("👥 " + event.getReserved() + "/" + event.getMaxCapacity() + " spots");
+        eventLocation.setText( event.getAddress() );
+        eventDate.setText( formattedDate);
+        eventGenre.setText( String.join(", ", event.getMusicTypes()));
+        eventSpots.setText( event.getReserved() + "/" + event.getMaxCapacity() + " spots");
 
         btnEdit.setOnClickListener(v -> {
             Intent intent = new Intent(OwnerActivity.this, EditEventActivity.class);

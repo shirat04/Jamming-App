@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F2F4F7"
-    tools:context=".view.eventDetailActivity">
+    tools:context=".view.EventDetailActivity">
 
     <!-- תמונת האירוע -->
     <ImageView
@@ -19,6 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription,ImageContrastCheck" />
+
 
     <!-- כרטיס לבן עם פרטים -->
     <androidx.cardview.widget.CardView
@@ -34,29 +35,23 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
+            android:id="@+id/contentLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="20dp"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <!-- כותרת -->
             <TextView
                 android:id="@+id/titleEvent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/jazz_open_mic_night"
+                android:hint="title event"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="#000000"/>
-
-            <TextView
-                android:id="@+id/subTitleEvent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/cafe_bloute_9_pm"
-                android:textSize="15sp"
-                android:layout_marginTop="4dp"
-                android:textColor="#555555"/>
 
             <!-- פרטי מיקום -->
             <LinearLayout
@@ -66,12 +61,25 @@
                 android:gravity="center_vertical"
                 android:layout_marginTop="16dp">
 
+                <!-- אימוג'י -->
                 <TextView
-                    android:id="@+id/locationTextView"  android:layout_width="wrap_content"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/_123_main_st"
-                    android:textSize="16sp"/>
+                    android:text="📍"
+                    android:textSize="16sp" />
 
+                <Space
+                    android:layout_width="8dp"
+                    android:layout_height="wrap_content" />
+
+                <!-- טקסט -->
+                <TextView
+                    android:id="@+id/locationTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="Location"
+                    android:textSize="16sp"
+                    android:textColor="#555555" />
             </LinearLayout>
 
             <!-- תאריך ושעה -->
@@ -82,53 +90,106 @@
                 android:gravity="center_vertical"
                 android:layout_marginTop="10dp">
 
+                <!-- אימוג'י -->
                 <TextView
-                    android:id="@+id/dateTextView"  android:layout_width="wrap_content"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/_15_01_2024_19_00"
-                    android:textSize="16sp"/>
+                    android:text="🕒"
+                    android:textSize="16sp" />
 
+                <Space
+                    android:layout_width="8dp"
+                    android:layout_height="wrap_content" />
+
+                <!-- טקסט -->
+                <TextView
+                    android:id="@+id/dateTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="Date and Time"
+                    android:textSize="16sp"
+                    android:textColor="#555555" />
             </LinearLayout>
+
+            <!-- ז׳אנר -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="10dp">
+
+                <TextView
+                    android:text="🎵"
+                    android:textSize="16sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"/>
+
+                <Space
+                    android:layout_width="8dp"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/genreTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#555555"
+                    android:text=""
+                    tools:text="Jazz / Open Mic"
+                    android:includeFontPadding="false"/>
+            </LinearLayout>
+
+            <!-- קיבולת -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:text="👥"
+                    android:textSize="16sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"/>
+
+                <Space
+                    android:layout_width="8dp"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/capacityEvent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"
+                    android:text=""
+                    tools:text="15 / 20 seats"
+                    android:includeFontPadding="false"/>
+            </LinearLayout>
+
             <!-- תיאור האירוע -->
             <TextView
-                android:id="@+id/descriptionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/event_description"
+                android:text="Event Description"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:layout_marginTop="16dp"
-                android:textColor="#000000"/>
+                android:textColor="#000000"
+                android:layout_marginTop="16dp"/>
 
             <TextView
                 android:id="@+id/eventDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="event_description_text"
                 android:textSize="14sp"
                 android:textColor="#555555"
-                android:layout_marginTop="6dp"
-                android:lineSpacingExtra="4dp"/>
-
-            <!-- קיבולת -->
-            <TextView
-                android:id="@+id/capacityEvent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/capacity_15_20_spots"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_marginTop="14dp"
-                android:textColor="#333333"/>
-
-            <TextView
-                android:id="@+id/descriptionEvent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/sample_event_description"
-                android:textSize="15sp"
-                android:textColor="#333333" />
+                android:lineSpacingExtra="4dp"
+                android:text=""/>
 
             <!-- כפתור הרשמה -->
             <Button

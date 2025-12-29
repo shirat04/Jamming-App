@@ -26,30 +26,119 @@
             android:textColor="@color/black"/>
 
         <!-- מיקום -->
-        <TextView
-            android:id="@+id/myEventLocation"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="📍 Location" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📍"
+                android:textSize="16sp"
+                android:includeFontPadding="false"/>
+
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/myEventLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Location"
+                android:textSize="16sp"
+                android:includeFontPadding="false"/>
+        </LinearLayout>
         <!-- תאריך ושעה -->
-        <TextView
-            android:id="@+id/myEventDate"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="🕒 Date and Time" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🕒"
+                android:textSize="16sp"
+                android:includeFontPadding="false"/>
+
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/myEventDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Date and Time"
+                android:textSize="16sp"
+                android:includeFontPadding="false"/>
+        </LinearLayout>
+
+        <!-- ז'אנר -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🎵"
+                android:textSize="16sp"
+                android:includeFontPadding="false"/>
+
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/myEventGenre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gener"
+                android:textSize="16sp"
+                android:includeFontPadding="false"/>
+        </LinearLayout>
+
+        <!-- קיבולת / מספר מושבים -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="6dp">
+
+            <!-- אימוג'י -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="👥"
+                android:textSize="16sp"
+                android:includeFontPadding="false"/>
+
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="wrap_content" />
+
+            <!-- טקסט קיבולת -->
+            <TextView
+                android:id="@+id/myEventCapacity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="Capacity: 15 / 20"
+                android:textSize="16sp"
+                android:includeFontPadding="false"/>
+        </LinearLayout>
 
         <!-- סטטוס -->
-        <TextView
-            android:id="@+id/myEventStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Registered"
-            android:textColor="#2E7D32"
-            android:textStyle="bold" />
 
         <!-- קו מפריד -->
         <View
@@ -66,18 +155,21 @@
 
             <Button
                 android:id="@+id/btnMyEventDetails"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="8dp"
                 android:backgroundTint="#1E63E9"
                 android:text="View Details"
                 android:textColor="@android:color/white" />
 
+            <Space
+                android:layout_width="12dp"
+                android:layout_height="wrap_content" />
+
             <Button
                 android:id="@+id/btnCancelMyEvent"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:backgroundTint="#E53935"
                 android:text="Cancel Registration"

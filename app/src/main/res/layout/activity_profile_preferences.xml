@@ -224,36 +224,6 @@
             </LinearLayout>
 
             <!-- ▬▬▬ ROW: Registered Events Switch ▬▬▬ -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="55dp"
-                android:background="@android:color/white"
-                android:gravity="center_vertical"
-                android:padding="12dp"
-                android:layout_marginBottom="20dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:contentDescription="@string/todo"
-                    android:src="@android:drawable/btn_star_big_off"
-                    tools:ignore="ImageContrastCheck" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="@string/my_registered_events"
-                    android:textSize="16sp"/>
-
-                <Switch
-                    android:id="@+id/registerSwitch"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:minHeight="48dp"
-                    tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck,VisualLintButtonSize" />
-            </LinearLayout>
 
             <!-- ▬▬▬ LOGOUT BUTTON ▬▬▬ -->
             <Button

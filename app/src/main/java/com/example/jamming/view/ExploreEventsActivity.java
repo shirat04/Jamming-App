@@ -12,8 +12,6 @@ import androidx.activity.EdgeToEdge;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.repository.UserRepository;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -79,7 +77,7 @@ public class ExploreEventsActivity extends BaseMapActivity {
 
         String eventId = (String) tag;
 
-        Intent intent = new Intent(this, eventDetailActivity.class);
+        Intent intent = new Intent(this, EventDetailActivity.class);
         intent.putExtra("EVENT_ID", eventId);
 
         startActivity(intent);

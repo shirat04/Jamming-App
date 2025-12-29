@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F2F4F7">
-
+    tools:context=".view.EditProfileUserActivity">
     <!-- 🔵 TOP BAR -->
     <LinearLayout
         android:id="@+id/topBar"
@@ -20,7 +19,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- ☰ MENU -->
         <ImageButton
             android:id="@+id/btnMenu"
             android:layout_width="32dp"
@@ -58,43 +56,39 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:orientation="horizontal"
-            android:background="@android:color/white"
-            android:padding="12dp"
-            android:elevation="4dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:contentDescription="@string/todo"
-                android:src="@android:drawable/sym_def_app_icon"
-                android:layout_marginEnd="12dp"/>
-
+            <!-- Profile Header -->
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:orientation="horizontal"
+                android:background="@android:color/white"
+                android:padding="12dp"
+                android:elevation="4dp"
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@android:drawable/sym_def_app_icon"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="@string/todo"/>
 
                 <TextView
+                    android:id="@+id/txtUsername"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/owner_name"
+                    android:text="Username"
                     android:textStyle="bold"
                     android:textSize="18sp"/>
             </LinearLayout>
 
-            </LinearLayout>
-            <!-- Full Name / Business Name -->
+            <!-- Full Name -->
             <EditText
                 android:id="@+id/inputName"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:hint="Business / Owner Name"
+                android:hint="Full Name"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp"/>
 
@@ -116,7 +110,8 @@
                 android:hint="Phone Number"
                 android:inputType="phone"
                 android:padding="12dp"
-                android:layout_marginBottom="12dp"/>
+                />
+
 
             <Button
                 android:id="@+id/btnChangePassword"
@@ -125,7 +120,7 @@
                 android:text="Change Password"
                 android:backgroundTint="#E0E0E0"
                 android:textColor="@android:color/black"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:layout_marginBottom="12dp"/>
 
             <!-- Save Button -->
@@ -134,10 +129,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Save Changes"
-                android:textSize="18sp"
-                android:textColor="@android:color/white"/>
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
 
         </LinearLayout>
+
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

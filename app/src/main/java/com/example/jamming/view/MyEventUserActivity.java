@@ -96,7 +96,8 @@ public class MyEventUserActivity extends AppCompatActivity {
         TextView title = card.findViewById(R.id.myEventTitle);
         TextView location = card.findViewById(R.id.myEventLocation);
         TextView date = card.findViewById(R.id.myEventDate);
-        TextView status = card.findViewById(R.id.myEventStatus);
+        TextView gener = card.findViewById(R.id.myEventGenre);
+        TextView capacity = card.findViewById(R.id.myEventCapacity);
 
         Button detailsBtn = card.findViewById(R.id.btnMyEventDetails);
         Button cancelBtn = card.findViewById(R.id.btnCancelMyEvent);
@@ -104,15 +105,24 @@ public class MyEventUserActivity extends AppCompatActivity {
         title.setText(event.getName());
         location.setText(event.getAddress());
 
+        List<String> genres = event.getMusicTypes();
+        if (genres != null && !genres.isEmpty()) {
+            gener.setText(String.join(" / ", genres));
+        } else {
+            gener.setText("No genre");
+        }
+
+        String capacityText = event.getReserved() + " / " + event.getMaxCapacity() + " משתתפים";
+        capacity.setText(capacityText);;
+
+
         // אצלך event.getDateTime() הוא millis (כמו שראיתי ב-EventDetailActivity)
         String formattedDate = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
                 .format(new Date(event.getDateTime()));
         date.setText(formattedDate);
 
-        status.setText(getString(R.string.registered)); // או "Registered"
-
         detailsBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(this, eventDetailActivity.class);
+            Intent intent = new Intent(this, EventDetailActivity.class);
             intent.putExtra("EVENT_ID", eventId);
             startActivity(intent);
         });
