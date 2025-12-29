@@ -81,16 +81,14 @@
                 android:minLines="3"
                 tools:ignore="Autofill,VisualLintTextFieldSize,TextContrastCheck" />
 
-            <!-- Location -->
-            <EditText
-                android:id="@+id/editMusicgenre"
+            <TextView
+                android:id="@+id/selectGenreText"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:ems="10"
-                android:inputType="text"
-                android:hint="@string/music_genre"
-                tools:ignore="Autofill,SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
+                android:layout_height="50dp"
+                android:padding="12dp"
+                android:text="Select genres"
+                android:textColor="#555555"
+                android:gravity="center_vertical" />
 
             <!-- Location row -->
             <LinearLayout

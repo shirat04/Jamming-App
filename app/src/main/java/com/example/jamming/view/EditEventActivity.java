@@ -1,5 +1,6 @@
 package com.example.jamming.view;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -21,6 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -34,9 +37,13 @@ public class EditEventActivity extends AppCompatActivity {
     private ImageButton btnOpenMap;
 
 
-    private EditText etEventTitle, etEventDescription, etEventLocation, etEventDate, etEventGenre, etEventTime, etEventCapacity;
+    private EditText etEventTitle, etEventDescription, etEventLocation, etEventDate, etEventTime, etEventCapacity;
     private Button btnSaveEvent, btnDeleteEvent;
     private boolean locationVerified = false;
+    private TextView selectGenreText;
+    private boolean[] checkedGenres;
+    private final List<String> selectedGenres = new ArrayList<>();
+    private String[] allGenres;
 
     private double selectedLat = 0.0;
     private double selectedLng = 0.0;
@@ -90,8 +97,9 @@ public class EditEventActivity extends AppCompatActivity {
         etEventCapacity = findViewById(R.id.etEventCapacity);
         btnSaveEvent = findViewById(R.id.btnSaveEvent);
         btnDeleteEvent = findViewById(R.id.btnDeleteEvent);
-        etEventGenre = findViewById(R.id.editMusicgenre);
         btnOpenMap = findViewById(R.id.btnOpenMap);
+        selectGenreText = findViewById(R.id.selectGenreText);
+
     }
 
     private void setupListeners() {
@@ -117,7 +125,40 @@ public class EditEventActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(android.text.Editable s) {}
         });
+        allGenres = getResources().getStringArray(R.array.music_genres);
+        checkedGenres = new boolean[allGenres.length];
+
+        selectGenreText.setOnClickListener(v -> openGenreDialog());
     }
+
+    private void openGenreDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select music genres");
+
+        builder.setMultiChoiceItems(allGenres, checkedGenres,
+                (dialog, which, isChecked) -> {
+                    if (isChecked) {
+                        if (!selectedGenres.contains(allGenres[which])) {
+                            selectedGenres.add(allGenres[which]);
+                        }
+                    } else {
+                        selectedGenres.remove(allGenres[which]);
+                    }
+                });
+
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            selectGenreText.setText(
+                    android.text.TextUtils.join(" / ", selectedGenres)
+            );
+            selectGenreText.setError(null);
+
+        });
+
+        builder.setNegativeButton("Cancel", null);
+
+        builder.show();
+    }
+
 
     private void loadEventData(String eventId) {
         db.collection("events").document(eventId).get()
@@ -136,11 +177,15 @@ public class EditEventActivity extends AppCompatActivity {
                             etEventCapacity.setText(String.valueOf(event.getMaxCapacity()));
                             List<String> genres = event.getMusicTypes();
 
-                            if (genres != null && !genres.isEmpty()) {
-                                etEventGenre.setText(String.join(", ", genres));
-                            } else {
-                                etEventGenre.setText("");
+                            selectedGenres.clear();
+                            selectedGenres.addAll(genres);
+
+                            for (int i = 0; i < allGenres.length; i++) {
+                                checkedGenres[i] = genres.contains(allGenres[i]);
                             }
+                            selectGenreText.setText(
+                                    android.text.TextUtils.join(" / ", genres)
+                            );
 
                             selectedDateTime.setTimeInMillis(event.getDateTime());
                             SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -191,7 +236,6 @@ public class EditEventActivity extends AppCompatActivity {
         String description = etEventDescription.getText().toString().trim();
         String location = etEventLocation.getText().toString().trim();
         String capacityStr = etEventCapacity.getText().toString().trim();
-        String genreMusic = etEventGenre.getText().toString().trim();
 
 
         if (title.isEmpty()) {
@@ -204,10 +248,11 @@ public class EditEventActivity extends AppCompatActivity {
             etEventDescription.requestFocus();
             return;
         }
-        if (genreMusic.isEmpty()) {
-            etEventGenre.setError("נא להזין ז'אנר");
-            etEventGenre.requestFocus();
+        if (selectedGenres == null || selectedGenres.isEmpty()) {
+            selectGenreText.setError("נא להזין ז'אנר");
+            selectGenreText.requestFocus();
             return;
+
         }
         if (location.isEmpty()) {
             etEventLocation.setError("נא להזין את מיקום האירוע");
@@ -259,9 +304,7 @@ public class EditEventActivity extends AppCompatActivity {
         updatedEvent.put("longitude", selectedLng);
         updatedEvent.put("maxCapacity", Integer.parseInt(capacityStr));
         updatedEvent.put("dateTime", selectedDateTime.getTimeInMillis());
-        List<String> genres =
-                List.of(genreMusic.split("\\s*,\\s*"));
-        updatedEvent.put("musicTypes", genres);
+        updatedEvent.put("musicTypes", selectedGenres);
 
 
         db.collection("events").document(eventId).update(updatedEvent)

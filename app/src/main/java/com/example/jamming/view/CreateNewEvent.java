@@ -1,5 +1,6 @@
 package com.example.jamming.view;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
@@ -27,6 +28,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -34,7 +36,7 @@ import java.util.Locale;
 
 public class CreateNewEvent extends AppCompatActivity {
 
-    private EditText eventNameInput, genreInput, capacityInput, descriptionInput, dateInput, timeInput,locationInput;
+    private EditText eventNameInput, capacityInput, descriptionInput, dateInput, timeInput,locationInput;
     private boolean locationVerified = false;
 
     private double selectedLat = 0.0;
@@ -44,6 +46,11 @@ public class CreateNewEvent extends AppCompatActivity {
 
     private Button publishBtn;
     private TextView cancelBtn;
+    private TextView selectGenreText;
+    private boolean[] checkedGenres;
+    private final List<String> selectedGenres = new ArrayList<>();
+    private String[] allGenres;
+
 
 
     private final Calendar selectedDateTime = Calendar.getInstance();
@@ -86,7 +93,7 @@ public class CreateNewEvent extends AppCompatActivity {
 
     private void initViews() {
         eventNameInput = findViewById(R.id.eventNameInput);
-        genreInput = findViewById(R.id.genreSpinner);
+        selectGenreText = findViewById(R.id.selectGenreText);
         capacityInput = findViewById(R.id.eventCapacityInput);
         descriptionInput = findViewById(R.id.eventDescriptionInput);
         dateInput = findViewById(R.id.dateInput);
@@ -95,6 +102,7 @@ public class CreateNewEvent extends AppCompatActivity {
         cancelBtn = findViewById(R.id.cancelBtn);
         locationInput = findViewById(R.id.eventLocationInput);
         mapButton = findViewById(R.id.mapButton);
+        selectGenreText = findViewById(R.id.genreSpinner);
 
     }
 
@@ -125,7 +133,36 @@ public class CreateNewEvent extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {}
         });
+
+        allGenres = getResources().getStringArray(R.array.music_genres);
+        checkedGenres = new boolean[allGenres.length];
+
+        selectGenreText.setOnClickListener(v -> openGenreDialog());
+
     }
+
+    private void openGenreDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select music genres");
+
+        builder.setMultiChoiceItems(allGenres, checkedGenres,
+                (dialog, which, isChecked) -> {
+                    if (isChecked) {
+                        selectedGenres.add(allGenres[which]);
+                    } else {
+                        selectedGenres.remove(allGenres[which]);
+                    }
+                });
+
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            selectGenreText.setText(String.join(" / ", selectedGenres));
+        });
+
+        builder.setNegativeButton("Cancel", null);
+
+        builder.show();
+    }
+
 
     private boolean verifyLocationIfNeeded(String locationText) {
         if (locationVerified) return true;
@@ -209,13 +246,11 @@ public class CreateNewEvent extends AppCompatActivity {
     private void publishEvent() {
 
         String name = eventNameInput.getText().toString().trim();
-        String genreStr = genreInput.getText().toString().trim();
         String capacityStr = capacityInput.getText().toString().trim();
         String description = descriptionInput.getText().toString().trim();
         String location = locationInput.getText().toString().trim();
 
-
-        if (!validateInputs(name, genreStr, capacityStr, location)) {
+        if (!validateInputs(name, selectedGenres, capacityStr, location)) {
             return;
         }
         if (!verifyLocationIfNeeded(location)) {
@@ -223,7 +258,6 @@ public class CreateNewEvent extends AppCompatActivity {
         }
 
         int capacity = Integer.parseInt(capacityStr);
-        List<String> musicTypes = Arrays.asList(genreStr.split(","));
 
         String ownerId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
 
@@ -245,7 +279,7 @@ public class CreateNewEvent extends AppCompatActivity {
                     ownerId,
                     name,
                     description,
-                    musicTypes,
+                    selectedGenres,
                     selectedAddress,
                     selectedDateTime.getTimeInMillis(),
                     capacity,
@@ -268,7 +302,7 @@ public class CreateNewEvent extends AppCompatActivity {
         });
     }
 
-    private boolean validateInputs(String name, String genre, String capacity ,String location) {
+    private boolean validateInputs(String name, List<String> genre, String capacity ,String location) {
 
         if (name.isEmpty()) {
             eventNameInput.setError("נא להזין שם אירוע");
@@ -291,9 +325,9 @@ public class CreateNewEvent extends AppCompatActivity {
             return false;
         }
 
-        if (genre.isEmpty()) {
-            genreInput.setError("נא להזין ז'אנר");
-            genreInput.requestFocus();
+        if (genre == null || genre.isEmpty()) {
+            selectGenreText.setError("נא להזין ז'אנר");
+            selectGenreText.requestFocus();
             return false;
         }
 

@@ -163,5 +163,16 @@
     <string name="owner_name">owner name</string>
     <string name="open_map">open map</string>
 
+    <string-array name="music_genres">
+        <item>Jazz</item>
+        <item>Rock</item>
+        <item>Pop</item>
+        <item>Blues</item>
+        <item>Hip Hop</item>
+        <item>Electronic</item>
+        <item>Classical</item>
+        <item>Open Mic</item>
+    </string-array>
+
 
 </resources>
