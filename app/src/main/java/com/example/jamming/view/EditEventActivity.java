@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
+import com.example.jamming.utils.AddressUtils;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
@@ -49,6 +50,7 @@ public class EditEventActivity extends AppCompatActivity {
     private double selectedLng = 0.0;
     private String selectedAddress = "";
 
+    private boolean locationChanged = false;
 
     private final Calendar selectedDateTime = Calendar.getInstance();
     private final ActivityResultLauncher<Intent> mapPickerLauncher =
@@ -62,6 +64,8 @@ public class EditEventActivity extends AppCompatActivity {
                             selectedLng = data.getDoubleExtra("lng", 0.0);
                             selectedAddress = data.getStringExtra("address");
 
+
+                            locationChanged = true;
                             locationVerified = true;
                             etEventLocation.setText(selectedAddress);
                             etEventLocation.setError(null);
@@ -119,12 +123,14 @@ public class EditEventActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                locationChanged = true;
                 locationVerified = false;
             }
 
             @Override
             public void afterTextChanged(android.text.Editable s) {}
         });
+
         allGenres = getResources().getStringArray(R.array.music_genres);
         checkedGenres = new boolean[allGenres.length];
 
@@ -172,6 +178,7 @@ public class EditEventActivity extends AppCompatActivity {
                             selectedLng = event.getLongitude();
                             selectedAddress = event.getAddress();
                             locationVerified = true;
+                            locationChanged = false;
 
                             etEventLocation.setText(selectedAddress);
                             etEventCapacity.setText(String.valueOf(event.getMaxCapacity()));
@@ -184,7 +191,7 @@ public class EditEventActivity extends AppCompatActivity {
                                 checkedGenres[i] = genres.contains(allGenres[i]);
                             }
                             selectGenreText.setText(
-                                    android.text.TextUtils.join(" / ", genres)
+                                    android.text.TextUtils.join(" , ", genres)
                             );
 
                             selectedDateTime.setTimeInMillis(event.getDateTime());
@@ -271,8 +278,10 @@ public class EditEventActivity extends AppCompatActivity {
             return;
         }
 
-        if (!verifyLocationIfNeeded(location)) {
-            return;
+        if (locationChanged) {
+            if (!verifyLocationIfNeeded(location)) {
+                return;
+            }
         }
 
 
@@ -347,7 +356,8 @@ public class EditEventActivity extends AppCompatActivity {
 
                 selectedLat = addr.getLatitude();
                 selectedLng = addr.getLongitude();
-                selectedAddress = addr.getAddressLine(0);
+                selectedAddress = AddressUtils.formatAddress(addr);
+
                 locationVerified = true;
                 etEventLocation.setError(null);
                 return true;

@@ -128,7 +128,7 @@ public class OwnerActivity extends AppCompatActivity {
         eventLocation.setText( event.getAddress() );
         eventDate.setText( formattedDate);
         eventGenre.setText( String.join(", ", event.getMusicTypes()));
-        eventSpots.setText( event.getReserved() + "/" + event.getMaxCapacity() + "משתתפים");
+        eventSpots.setText( event.getReserved() + "/" + event.getMaxCapacity() + " משתתפים");
 
         btnEdit.setOnClickListener(v -> {
             Intent intent = new Intent(OwnerActivity.this, EditEventActivity.class);

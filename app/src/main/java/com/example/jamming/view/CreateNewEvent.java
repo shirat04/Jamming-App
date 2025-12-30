@@ -24,12 +24,12 @@ import com.example.jamming.model.Event;
 import com.example.jamming.model.Owner;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.repository.UserRepository;
+import com.example.jamming.utils.AddressUtils;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -188,7 +188,7 @@ public class CreateNewEvent extends AppCompatActivity {
                 }
                 selectedLat = addr.getLatitude();
                 selectedLng = addr.getLongitude();
-                selectedAddress = addr.getAddressLine(0);
+                selectedAddress = AddressUtils.formatAddress(addr);
                 locationVerified = true;
                 locationInput.setError(null);
                 return true;

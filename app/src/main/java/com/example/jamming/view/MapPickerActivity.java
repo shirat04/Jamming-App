@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.jamming.R;
+import com.example.jamming.utils.AddressUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -94,7 +95,7 @@ public class MapPickerActivity extends BaseMapActivity {
                         geocoder.getFromLocation(selectedLat, selectedLng, 1);
 
                 if (addresses != null && !addresses.isEmpty()) {
-                    selectedAddress = addresses.get(0).getAddressLine(0);
+                    selectedAddress = AddressUtils.formatAddress(addresses.get(0));
                 } else {
                     selectedAddress = "מיקום נבחר";
                 }
@@ -153,7 +154,7 @@ public class MapPickerActivity extends BaseMapActivity {
 
                 selectedLat = latLng.latitude;
                 selectedLng = latLng.longitude;
-                selectedAddress = address.getAddressLine(0);
+                selectedAddress = AddressUtils.formatAddress(address);
                 locationSelected = true;
             } else {
                 Toast.makeText(this, "לא נמצאה תוצאה", Toast.LENGTH_SHORT).show();
