@@ -2,11 +2,9 @@ package com.example.jamming.viewmodel;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import com.example.jamming.model.Event;
 import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.EventRepository;
-import com.example.jamming.repository.OwnerRepository;
 import com.example.jamming.repository.UserRepository;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 

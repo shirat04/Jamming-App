@@ -4,11 +4,10 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,10 +23,8 @@ import com.example.jamming.model.Event;
 import com.example.jamming.model.Owner;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.repository.UserRepository;
-import com.example.jamming.utils.AddressUtils;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,12 +34,12 @@ import java.util.Locale;
 public class CreateNewEvent extends AppCompatActivity {
 
     private EditText eventNameInput, capacityInput, descriptionInput, dateInput, timeInput,locationInput;
-    private boolean locationVerified = false;
-
     private double selectedLat = 0.0;
     private double selectedLng = 0.0;
     private String selectedAddress = "";
     private ImageButton mapButton;
+    private View.OnClickListener openMapListener;
+
 
     private Button publishBtn;
     private TextView cancelBtn;
@@ -65,11 +62,11 @@ public class CreateNewEvent extends AppCompatActivity {
                         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                             Intent data = result.getData();
 
-                            selectedLat = data.getDoubleExtra("lat", 0.0);
-                            selectedLng = data.getDoubleExtra("lng", 0.0);
+                            selectedLat = data.getDoubleExtra("lat", Double.NaN);
+                            selectedLng = data.getDoubleExtra("lng", Double.NaN);
+
                             selectedAddress = data.getStringExtra("address");
 
-                            locationVerified = true;
                             locationInput.setText(selectedAddress);
                             locationInput.setError(null);
                         }
@@ -86,7 +83,6 @@ public class CreateNewEvent extends AppCompatActivity {
         userRepository = new UserRepository();
         eventRepository = new EventRepository();
         initViews();
-
 
         setupListeners();
     }
@@ -112,27 +108,13 @@ public class CreateNewEvent extends AppCompatActivity {
         publishBtn.setOnClickListener(v -> publishEvent());
         cancelBtn.setOnClickListener(v -> finish());
 
-        mapButton.setOnClickListener(v -> {
+        openMapListener = v -> {
             Intent intent = new Intent(this, MapPickerActivity.class);
             mapPickerLauncher.launch(intent);
-        });
+        };
 
-        locationInput.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                locationVerified = false;
-                selectedAddress = "";
-                selectedLat = 0.0;
-                selectedLng = 0.0;
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
+        mapButton.setOnClickListener(openMapListener);
+        locationInput.setOnClickListener(openMapListener);
 
         allGenres = getResources().getStringArray(R.array.music_genres);
         checkedGenres = new boolean[allGenres.length];
@@ -162,49 +144,6 @@ public class CreateNewEvent extends AppCompatActivity {
 
         builder.show();
     }
-
-
-    private boolean verifyLocationIfNeeded(String locationText) {
-        if (locationVerified) return true;
-
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        try {
-            List<Address> results =
-                    geocoder.getFromLocationName(locationText, 1);
-
-            if (results != null && !results.isEmpty()) {
-                Address addr = results.get(0);
-
-                String street = addr.getThoroughfare();
-                String house = addr.getSubThoroughfare();
-                boolean missingStreet = (street == null || street.trim().isEmpty());
-                boolean missingHouse  = (house == null  || house.trim().isEmpty());
-
-
-                if (missingStreet || missingHouse) {
-                    locationInput.setError("נא להזין כתובת מדויקת (רחוב ומספר) או לבחור מהמפה");
-                    locationInput.requestFocus();
-                    return false;
-                }
-                selectedLat = addr.getLatitude();
-                selectedLng = addr.getLongitude();
-                selectedAddress = AddressUtils.formatAddress(addr);
-                locationVerified = true;
-                locationInput.setError(null);
-                return true;
-            } else {
-                locationInput.setError("הכתובת לא נמצאה. נא לבחור מהמפה");
-                locationInput.requestFocus();
-                return false;
-            }
-
-        } catch (IOException e) {
-            locationInput.setError("לא ניתן לאמת כתובת. נא לבחור מהמפה");
-            locationInput.requestFocus();
-            return false;
-        }
-    }
-
 
     private void showDatePicker() {
         int year = selectedDateTime.get(Calendar.YEAR);
@@ -253,9 +192,13 @@ public class CreateNewEvent extends AppCompatActivity {
         if (!validateInputs(name, selectedGenres, capacityStr, location)) {
             return;
         }
-        if (!verifyLocationIfNeeded(location)) {
+
+        if ( selectedAddress == null || selectedAddress.trim().isEmpty()) {
+            locationInput.setError("נא לבחור מיקום מהמפה");
+            locationInput.requestFocus();
             return;
         }
+
 
         int capacity = Integer.parseInt(capacityStr);
 

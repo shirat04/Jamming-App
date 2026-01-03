@@ -92,9 +92,11 @@
                     android:background="@android:color/transparent"
                     android:gravity="center_vertical"
                     android:hint="@string/location"
-                    android:inputType="textPostalAddress"
                     android:paddingStart="8dp"
                     android:paddingTop="10dp"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:inputType="none"
                     android:paddingEnd="8dp"
                     android:paddingBottom="6dp" />
 

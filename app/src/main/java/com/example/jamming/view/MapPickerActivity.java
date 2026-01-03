@@ -32,7 +32,6 @@ public class MapPickerActivity extends BaseMapActivity {
     private String selectedAddress = "";
     private EditText etSearchLocation;
     private ImageButton btnSearch;
-    private boolean locationSelected = false;
 
 
 
@@ -71,9 +70,25 @@ public class MapPickerActivity extends BaseMapActivity {
 
     @Override
     protected void onMapReadyCustom() {
-        // מיקום התחלתי – ישראל
-        LatLng israel = new LatLng(31.0461, 34.8516);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(israel, 7f));
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        enableMyLocationSafe();
+
+        fetchLastLocation(location -> {
+            if (location != null) {
+                LatLng userLatLng = new LatLng(
+                        location.getLatitude(),
+                        location.getLongitude()
+                );
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 17f));
+            } else {
+                LatLng israel = new LatLng(31.0461, 34.8516);
+                mMap.moveCamera(
+                        CameraUpdateFactory.newLatLngZoom(israel, 15f)
+                );
+            }
+        });
+
 
         mMap.setOnMapClickListener(latLng -> {
             mMap.clear();
@@ -95,12 +110,32 @@ public class MapPickerActivity extends BaseMapActivity {
                         geocoder.getFromLocation(selectedLat, selectedLng, 1);
 
                 if (addresses != null && !addresses.isEmpty()) {
-                    selectedAddress = AddressUtils.formatAddress(addresses.get(0));
+                    Address adder = addresses.get(0);
+
+                    String street = adder.getThoroughfare();
+                    String house  = adder.getSubThoroughfare();
+                    String city   = adder.getLocality();
+
+                    boolean hasStreet = street != null && !street.trim().isEmpty();
+                    boolean hasHouse  = house  != null && !house.trim().isEmpty();
+                    boolean hasCity   = city   != null && !city.trim().isEmpty();
+
+                    if (hasStreet && hasHouse && hasCity) {
+                        selectedAddress = street + " " + house + ", " + city;   // כתובת מלאה
+                    } else if (hasStreet && hasCity) {
+                        selectedAddress = street + ", " + city;                 // בלי מספר בית
+                    } else {
+                        selectedAddress = "";
+                        Toast.makeText(this, "לא ניתן לזהות כתובת. נסי לבחור נקודה מדויקת יותר", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                 } else {
-                    selectedAddress = "מיקום נבחר";
+                    selectedAddress = "";
+                    Toast.makeText(this, "לא ניתן לזהות כתובת. נסי לבחור נקודה מדויקת יותר", Toast.LENGTH_SHORT).show();
                 }
             } catch (IOException e) {
-                selectedAddress = "מיקום נבחר";
+                selectedAddress = "";
+                Toast.makeText(this, "שגיאה בזיהוי כתובת. נסי שוב", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -109,6 +144,11 @@ public class MapPickerActivity extends BaseMapActivity {
     private void confirmLocation() {
         if (Double.isNaN(selectedLat) || Double.isNaN(selectedLng)) {
             Toast.makeText(this, "נא לבחור מיקום על המפה", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (selectedAddress == null || selectedAddress.trim().isEmpty()) {
+            Toast.makeText(this, "נא לבחור מיקום עם כתובת מזוהה", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -155,7 +195,6 @@ public class MapPickerActivity extends BaseMapActivity {
                 selectedLat = latLng.latitude;
                 selectedLng = latLng.longitude;
                 selectedAddress = AddressUtils.formatAddress(address);
-                locationSelected = true;
             } else {
                 Toast.makeText(this, "לא נמצאה תוצאה", Toast.LENGTH_SHORT).show();
             }

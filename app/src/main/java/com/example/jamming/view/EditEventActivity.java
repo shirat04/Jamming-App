@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -40,7 +41,6 @@ public class EditEventActivity extends AppCompatActivity {
 
     private EditText etEventTitle, etEventDescription, etEventLocation, etEventDate, etEventTime, etEventCapacity;
     private Button btnSaveEvent, btnDeleteEvent;
-    private boolean locationVerified = false;
     private TextView selectGenreText;
     private boolean[] checkedGenres;
     private final List<String> selectedGenres = new ArrayList<>();
@@ -49,8 +49,6 @@ public class EditEventActivity extends AppCompatActivity {
     private double selectedLat = 0.0;
     private double selectedLng = 0.0;
     private String selectedAddress = "";
-
-    private boolean locationChanged = false;
 
     private final Calendar selectedDateTime = Calendar.getInstance();
     private final ActivityResultLauncher<Intent> mapPickerLauncher =
@@ -63,10 +61,6 @@ public class EditEventActivity extends AppCompatActivity {
                             selectedLat = data.getDoubleExtra("lat", 0.0);
                             selectedLng = data.getDoubleExtra("lng", 0.0);
                             selectedAddress = data.getStringExtra("address");
-
-
-                            locationChanged = true;
-                            locationVerified = true;
                             etEventLocation.setText(selectedAddress);
                             etEventLocation.setError(null);
                         }
@@ -112,24 +106,14 @@ public class EditEventActivity extends AppCompatActivity {
 
         btnSaveEvent.setOnClickListener(v -> saveEventChanges());
         btnDeleteEvent.setOnClickListener(v -> deleteEvent());
-        btnOpenMap.setOnClickListener(v -> {
+
+        View.OnClickListener openMapListener = v -> {
             Intent intent = new Intent(this, MapPickerActivity.class);
             mapPickerLauncher.launch(intent);
-        });
+        };
 
-        etEventLocation.addTextChangedListener(new android.text.TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                locationChanged = true;
-                locationVerified = false;
-            }
-
-            @Override
-            public void afterTextChanged(android.text.Editable s) {}
-        });
+        btnOpenMap.setOnClickListener(openMapListener);
+        etEventLocation.setOnClickListener(openMapListener);
 
         allGenres = getResources().getStringArray(R.array.music_genres);
         checkedGenres = new boolean[allGenres.length];
@@ -177,9 +161,6 @@ public class EditEventActivity extends AppCompatActivity {
                             selectedLat = event.getLatitude();
                             selectedLng = event.getLongitude();
                             selectedAddress = event.getAddress();
-                            locationVerified = true;
-                            locationChanged = false;
-
                             etEventLocation.setText(selectedAddress);
                             etEventCapacity.setText(String.valueOf(event.getMaxCapacity()));
                             List<String> genres = event.getMusicTypes();
@@ -278,11 +259,14 @@ public class EditEventActivity extends AppCompatActivity {
             return;
         }
 
-        if (locationChanged) {
-            if (!verifyLocationIfNeeded(location)) {
-                return;
-            }
+        if (selectedAddress == null || selectedAddress.trim().isEmpty()
+                || Double.isNaN(selectedLat) || Double.isNaN(selectedLng)) {
+
+            etEventLocation.setError("נא לבחור מיקום מהמפה");
+            etEventLocation.requestFocus();
+            return;
         }
+
 
 
         if (capacityStr.isEmpty()) {
@@ -325,56 +309,6 @@ public class EditEventActivity extends AppCompatActivity {
                     Toast.makeText(this, "Error updating event.", Toast.LENGTH_SHORT).show();
                 });
     }
-    private boolean verifyLocationIfNeeded(String locationText) {
-        if (locationText.isEmpty()) {
-            etEventLocation.setError("נא להזין מיקום");
-            etEventLocation.requestFocus();
-            return false;
-        }
-
-        if (locationVerified) return true;
-
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        try {
-            List<Address> results =
-                    geocoder.getFromLocationName(locationText, 1);
-
-            if (results != null && !results.isEmpty()) {
-                Address addr = results.get(0);
-
-                String street = addr.getThoroughfare();
-                String house = addr.getSubThoroughfare();
-                boolean missingStreet = (street == null || street.trim().isEmpty());
-                boolean missingHouse  = (house == null  || house.trim().isEmpty());
-
-
-                if (missingStreet || missingHouse) {
-                    etEventLocation.setError("נא להזין כתובת מדויקת (רחוב ומספר) או לבחור מהמפה");
-                    etEventLocation.requestFocus();
-                    return false;
-                }
-
-                selectedLat = addr.getLatitude();
-                selectedLng = addr.getLongitude();
-                selectedAddress = AddressUtils.formatAddress(addr);
-
-                locationVerified = true;
-                etEventLocation.setError(null);
-                return true;
-
-            } else {
-                etEventLocation.setError("הכתובת לא נמצאה. נא לבחור מהמפה");
-                etEventLocation.requestFocus();
-                return false;
-            }
-
-        } catch (IOException e) {
-            etEventLocation.setError("לא ניתן לאמת כתובת. נא לבחור מהמפה");
-            etEventLocation.requestFocus();
-            return false;
-        }
-    }
-
     private void deleteEvent() {
         db.collection("events").document(eventId).delete()
                 .addOnSuccessListener(aVoid -> {

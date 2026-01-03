@@ -37,6 +37,9 @@ public abstract class BaseMapActivity extends AppCompatActivity
         mMap.getUiSettings().setRotateGesturesEnabled(true);
         mMap.getUiSettings().setTiltGesturesEnabled(false);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mMap.setMinZoomPreference(5f);
+        mMap.setMaxZoomPreference(20f);
     }
 
 

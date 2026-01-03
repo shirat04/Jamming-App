@@ -112,6 +112,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="@string/location"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:inputType="none"
                     tools:ignore="Autofill,TextFields,TouchTargetSizeCheck,VisualLintTextFieldSize,DuplicateSpeakableTextCheck" />
 
                 <ImageButton
