@@ -2,11 +2,12 @@ package com.example.jamming.view;
 
 import android.os.Bundle;
 import android.content.Intent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
@@ -18,7 +19,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText usernameInput, passwordInput;
     private LoginViewModel loginViewModel;
 
-    private TextView errorText;
+    private TextView errorText, forgotPassword;
 
 
     @Override
@@ -31,13 +32,35 @@ public class LoginActivity extends AppCompatActivity {
         Button loginBtn = findViewById(R.id.loginButton);
         Button registerBtn = findViewById(R.id.registerText);
         errorText = findViewById(R.id.errorTextView);
+        forgotPassword = findViewById(R.id.forgotPasswordText);
 
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+
+        TextWatcher clearMessageWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                loginViewModel.clearMessage();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
+
+        usernameInput.addTextChangedListener(clearMessageWatcher);
+        passwordInput.addTextChangedListener(clearMessageWatcher);
 
         loginBtn.setOnClickListener(v -> {
             String identifier = usernameInput.getText().toString().trim();
             String pass = passwordInput.getText().toString().trim();
             loginViewModel.login(identifier, pass);
+        });
+
+        forgotPassword.setOnClickListener(v -> {
+            String identifier = usernameInput.getText().toString().trim();
+            loginViewModel.resetPassword(identifier);
         });
 
         registerBtn.setOnClickListener(v ->
@@ -48,10 +71,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void observeViewModel() {
-
-        loginViewModel.getError().observe(this, err -> {
-            if (err != null) {
-                errorText.setText(err);
+        loginViewModel.getMessage().observe(this, msg -> {
+            if (msg != null) {
+                errorText.setText(msg);
                 errorText.setVisibility(View.VISIBLE);
             } else {
                 errorText.setVisibility(View.GONE);

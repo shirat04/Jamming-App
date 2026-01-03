@@ -120,18 +120,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="108dp"
-        android:backgroundTint="@android:color/white"
         android:clickable="true"
         android:focusable="true"
-        android:paddingTop="8dp"
         android:text="Forgot your password?"
         android:textColor="#0B375E"
         android:textSize="14sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/passwordInput"
+        app:layout_constraintLeft_toLeftOf="@id/passwordInput"
         tools:ignore="TextContrastCheck" />
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -55,4 +55,8 @@ public class AuthRepository {
         return (auth.getCurrentUser() != null) ? auth.getCurrentUser().getUid() : null;
     }
 
+    public Task<Void> sendPasswordResetEmail(String email) {
+        return FirebaseAuth.getInstance().sendPasswordResetEmail(email);
+    }
+
 }
