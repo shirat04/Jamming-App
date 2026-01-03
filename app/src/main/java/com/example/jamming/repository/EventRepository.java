@@ -9,13 +9,18 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.Map;
 
 public class EventRepository {
+    public static class EventWithId {
+        public Event event;
+        public String id;
 
-    private final FirebaseFirestore db;
-
-    public EventRepository() {
-        // Initialize Firestore instance
-        db = FirebaseFirestore.getInstance();
+        public EventWithId(Event event, String id) {
+            this.event = event;
+            this.id = id;
+        }
     }
+
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
 
     // Create new event in Firestore
     public Task<Void> createEvent(Event event) {
@@ -31,12 +36,6 @@ public class EventRepository {
     public Task<DocumentSnapshot> getEventById(String eventId) {
         return db.collection("events")
                 .document(eventId)
-                .get();
-    }
-
-    // Get all events in the system
-    public Task<QuerySnapshot> getAllEvents() {
-        return db.collection("events")
                 .get();
     }
 
@@ -75,10 +74,4 @@ public class EventRepository {
                 .update("reserved", FieldValue.increment(-1));
     }
 
-    // Replace entire event record (useful for cloning)
-    public Task<Void> overwriteEvent(String id, Event event) {
-        return db.collection("events")
-                .document(id)
-                .set(event);
-    }
 }

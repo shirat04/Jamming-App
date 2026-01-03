@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Jamming">
         <activity
+            android:name=".item_event_owner_card"
+            android:exported="false" />
+        <activity
             android:name=".view.EditProfileUserActivity"
             android:exported="false" />
         <activity

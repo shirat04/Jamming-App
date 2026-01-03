@@ -17,9 +17,13 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
+import com.example.jamming.repository.EventRepository;
+import com.example.jamming.utils.DateUtils;
+import com.example.jamming.viewmodel.OwnerViewModel;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -30,123 +34,95 @@ import java.util.Date;
 import java.util.Locale;
 
 public class OwnerActivity extends AppCompatActivity {
-    private Button createEventButton;
+    private OwnerViewModel viewModel;
+    private TextView greeting, emptyEventsText;
+
     private LinearLayout eventsContainer;
-    private FirebaseFirestore db;
-    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_owner);
-        TextView greeting = findViewById(R.id.ownerGreeting);
+
+        greeting = findViewById(R.id.ownerGreeting);
         DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
         ImageButton btnMenu = findViewById(R.id.btnMore);
-        createEventButton = findViewById(R.id.createEventButton);
-        createEventButton.setOnClickListener(v -> {
-            Intent intent = new Intent(OwnerActivity.this, CreateNewEvent.class);
-            startActivity(intent);
-        });
-
-        db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
-        loadOwnerName();
+        Button createEventBtn = findViewById(R.id.createEventButton);
         eventsContainer = findViewById(R.id.eventsContainer);
+        emptyEventsText = findViewById(R.id.emptyEventsText);
+
+
+        viewModel = new ViewModelProvider(this).get(OwnerViewModel.class);
+        observeViewModel();
+        viewModel.loadOwnerName();
+
+        createEventBtn.setOnClickListener(v ->
+                startActivity(new Intent(this, CreateNewEvent.class))
+        );
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        loadOwnerEvents();
+        viewModel.loadOwnerEvents();
     }
 
-    @SuppressLint("SetTextI18n")
-    private void loadOwnerName() {
-        if (auth.getCurrentUser() == null) return;
+    private void observeViewModel() {
+        viewModel.ownerName.observe(this, name ->
+                greeting.setText(getString(R.string.hello_user, name))
+        );
 
-        String uid = auth.getCurrentUser().getUid();
+        viewModel.events.observe(this, events -> {
+            eventsContainer.removeAllViews();
+            if (events == null || events.isEmpty()) {
+                emptyEventsText.setVisibility(View.VISIBLE);
+            } else {
+                emptyEventsText.setVisibility(View.GONE);
+                for (EventRepository.EventWithId e : events) {
+                    addEventCard(e);
+                }
+            }
+        });
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        TextView greeting = findViewById(R.id.ownerGreeting);
-
-        db.collection("users").document(uid).get()
-                .addOnSuccessListener(document -> {
-                    if (document.exists()) {
-                        String name = document.getString("fullName"); // או "username" לפי מה ששמרת
-                        greeting.setText("Hello " + name);
-                    } else {
-                        greeting.setText("Hello Owner");
-                    }
-                })
-                .addOnFailureListener(e -> greeting.setText("Hello Owner"));
+        viewModel.message.observe(this, msg ->
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        );
     }
+    private void addEventCard(EventRepository.EventWithId e) {
+        View card = getLayoutInflater()
+                .inflate(R.layout.activity_item_event_owner_card, eventsContainer, false);
 
+        TextView title = card.findViewById(R.id.myEventTitle);
+        TextView location = card.findViewById(R.id.myEventLocation);
+        TextView date = card.findViewById(R.id.myEventDate);
+        TextView genre = card.findViewById(R.id.myEventGenre);
+        TextView capacity = card.findViewById(R.id.myEventCapacity);
+        Button editBtn = card.findViewById(R.id.btnMyEventDetails);
+        Button cancelBtn = card.findViewById(R.id.btnCancelMyEvent);
 
-    private void loadOwnerEvents() {
-        if (auth.getCurrentUser() == null) {
-            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        String currentUserId = auth.getCurrentUser().getUid();
+        title.setText(e.event.getName());
+        location.setText(e.event.getAddress());
+        date.setText(DateUtils.formatDate(e.event.getDateTime()));
+        genre.setText(String.join(", ", e.event.getMusicTypes()));
+        String text = getString(
+                R.string.participants_format,
+                e.event.getReserved(),
+                e.event.getMaxCapacity()
+        );
 
-        eventsContainer.removeAllViews(); // Clear previous views
+        capacity.setText(text);
 
-        db.collection("events")
-                .whereEqualTo("ownerId", currentUserId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Event event = document.toObject(Event.class);
-                            addEventCardToView(event, document.getId());
-                        }
-                    } else {
-                        Toast.makeText(OwnerActivity.this, "Failed to load events.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private void addEventCardToView(Event event, String eventId) {
-        View eventCardView = getLayoutInflater().inflate(R.layout.item_my_event_card, eventsContainer, false);
-
-        TextView eventName = eventCardView.findViewById(R.id.myEventTitle);
-        TextView eventLocation = eventCardView.findViewById(R.id.myEventLocation);
-        TextView eventDate = eventCardView.findViewById(R.id.myEventDate);
-        TextView eventGenre = eventCardView.findViewById(R.id.myEventGenre);
-        Button btnEdit = eventCardView.findViewById(R.id.btnMyEventDetails);
-        Button btnCancel = eventCardView.findViewById(R.id.btnCancelMyEvent);
-        TextView eventSpots =  eventCardView.findViewById(R.id.myEventCapacity);
-
-        // Format date and time
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy • HH:mm", Locale.getDefault());
-        String formattedDate = sdf.format(new Date(event.getDateTime()));
-
-        // Populate the views
-        eventName.setText(event.getName());
-        eventLocation.setText( event.getAddress() );
-        eventDate.setText( formattedDate);
-        eventGenre.setText( String.join(", ", event.getMusicTypes()));
-        eventSpots.setText( event.getReserved() + "/" + event.getMaxCapacity() + " משתתפים");
-
-        btnEdit.setOnClickListener(v -> {
-            Intent intent = new Intent(OwnerActivity.this, EditEventActivity.class);
-            intent.putExtra("EVENT_ID", eventId);
+        editBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(this, EditEventActivity.class);
+            intent.putExtra("EVENT_ID", e.id);
             startActivity(intent);
         });
 
-        btnCancel.setOnClickListener(v -> {
-            // Add logic to cancel/delete the event
-            db.collection("events").document(eventId)
-                    .delete()
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(OwnerActivity.this, "Event cancelled", Toast.LENGTH_SHORT).show();
-                        loadOwnerEvents(); // Refresh the list
-                    })
-                    .addOnFailureListener(e -> Toast.makeText(OwnerActivity.this, "Error cancelling event", Toast.LENGTH_SHORT).show());
-        });
+        cancelBtn.setOnClickListener(v ->
+                viewModel.deleteEvent(e.id)
+        );
 
-        eventsContainer.addView(eventCardView);
+        eventsContainer.addView(card);
     }
 }

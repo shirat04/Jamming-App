@@ -5,6 +5,7 @@ import com.example.jamming.model.User;
 import com.example.jamming.utils.GeoUtils;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -15,12 +16,7 @@ import java.util.Map;
 
 public class UserRepository {
 
-    private final FirebaseFirestore db;
-
-    public UserRepository() {
-        // Initialize Firestore instance
-        db = FirebaseFirestore.getInstance();
-    }
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     // Get user document by UID
     public Task<DocumentSnapshot> getUserById(String uid) {
@@ -28,6 +24,17 @@ public class UserRepository {
                 .document(uid)
                 .get();
     }
+    public Task<String> getUserFullName(String uid) {
+        return getUserById(uid).continueWith(task -> {
+            if (!task.isSuccessful() || task.getResult() == null) {
+                return null;
+            }
+
+            DocumentSnapshot doc = task.getResult();
+            return doc.exists() ? doc.getString("fullName") : null;
+        });
+    }
+
 
     // Update a single field of the user document
     public Task<Void> updateUserField(String uid, String fieldName, Object value) {

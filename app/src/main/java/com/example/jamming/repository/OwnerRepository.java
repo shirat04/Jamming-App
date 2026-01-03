@@ -26,6 +26,7 @@ public class OwnerRepository {
                 .get();
     }
 
+
     // Update a single field of the owner document
     public Task<Void> updateOwnerField(String uid, String field, Object value) {
         return db.collection("owners")

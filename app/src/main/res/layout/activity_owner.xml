@@ -53,7 +53,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/hello_owner"
+            android:text=""
+            tools:text='hello "owner name"'
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -62,8 +63,6 @@
         <Space
             android:layout_width="12dp"
             android:layout_height="wrap_content" />
-
-        <!-- Notifications Icon -->
 
     </LinearLayout>
 
@@ -109,13 +108,36 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
+            android:id="@+id/emptyEvents"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        <!-- 🔹 Empty State -->
+        <TextView
+            android:id="@+id/emptyEventsText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="You haven’t created any events yet"
+            android:textColor="@android:color/black"
+            android:gravity="center"
+            android:padding="24dp"
+            android:visibility="gone"
+            tools:text="You haven’t created any events yet" />
+
+
+        <LinearLayout
             android:id="@+id/eventsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+
+
             <!-- Event cards will be programmatically added here -->
 
+        </LinearLayout>
         </LinearLayout>
 
     </ScrollView>

@@ -174,5 +174,9 @@
         <item>Open Mic</item>
     </string-array>
 
+    <string name="participants_format">%1$d/%2$d משתתפים</string>
+
+    <string name="hello_user">Hello %1$s</string>
+
 
 </resources>
