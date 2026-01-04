@@ -22,8 +22,7 @@ public class CreateNewEventViewModel extends ViewModel {
 
     private double lat, lng;
     private String address;
-    private final MutableLiveData<String> firstErrorField = new MutableLiveData<>();
-    public LiveData<String> getFirstErrorField() { return firstErrorField; }
+    private final List<String> genres = new ArrayList<>();
 
     private final MutableLiveData<String> dateText = new MutableLiveData<>();
     private final MutableLiveData<String> timeText = new MutableLiveData<>();
@@ -32,18 +31,27 @@ public class CreateNewEventViewModel extends ViewModel {
     private final MutableLiveData<String> nameError = new MutableLiveData<>();
     private final MutableLiveData<String> locationError = new MutableLiveData<>();
     private final MutableLiveData<String> capacityError = new MutableLiveData<>();
-    private final List<String> genres = new ArrayList<>();
-
-    private final MutableLiveData<String> toastMessage = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> success = new MutableLiveData<>();
     private final MutableLiveData<String> dateError = new MutableLiveData<>();
     private final MutableLiveData<String> timeError = new MutableLiveData<>();
     private final MutableLiveData<Boolean> genreError = new MutableLiveData<>();
+    private final MutableLiveData<ErrorField> firstErrorField = new MutableLiveData<>();
+    private final MutableLiveData<String> toastMessage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> success = new MutableLiveData<>();
 
-    public LiveData<Boolean> getGenreError() {
-        return genreError;
+
+
+    public enum ErrorField {
+        NAME,
+        DATE,
+        TIME,
+        LOCATION,
+        CAPACITY,
+        GENRE
     }
 
+
+    public LiveData<Boolean> getGenreError() {return genreError;}
+    public LiveData<ErrorField> getFirstErrorField() {return firstErrorField;}
     public LiveData<String> getDateError() { return dateError; }
     public LiveData<String> getTimeError() { return timeError; }
 
@@ -61,6 +69,13 @@ public class CreateNewEventViewModel extends ViewModel {
     public String getGenresText() {
         return String.join(" , ", genres);
     }
+
+    private void markFirstError(ErrorField field) {
+        if (firstErrorField.getValue() == null) {
+            firstErrorField.setValue(field);
+        }
+    }
+
 
     public void setDate(int year, int month, int day) {
         dateTime.set(year, month, day);
@@ -107,6 +122,7 @@ public class CreateNewEventViewModel extends ViewModel {
 
         if (name == null || name.trim().isEmpty()) {
             nameError.setValue("נא להזין שם אירוע");
+            markFirstError(ErrorField.NAME);
             valid = false;
         } else {
             nameError.setValue(null);
@@ -114,6 +130,7 @@ public class CreateNewEventViewModel extends ViewModel {
 
         if (dateText.getValue() == null) {
             dateError.setValue("נא לבחור תאריך");
+            markFirstError(ErrorField.DATE);
             valid = false;
         } else {
             dateError.setValue(null);
@@ -121,21 +138,17 @@ public class CreateNewEventViewModel extends ViewModel {
 
         if (timeText.getValue() == null) {
             timeError.setValue("נא לבחור שעה");
+            markFirstError(ErrorField.TIME);
             valid = false;
         } else {
             timeError.setValue(null);
         }
         if (address == null || address.trim().isEmpty()) {
             locationError.setValue("נא לבחור מיקום");
-            if (firstErrorField.getValue() == null)
-                firstErrorField.setValue("location");
+            markFirstError(ErrorField.LOCATION);
             valid = false;
         } else {
             locationError.setValue(null);
-        }
-        if (genres.isEmpty()) {
-            genreError.setValue(true);
-            valid = false;
         }
 
         int cap = 0;
@@ -144,11 +157,13 @@ public class CreateNewEventViewModel extends ViewModel {
             if (cap <= 0) throw new NumberFormatException();
         } catch (Exception e) {
             capacityError.setValue("נא להזין קיבולת תקינה");
+            markFirstError(ErrorField.CAPACITY);
             valid = false;
         }
 
         if (genres.isEmpty()) {
             genreError.setValue(true);
+            markFirstError(ErrorField.GENRE);
             valid = false;
         } else {
             genreError.setValue(false);

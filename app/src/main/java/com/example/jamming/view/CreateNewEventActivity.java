@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.View;
@@ -26,6 +27,7 @@ public class CreateNewEventActivity extends AppCompatActivity {
     private EditText nameInput, capacityInput, descriptionInput, locationInput;
     private TextView dateInput, timeInput, genreText, genreErrorText, cancelBtn;
     private Button publishBtn;
+    private LinearLayout genreContainer;
 
     private ImageButton mapButton;
 
@@ -69,9 +71,39 @@ public class CreateNewEventActivity extends AppCompatActivity {
         cancelBtn = findViewById(R.id.cancelBtn);
         mapButton = findViewById(R.id.mapButton);
         genreErrorText = findViewById(R.id.genreErrorText);
+        genreContainer = findViewById(R.id.genreContainer);
     }
 
     private void observeViewModel() {
+        viewModel.getFirstErrorField().observe(this, field -> {
+            if (field == null) return;
+
+            switch (field) {
+                case NAME:
+                    nameInput.requestFocus();
+                    break;
+                case LOCATION:
+                    locationInput.requestFocus();
+                    break;
+
+                case DATE:
+                    dateInput.requestFocus();
+                    break;
+
+                case TIME:
+                    timeInput.requestFocus();
+                    break;
+
+                case GENRE:
+                    genreText.requestFocus();
+                    break;
+
+                case CAPACITY:
+                    capacityInput.requestFocus();
+                    break;
+            }
+        });
+
         // ===== תאריך =====
         viewModel.getDateText().observe(this, text -> {
             if (text != null) {
@@ -130,19 +162,16 @@ public class CreateNewEventActivity extends AppCompatActivity {
 
         // ===== ז'אנר (TextView – בלי בועה) =====
         viewModel.getGenreError().observe(this, hasError -> {
-            if (hasError != null && hasError) {
-                genreText.setTextColor(
-                        getResources().getColor(android.R.color.holo_red_dark)
-                );
+            if (Boolean.TRUE.equals(hasError)) {
+                genreContainer.setBackgroundResource(R.drawable.genre_error_bg);
+                genreText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
                 genreErrorText.setVisibility(View.VISIBLE);
             } else {
-                genreText.setTextColor(
-                        getResources().getColor(android.R.color.black)
-                );
+                genreContainer.setBackgroundResource(R.drawable.genre_normal_bg);
+                genreText.setTextColor(getResources().getColor(android.R.color.black));
                 genreErrorText.setVisibility(View.GONE);
             }
         });
-
 
         // ===== הודעות כלליות =====
         viewModel.getToastMessage().observe(this, msg -> {
@@ -195,6 +224,13 @@ public class CreateNewEventActivity extends AppCompatActivity {
         capacityInput.addTextChangedListener(new SimpleTextWatcher(() ->
                 capacityInput.setError(null)
         ));
+        genreText.setOnClickListener(v -> {
+            genreContainer.setBackgroundResource(
+                    R.drawable.genre_normal_bg
+            );
+            openGenreDialog();
+        });
+
 
         publishBtn.setOnClickListener(v ->
                 viewModel.publish(
