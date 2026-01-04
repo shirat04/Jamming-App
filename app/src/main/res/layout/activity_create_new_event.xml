@@ -144,6 +144,12 @@
                 android:inputType="none"
                 tools:ignore="KeyboardInaccessibleWidget" />
 
+            <LinearLayout
+                android:id="@+id/genreContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
             <!-- בחירת ז'אנר -->
             <TextView
                 android:id="@+id/genreSpinner"
@@ -154,15 +160,27 @@
                 android:hint="@string/music_genre"
                 android:textColor="#555555"
                 android:gravity="center_vertical"
-                android:padding="8dp" />
+                android:padding="10dp" />
+                <TextView
+                    android:id="@+id/genreErrorText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="נא לבחור לפחות ז'אנר אחד"
+                    android:textColor="#AD0707"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:paddingStart="12dp"
+                    android:paddingTop="2dp"
+                    android:visibility="gone" />
+
+        </LinearLayout>
+
             <!-- הפס שמתחת -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#9E9E9E"
-                android:layout_marginTop="-8dp"
+                android:background="#000000"
                 android:layout_marginBottom="10dp"/>
-
 
             <!-- שדה: קהל מקסימלי -->
             <EditText

@@ -1,6 +1,5 @@
 package com.example.jamming.view;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -10,28 +9,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.GravityCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.jamming.R;
-import com.example.jamming.model.Event;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.viewmodel.OwnerViewModel;
-import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 public class OwnerActivity extends AppCompatActivity {
     private OwnerViewModel viewModel;
@@ -57,7 +42,7 @@ public class OwnerActivity extends AppCompatActivity {
         viewModel.loadOwnerName();
 
         createEventBtn.setOnClickListener(v ->
-                startActivity(new Intent(this, CreateNewEvent.class))
+                startActivity(new Intent(this, CreateNewEventActivity.class))
         );
 
     }
@@ -103,7 +88,10 @@ public class OwnerActivity extends AppCompatActivity {
 
         title.setText(e.event.getName());
         location.setText(e.event.getAddress());
-        date.setText(DateUtils.formatDate(e.event.getDateTime()));
+        long ts = e.event.getDateTime();
+        String dateTimeText = DateUtils.formatOnlyDate(ts) + " • " + DateUtils.formatOnlyTime(ts);
+        date.setText(dateTimeText);
+
         genre.setText(String.join(", ", e.event.getMusicTypes()));
         String text = getString(
                 R.string.participants_format,

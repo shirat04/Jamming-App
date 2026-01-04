@@ -48,7 +48,7 @@
             android:name=".view.EventDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".view.CreateNewEvent"
+            android:name=".view.CreateNewEventActivity"
             android:exported="false" />
         <activity
             android:name=".view.ExploreEventsActivity"
