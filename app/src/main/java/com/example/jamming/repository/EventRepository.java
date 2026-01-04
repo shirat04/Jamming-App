@@ -74,4 +74,13 @@ public class EventRepository {
                 .update("reserved", FieldValue.increment(-1));
     }
 
+    public Task<Event> getEventByIdAsEvent(String eventId) {
+        return db.collection("events")
+                .document(eventId)
+                .get()
+                .continueWith(task ->
+                        task.getResult().toObject(Event.class)
+                );
+    }
+
 }

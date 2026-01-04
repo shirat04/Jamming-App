@@ -1,0 +1,204 @@
+package com.example.jamming.viewmodel;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+
+import com.example.jamming.model.Event;
+import com.example.jamming.repository.EventRepository;
+import com.example.jamming.utils.DateUtils;
+import com.example.jamming.view.EditEventField;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class EditEventViewModel extends ViewModel {
+
+    private final EventRepository eventRepository = new EventRepository();
+
+    private final Calendar dateTime = Calendar.getInstance();
+    private double lat, lng;
+    private String address;
+
+    private final List<String> genres = new ArrayList<>();
+
+    private final MutableLiveData<String> title = new MutableLiveData<>("");
+    private final MutableLiveData<String> description = new MutableLiveData<>("");
+    private final MutableLiveData<String> locationText = new MutableLiveData<>("");
+    private final MutableLiveData<String> dateText = new MutableLiveData<>("");
+    private final MutableLiveData<String> timeText = new MutableLiveData<>("");
+    private final MutableLiveData<String> capacityText = new MutableLiveData<>("");
+    private final MutableLiveData<String> genresText = new MutableLiveData<>("");
+
+    private final MutableLiveData<EditEventField> errorField = new MutableLiveData<>();
+    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> success = new MutableLiveData<>(false);
+
+    private boolean isDateSet = false;
+    private boolean isTimeSet = false;
+
+    // ===== LiveData getters =====
+    public LiveData<String> getTitle() { return title; }
+    public LiveData<String> getDescription() { return description; }
+    public LiveData<String> getLocationText() { return locationText; }
+    public LiveData<String> getDateText() { return dateText; }
+    public LiveData<String> getTimeText() { return timeText; }
+    public LiveData<String> getCapacityText() { return capacityText; }
+    public LiveData<String> getGenresText() { return genresText; }
+
+    public LiveData<EditEventField> getErrorField() { return errorField; }
+    public LiveData<String> getErrorMessage() { return errorMessage; }
+    public LiveData<Boolean> getSuccess() { return success; }
+
+    // ===== Setters from UI (Activity) =====
+    public void onTitleChanged(String v) { title.setValue(v == null ? "" : v); }
+    public void onDescriptionChanged(String v) { description.setValue(v == null ? "" : v); }
+    public void onCapacityChanged(String v) { capacityText.setValue(v == null ? "" : v); }
+
+    // ===== Load event =====
+    public void loadEvent(String eventId) {
+        eventRepository.getEventById(eventId)
+                .addOnSuccessListener(doc -> {
+                    if (doc == null || !doc.exists()) {
+                        errorMessage.setValue("שגיאה בטעינת האירוע");
+                        return;
+                    }
+
+                    Event event = doc.toObject(Event.class);
+                    if (event == null) {
+                        errorMessage.setValue("שגיאה בטעינת האירוע");
+                        return;
+                    }
+
+                    title.setValue(event.getName());
+                    description.setValue(event.getDescription());
+                    capacityText.setValue(String.valueOf(event.getMaxCapacity()));
+
+                    address = event.getAddress();
+                    lat = event.getLatitude();
+                    lng = event.getLongitude();
+                    locationText.setValue(address);
+
+                    genres.clear();
+                    if (event.getMusicTypes() != null) {
+                        genres.addAll(event.getMusicTypes());
+                    }
+                    genresText.setValue(String.join(" , ", genres));
+
+                    dateTime.setTimeInMillis(event.getDateTime());
+                    dateText.setValue(DateUtils.formatOnlyDate(event.getDateTime()));
+                    timeText.setValue(DateUtils.formatOnlyTime(event.getDateTime()));
+
+                    isDateSet = true;
+                    isTimeSet = true;
+                })
+                .addOnFailureListener(e -> errorMessage.setValue("שגיאה בטעינת האירוע"));
+    }
+
+    // ===== Location =====
+    public void onLocationSelected(double lat, double lng, String address) {
+        this.lat = lat;
+        this.lng = lng;
+        this.address = address;
+        locationText.setValue(address == null ? "" : address);
+        // אם הייתה שגיאת מיקום - ניקוי
+        if (address != null && !address.trim().isEmpty()) {
+            if (errorField.getValue() == EditEventField.LOCATION) errorField.setValue(null);
+        }
+    }
+
+    // ===== Date & Time =====
+    public void setDate(int year, int month, int day) {
+        dateTime.set(Calendar.YEAR, year);
+        dateTime.set(Calendar.MONTH, month);
+        dateTime.set(Calendar.DAY_OF_MONTH, day);
+        isDateSet = true;
+        dateText.setValue(DateUtils.formatOnlyDate(dateTime.getTimeInMillis()));
+        if (errorField.getValue() == EditEventField.DATE) errorField.setValue(null);
+    }
+
+    public void setTime(int hour, int minute) {
+        dateTime.set(Calendar.HOUR_OF_DAY, hour);
+        dateTime.set(Calendar.MINUTE, minute);
+        isTimeSet = true;
+        timeText.setValue(DateUtils.formatOnlyTime(dateTime.getTimeInMillis()));
+        if (errorField.getValue() == EditEventField.TIME) errorField.setValue(null);
+    }
+
+    // ===== Genres =====
+    public void toggleGenre(String genre, boolean checked) {
+        if (genre == null) return;
+
+        if (checked && !genres.contains(genre)) {
+            genres.add(genre);
+        } else if (!checked) {
+            genres.remove(genre);
+        }
+
+        genresText.setValue(String.join(" , ", genres));
+
+        // ניקוי שגיאת ז'אנר אם יש בחירה
+        if (!genres.isEmpty() && errorField.getValue() == EditEventField.GENRE) {
+            errorField.setValue(null);
+        }
+    }
+
+    public boolean[] getCheckedGenres(String[] allGenres) {
+        boolean[] checked = new boolean[allGenres.length];
+        for (int i = 0; i < allGenres.length; i++) {
+            checked[i] = genres.contains(allGenres[i]);
+        }
+        return checked;
+    }
+
+    // ===== Save changes =====
+    public void saveChanges(String eventId) {
+        errorField.setValue(null);
+
+        String t = title.getValue() == null ? "" : title.getValue().trim();
+        String d = description.getValue() == null ? "" : description.getValue().trim();
+        String capStr = capacityText.getValue() == null ? "" : capacityText.getValue().trim();
+
+        if (t.isEmpty()) { errorField.setValue(EditEventField.TITLE); return; }
+        if (d.isEmpty()) { errorField.setValue(EditEventField.DESCRIPTION); return; }
+        if (address == null || address.trim().isEmpty()) { errorField.setValue(EditEventField.LOCATION); return; }
+        if (!isDateSet) { errorField.setValue(EditEventField.DATE); return; }
+        if (!isTimeSet) { errorField.setValue(EditEventField.TIME); return; }
+
+        int cap;
+        try {
+            cap = Integer.parseInt(capStr);
+            if (cap <= 0) throw new NumberFormatException();
+        } catch (Exception e) {
+            errorField.setValue(EditEventField.CAPACITY);
+            return;
+        }
+
+        if (genres.isEmpty()) { errorField.setValue(EditEventField.GENRE); return; }
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("name", t);
+        updates.put("description", d);
+        updates.put("address", address);
+        updates.put("latitude", lat);
+        updates.put("longitude", lng);
+        updates.put("maxCapacity", cap);
+        updates.put("dateTime", dateTime.getTimeInMillis());
+        updates.put("musicTypes", new ArrayList<>(genres));
+
+        eventRepository.updateEvent(eventId, updates)
+                .addOnSuccessListener(a -> success.setValue(true))
+                .addOnFailureListener(e -> errorMessage.setValue("שגיאה בעדכון האירוע"));
+    }
+
+    // ===== Delete =====
+    public void deleteEvent(String eventId) {
+        eventRepository.deleteEvent(eventId)
+                .addOnSuccessListener(a -> success.setValue(true))
+                .addOnFailureListener(e -> errorMessage.setValue("שגיאה במחיקת האירוע"));
+    }
+}

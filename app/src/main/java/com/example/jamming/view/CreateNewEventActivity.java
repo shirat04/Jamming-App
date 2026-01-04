@@ -144,6 +144,7 @@ public class CreateNewEventActivity extends AppCompatActivity {
             }
         });
 
+
         // ===== הודעות כלליות =====
         viewModel.getToastMessage().observe(this, msg -> {
             if (msg != null) {

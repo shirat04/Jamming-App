@@ -36,7 +36,7 @@ public class CreateNewEventViewModel extends ViewModel {
     private final MutableLiveData<Boolean> genreError = new MutableLiveData<>();
     private final MutableLiveData<String> toastMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> success = new MutableLiveData<>();
-
+    private final MutableLiveData<String> genresText = new MutableLiveData<>();
     public LiveData<Boolean> getGenreError() {return genreError;}
     public LiveData<String> getDateError() { return dateError; }
     public LiveData<String> getTimeError() { return timeError; }
@@ -75,8 +75,10 @@ public class CreateNewEventViewModel extends ViewModel {
     public void toggleGenre(String genre, boolean checked) {
         if (checked && !genres.contains(genre)) {
             genres.add(genre);
+            genresText.setValue(String.join(" , ", genres));
         } else if (!checked) {
             genres.remove(genre);
+            genresText.setValue(String.join(" , ", genres));
         }
         genreError.setValue(genres.isEmpty());
     }
@@ -129,9 +131,13 @@ public class CreateNewEventViewModel extends ViewModel {
         int cap = 0;
         try {
             cap = Integer.parseInt(capacity);
-            if (cap <= 0) throw new NumberFormatException();
+            if (cap == 0){
+                capacityError.setValue("נא להזין כמות משתתפים");
+                valid = false;
+            }
+            if (cap < 0) throw new NumberFormatException();
         } catch (Exception e) {
-            capacityError.setValue("נא להזין קיבולת תקינה");
+            capacityError.setValue("נא להזין  כמות משתתפים תקינה");
             valid = false;
         }
 
