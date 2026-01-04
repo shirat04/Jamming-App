@@ -75,35 +75,6 @@ public class CreateNewEventActivity extends AppCompatActivity {
     }
 
     private void observeViewModel() {
-        viewModel.getFirstErrorField().observe(this, field -> {
-            if (field == null) return;
-
-            switch (field) {
-                case NAME:
-                    nameInput.requestFocus();
-                    break;
-                case LOCATION:
-                    locationInput.requestFocus();
-                    break;
-
-                case DATE:
-                    dateInput.requestFocus();
-                    break;
-
-                case TIME:
-                    timeInput.requestFocus();
-                    break;
-
-                case GENRE:
-                    genreText.requestFocus();
-                    break;
-
-                case CAPACITY:
-                    capacityInput.requestFocus();
-                    break;
-            }
-        });
-
         // ===== תאריך =====
         viewModel.getDateText().observe(this, text -> {
             if (text != null) {
