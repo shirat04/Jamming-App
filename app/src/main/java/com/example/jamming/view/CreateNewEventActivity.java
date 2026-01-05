@@ -1,15 +1,15 @@
 package com.example.jamming.view;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -21,15 +21,17 @@ import com.example.jamming.viewmodel.CreateNewEventViewModel;
 import com.example.jamming.view.dialog.DatePickerDialogFragment;
 import com.example.jamming.view.dialog.TimePickerDialogFragment;
 
+import java.util.Calendar;
+
 
 public class CreateNewEventActivity extends AppCompatActivity {
 
     private EditText nameInput, capacityInput, descriptionInput, locationInput;
-    private TextView dateInput, timeInput, genreText, genreErrorText, cancelBtn;
+    private TextView dateInput, timeInput, genreText, cancelBtn;
     private Button publishBtn;
-    private LinearLayout genreContainer;
-
     private ImageButton mapButton;
+    private Calendar calendar;
+
 
     private CreateNewEventViewModel viewModel;
 
@@ -53,7 +55,7 @@ public class CreateNewEventActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this)
                 .get(CreateNewEventViewModel.class);
-
+        calendar = viewModel.getDateTime();
         initViews();
         observeViewModel();
         setupListeners();
@@ -70,89 +72,84 @@ public class CreateNewEventActivity extends AppCompatActivity {
         publishBtn = findViewById(R.id.publishEventBtn);
         cancelBtn = findViewById(R.id.cancelBtn);
         mapButton = findViewById(R.id.mapButton);
-        genreErrorText = findViewById(R.id.genreErrorText);
-        genreContainer = findViewById(R.id.genreContainer);
     }
 
     private void observeViewModel() {
-        // ===== תאריך =====
-        viewModel.getDateText().observe(this, text -> {
-            if (text != null) {
-                dateInput.setText(text);
-                dateInput.setError(null);
-            }
-        });
+        viewModel.getErrorField().observe(this, field -> {
 
-        viewModel.getDateError().observe(this, msg -> {
-            if (msg != null) {
-                dateInput.setError(msg);
-            }
-        });
-
-        // ===== שעה =====
-        viewModel.getTimeText().observe(this, text -> {
-            if (text != null) {
-                timeInput.setText(text);
-                timeInput.setError(null);
-            }
-        });
-
-        viewModel.getTimeError().observe(this, msg -> {
-            if (msg != null) {
-                timeInput.setError(msg);
-            }
-        });
-
-        // ===== מיקום =====
-        viewModel.getLocationText().observe(this, text -> {
-            if (text != null) {
-                locationInput.setText(text);
+            if (field == null) {
+                nameInput.setError(null);
                 locationInput.setError(null);
+                dateInput.setError(null);
+                timeInput.setError(null);
+                capacityInput.setError(null);
+                genreText.setError(null);
+                return;
+            }
+
+            switch (field) {
+                case TITLE:
+                    nameInput.setError("נא להזין שם אירוע");
+                    nameInput.requestFocus();
+                    break;
+
+                case LOCATION:
+                    locationInput.setError("נא לבחור מיקום");
+                    locationInput.requestFocus();
+                    break;
+
+                case DATE:
+                    dateInput.setError("נא לבחור תאריך");
+                    dateInput.requestFocus();
+                    break;
+
+                case TIME:
+                    timeInput.setError("נא לבחור שעה");
+                    timeInput.requestFocus();
+                    break;
+
+                case GENRE:
+                    genreText.setError("נא לבחור ז'אנר");
+                    genreText.requestFocus();
+                    break;
+
+                case CAPACITY:
+                    capacityInput.setError("קיבולת לא תקינה");
+                    capacityInput.requestFocus();
+                    break;
+
             }
         });
 
-        viewModel.getLocationError().observe(this, msg -> {
-            if (msg != null) {
-                locationInput.setError(msg);
+        viewModel.getGenresTextLive().observe(this, text -> {
+            genreText.setText(text);
+            if (text != null && !text.trim().isEmpty()) {
+                genreText.setError(null);
             }
         });
-
-        // ===== שם אירוע =====
-        viewModel.getNameError().observe(this, msg -> {
-            if (msg != null) {
-                nameInput.setError(msg);
-            }
+        viewModel.getDateText().observe(this, text -> {
+            dateInput.setText(text);
+            dateInput.setError(null);
         });
 
-        // ===== קיבולת =====
-        viewModel.getCapacityError().observe(this, msg -> {
-            if (msg != null) {
-                capacityInput.setError(msg);
-            }
+        viewModel.getTimeText().observe(this, text -> {
+            timeInput.setText(text);
+            timeInput.setError(null);
         });
 
-        // ===== ז'אנר (TextView – בלי בועה) =====
-        viewModel.getGenreError().observe(this, hasError -> {
-            if (Boolean.TRUE.equals(hasError)) {
-                genreContainer.setBackgroundResource(R.drawable.genre_error_bg);
-                genreText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-                genreErrorText.setVisibility(View.VISIBLE);
-            } else {
-                genreContainer.setBackgroundResource(R.drawable.genre_normal_bg);
-                genreText.setTextColor(getResources().getColor(android.R.color.black));
-                genreErrorText.setVisibility(View.GONE);
-            }
+        viewModel.getLocationText().observe(this, text -> {
+            locationInput.setText(text);
+            locationInput.setError(null);
         });
 
 
-        // ===== הודעות כלליות =====
+
         viewModel.getToastMessage().observe(this, msg -> {
             if (msg != null) {
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
             }
         });
 
-        // ===== הצלחה =====
         viewModel.getSuccess().observe(this, success -> {
             if (Boolean.TRUE.equals(success)) {
                 Toast.makeText(this, "האירוע נוצר בהצלחה!", Toast.LENGTH_SHORT).show();
@@ -171,21 +168,27 @@ public class CreateNewEventActivity extends AppCompatActivity {
                 mapPickerLauncher.launch(
                         new Intent(this, MapPickerActivity.class)));
 
-        dateInput.setOnClickListener(v -> {
-            DatePickerDialogFragment dialog =
-                    DatePickerDialogFragment.newInstance(
-                            (year, month, day) ->
-                                    viewModel.setDate(year, month, day));
-            dialog.show(getSupportFragmentManager(), "DATE_PICKER");
-        });
+        dateInput.setOnClickListener(v ->
+                new DatePickerDialog(
+                        this,
+                        (view, y, m, d) -> viewModel.setDate(y, m, d),
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH)
+                ).show()
+        );
 
-        timeInput.setOnClickListener(v -> {
-            TimePickerDialogFragment dialog =
-                    TimePickerDialogFragment.newInstance(
-                            (hour, minute) ->
-                                    viewModel.setTime(hour, minute));
-            dialog.show(getSupportFragmentManager(), "TIME_PICKER");
-        });
+
+        timeInput.setOnClickListener(v ->
+                new TimePickerDialog(
+                        this,
+                        (view, h, m) -> viewModel.setTime(h, m),
+                        calendar.get(Calendar.HOUR_OF_DAY),
+                        calendar.get(Calendar.MINUTE),
+                        true
+                ).show()
+        );
+
 
         genreText.setOnClickListener(v -> openGenreDialog());
 
@@ -196,12 +199,7 @@ public class CreateNewEventActivity extends AppCompatActivity {
         capacityInput.addTextChangedListener(new SimpleTextWatcher(() ->
                 capacityInput.setError(null)
         ));
-        genreText.setOnClickListener(v -> {
-            genreContainer.setBackgroundResource(
-                    R.drawable.genre_normal_bg
-            );
-            openGenreDialog();
-        });
+        genreText.setOnClickListener(v -> openGenreDialog());
 
 
         publishBtn.setOnClickListener(v ->
@@ -231,11 +229,7 @@ public class CreateNewEventActivity extends AppCompatActivity {
                                         isChecked
                                 )
                 )
-                .setPositiveButton("OK", (d, w) -> {
-                    genreText.setText(
-                            viewModel.getGenresText()
-                    );
-                })
+                .setPositiveButton("OK", null)
                 .setNegativeButton("Cancel", null)
                 .show();
     }

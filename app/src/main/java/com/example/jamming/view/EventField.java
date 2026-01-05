@@ -1,6 +1,6 @@
 package com.example.jamming.view;
 
-public enum EditEventField {
+public enum EventField {
     TITLE,
     DESCRIPTION,
     LOCATION,

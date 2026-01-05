@@ -3,13 +3,10 @@ package com.example.jamming.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import com.example.jamming.model.Event;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.utils.DateUtils;
-import com.example.jamming.view.EditEventField;
-import com.google.firebase.firestore.DocumentSnapshot;
-
+import com.example.jamming.view.EventField;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -34,9 +31,10 @@ public class EditEventViewModel extends ViewModel {
     private final MutableLiveData<String> capacityText = new MutableLiveData<>("");
     private final MutableLiveData<String> genresText = new MutableLiveData<>("");
 
-    private final MutableLiveData<EditEventField> errorField = new MutableLiveData<>();
+    private final MutableLiveData<EventField> errorField = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> success = new MutableLiveData<>(false);
+    private final MutableLiveData<String> successMessage = new MutableLiveData<>();
+    public LiveData<String> getSuccessMessage() { return successMessage; }
 
     private boolean isDateSet = false;
     private boolean isTimeSet = false;
@@ -49,10 +47,10 @@ public class EditEventViewModel extends ViewModel {
     public LiveData<String> getTimeText() { return timeText; }
     public LiveData<String> getCapacityText() { return capacityText; }
     public LiveData<String> getGenresText() { return genresText; }
+    public Calendar getDateTime() {return dateTime;}
 
-    public LiveData<EditEventField> getErrorField() { return errorField; }
+    public LiveData<EventField> getErrorField() { return errorField; }
     public LiveData<String> getErrorMessage() { return errorMessage; }
-    public LiveData<Boolean> getSuccess() { return success; }
 
     // ===== Setters from UI (Activity) =====
     public void onTitleChanged(String v) { title.setValue(v == null ? "" : v); }
@@ -105,9 +103,8 @@ public class EditEventViewModel extends ViewModel {
         this.lng = lng;
         this.address = address;
         locationText.setValue(address == null ? "" : address);
-        // אם הייתה שגיאת מיקום - ניקוי
         if (address != null && !address.trim().isEmpty()) {
-            if (errorField.getValue() == EditEventField.LOCATION) errorField.setValue(null);
+            if (errorField.getValue() == EventField.LOCATION) errorField.setValue(null);
         }
     }
 
@@ -118,7 +115,7 @@ public class EditEventViewModel extends ViewModel {
         dateTime.set(Calendar.DAY_OF_MONTH, day);
         isDateSet = true;
         dateText.setValue(DateUtils.formatOnlyDate(dateTime.getTimeInMillis()));
-        if (errorField.getValue() == EditEventField.DATE) errorField.setValue(null);
+        if (errorField.getValue() == EventField.DATE) errorField.setValue(null);
     }
 
     public void setTime(int hour, int minute) {
@@ -126,7 +123,7 @@ public class EditEventViewModel extends ViewModel {
         dateTime.set(Calendar.MINUTE, minute);
         isTimeSet = true;
         timeText.setValue(DateUtils.formatOnlyTime(dateTime.getTimeInMillis()));
-        if (errorField.getValue() == EditEventField.TIME) errorField.setValue(null);
+        if (errorField.getValue() == EventField.TIME) errorField.setValue(null);
     }
 
     // ===== Genres =====
@@ -140,9 +137,7 @@ public class EditEventViewModel extends ViewModel {
         }
 
         genresText.setValue(String.join(" , ", genres));
-
-        // ניקוי שגיאת ז'אנר אם יש בחירה
-        if (!genres.isEmpty() && errorField.getValue() == EditEventField.GENRE) {
+        if (!genres.isEmpty() && errorField.getValue() == EventField.GENRE) {
             errorField.setValue(null);
         }
     }
@@ -163,22 +158,22 @@ public class EditEventViewModel extends ViewModel {
         String d = description.getValue() == null ? "" : description.getValue().trim();
         String capStr = capacityText.getValue() == null ? "" : capacityText.getValue().trim();
 
-        if (t.isEmpty()) { errorField.setValue(EditEventField.TITLE); return; }
-        if (d.isEmpty()) { errorField.setValue(EditEventField.DESCRIPTION); return; }
-        if (address == null || address.trim().isEmpty()) { errorField.setValue(EditEventField.LOCATION); return; }
-        if (!isDateSet) { errorField.setValue(EditEventField.DATE); return; }
-        if (!isTimeSet) { errorField.setValue(EditEventField.TIME); return; }
+        if (t.isEmpty()) { errorField.setValue(EventField.TITLE); return; }
+        if (d.isEmpty()) { errorField.setValue(EventField.DESCRIPTION); return; }
+        if (address == null || address.trim().isEmpty()) { errorField.setValue(EventField.LOCATION); return; }
+        if (!isDateSet) { errorField.setValue(EventField.DATE); return; }
+        if (!isTimeSet) { errorField.setValue(EventField.TIME); return; }
 
         int cap;
         try {
             cap = Integer.parseInt(capStr);
             if (cap <= 0) throw new NumberFormatException();
         } catch (Exception e) {
-            errorField.setValue(EditEventField.CAPACITY);
+            errorField.setValue(EventField.CAPACITY);
             return;
         }
 
-        if (genres.isEmpty()) { errorField.setValue(EditEventField.GENRE); return; }
+        if (genres.isEmpty()) { errorField.setValue(EventField.GENRE); return; }
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("name", t);
@@ -191,14 +186,14 @@ public class EditEventViewModel extends ViewModel {
         updates.put("musicTypes", new ArrayList<>(genres));
 
         eventRepository.updateEvent(eventId, updates)
-                .addOnSuccessListener(a -> success.setValue(true))
+                .addOnSuccessListener(a -> successMessage.setValue("האירוע עודכן בהצלחה"))
                 .addOnFailureListener(e -> errorMessage.setValue("שגיאה בעדכון האירוע"));
     }
 
     // ===== Delete =====
     public void deleteEvent(String eventId) {
         eventRepository.deleteEvent(eventId)
-                .addOnSuccessListener(a -> success.setValue(true))
+                .addOnSuccessListener(a -> successMessage.setValue("האירוע נמחק בהצלחה"))
                 .addOnFailureListener(e -> errorMessage.setValue("שגיאה במחיקת האירוע"));
     }
 }

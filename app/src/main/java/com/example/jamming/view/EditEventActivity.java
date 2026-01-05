@@ -33,8 +33,7 @@ public class EditEventActivity extends AppCompatActivity {
 
     private EditEventViewModel viewModel;
     private String eventId;
-
-    private final Calendar calendar = Calendar.getInstance();
+    private Calendar c;
 
     private final ActivityResultLauncher<Intent> mapPickerLauncher =
             registerForActivityResult(
@@ -46,9 +45,6 @@ public class EditEventActivity extends AppCompatActivity {
                             String address = result.getData().getStringExtra("address");
 
                             viewModel.onLocationSelected(lat, lng, address);
-
-                            // UI: ניקוי שגיאה (כדי שהאייקון ייעלם מיד)
-                            etLocation.setError(null);
                         }
                     }
             );
@@ -60,9 +56,9 @@ public class EditEventActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this).get(EditEventViewModel.class);
         eventId = getIntent().getStringExtra("EVENT_ID");
+        c = viewModel.getDateTime();
 
         initViews();
-        lockDateTimeInputs();   // כדי שלא יקלידו
         observeViewModel();
         setupListeners();
 
@@ -78,25 +74,10 @@ public class EditEventActivity extends AppCompatActivity {
         etDate = findViewById(R.id.etEventDate);
         etTime = findViewById(R.id.etEventTime);
         etCapacity = findViewById(R.id.etEventCapacity);
-
         genreText = findViewById(R.id.selectGenreText);
-
         btnSave = findViewById(R.id.btnSaveEvent);
         btnDelete = findViewById(R.id.btnDeleteEvent);
         btnMap = findViewById(R.id.btnOpenMap);
-    }
-
-    private void lockDateTimeInputs() {
-        // מונע הקלדה ומוודא שלחיצה פותחת דיאלוג
-        etDate.setFocusable(false);
-        etDate.setClickable(true);
-
-        etTime.setFocusable(false);
-        etTime.setClickable(true);
-
-        // המיקום אצלך כבר לא מוקלד (ב־XML יש focusable=false) אבל נוודא גם כאן
-        etLocation.setFocusable(false);
-        etLocation.setClickable(true);
     }
 
     private void observeViewModel() {
@@ -111,12 +92,21 @@ public class EditEventActivity extends AppCompatActivity {
                 genreText.setText("");
             } else {
                 genreText.setText(text);
+                genreText.setError(null);
             }
         });
 
         viewModel.getErrorField().observe(this, field -> {
-            if (field == null) return;
-
+            if (field == null) {
+                genreText.setError(null);
+                etTitle.setError(null);
+                etDescription.setError(null);
+                etLocation.setError(null);
+                etDate.setError(null);
+                etTime.setError(null);
+                etCapacity.setError(null);
+                return;
+            }
             switch (field) {
                 case TITLE:
                     etTitle.setError("נא להזין שם אירוע");
@@ -161,31 +151,26 @@ public class EditEventActivity extends AppCompatActivity {
             }
         });
 
-        viewModel.getSuccess().observe(this, ok -> {
-            if (Boolean.TRUE.equals(ok)) {
-                Toast.makeText(this,
-                        "האירוע עודכן בהצלחה",
-                        Toast.LENGTH_SHORT
-                ).show();
+        viewModel.getSuccessMessage().observe(this, msg -> {
+            if (msg != null) {
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
+
     }
 
     private void setupListeners() {
         etTitle.addTextChangedListener(new SimpleTextWatcher(s -> {
             viewModel.onTitleChanged(s);
-            etTitle.setError(null);
         }));
 
         etDescription.addTextChangedListener(new SimpleTextWatcher(s -> {
             viewModel.onDescriptionChanged(s);
-            etDescription.setError(null);
         }));
 
         etCapacity.addTextChangedListener(new SimpleTextWatcher(s -> {
             viewModel.onCapacityChanged(s);
-            etCapacity.setError(null);
         }));
 
         etDate.setOnClickListener(v -> showDatePicker());
@@ -214,8 +199,6 @@ public class EditEventActivity extends AppCompatActivity {
                         (dialog, which, isChecked) -> viewModel.toggleGenre(genres[which], isChecked)
                 )
                 .setPositiveButton("OK", (d, w) -> {
-                    // האייקון של error על TextView לא תמיד "יפה", אבל זה מה שביקשת: לא Snackbar
-                    genreText.setError(null);
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
@@ -225,11 +208,10 @@ public class EditEventActivity extends AppCompatActivity {
         new DatePickerDialog(this,
                 (view, y, m, d) -> {
                     viewModel.setDate(y, m, d);
-                    etDate.setError(null);
                 },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
+                c.get(Calendar.YEAR),
+                c.get(Calendar.MONTH),
+                c.get(Calendar.DAY_OF_MONTH)
         ).show();
     }
 
@@ -239,8 +221,8 @@ public class EditEventActivity extends AppCompatActivity {
                     viewModel.setTime(h, m);
                     etTime.setError(null);
                 },
-                calendar.get(Calendar.HOUR_OF_DAY),
-                calendar.get(Calendar.MINUTE),
+                c.get(Calendar.HOUR_OF_DAY),
+                c.get(Calendar.MINUTE),
                 true
         ).show();
     }

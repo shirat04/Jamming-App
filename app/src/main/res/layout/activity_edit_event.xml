@@ -113,6 +113,7 @@
                     android:layout_weight="1"
                     android:hint="@string/location"
                     android:focusable="false"
+                    android:cursorVisible="false"
                     android:clickable="true"
                     android:inputType="none"
                     tools:ignore="Autofill,TextFields,TouchTargetSizeCheck,VisualLintTextFieldSize,DuplicateSpeakableTextCheck" />
@@ -135,6 +136,7 @@
                 android:layout_width="match_parent"
                 android:focusable="false"
                 android:clickable="true"
+                android:cursorVisible="false"
                 android:inputType="none"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
@@ -149,6 +151,7 @@
                 android:inputType="none"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:cursorVisible="false"
                 android:layout_marginBottom="12dp"
                 android:hint="@string/time_hh_mm"
                 tools:ignore="Autofill,TextFields,TouchTargetSizeCheck,VisualLintTextFieldSize,TextContrastCheck" />
