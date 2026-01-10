@@ -9,26 +9,52 @@
     android:background="#F2F4F7"
     tools:context=".view.LoginActivity">
 
-    <!-- Title -->
-    <TextView
-        android:id="@+id/loginTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/login"
-        android:textSize="36sp"
-        android:textStyle="bold"
-        android:textColor="#0B375E"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+    <ImageView
+        android:id="@+id/loginLogo"
+        android:layout_width="331dp"
+        android:layout_height="97dp"
+        android:layout_marginTop="32dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/jamming_title"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="40dp"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+
+    <!--    &lt;!&ndash; Title &ndash;&gt;-->
+<!--    <TextView-->
+<!--        android:id="@+id/loginTitle"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Jamming"-->
+<!--        android:textSize="40sp"-->
+<!--        android:textStyle="bold"-->
+<!--        android:textColor="#0B375E"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        android:layout_marginTop="40dp"/>-->
 
     <!-- Username Field -->
+    <TextView
+        android:id="@+id/subTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="welcome back"
+        android:textColor="#2E0B35"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loginLogo" />
+
     <EditText
         android:id="@+id/usernameInput"
         android:layout_width="0dp"
         android:layout_height="55dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:background="@android:drawable/edit_text"
         android:hint="@string/username"
         android:inputType="textEmailAddress"
@@ -36,7 +62,7 @@
         android:paddingEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/loginTitle"
+        app:layout_constraintTop_toBottomOf="@id/subTitle"
         tools:ignore="Autofill,TextContrastCheck,VisualLintTextFieldSize" />
 
     <!-- Password Field -->
