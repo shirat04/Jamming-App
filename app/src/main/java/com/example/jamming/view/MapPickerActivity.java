@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -70,7 +71,10 @@ public class MapPickerActivity extends BaseMapActivity {
 
     @Override
     protected void onMapReadyCustom() {
+        Log.d("MAP_DEBUG", "Map is ready, type NORMAL");
+
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        Log.d("MAP_DEBUG", "Map is ready, type NORMAL");
 
         enableMyLocationSafe();
 

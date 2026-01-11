@@ -4,6 +4,13 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
 }
+val mapsApiKey: String = project
+    .rootProject
+    .file("local.properties")
+    .readLines()
+    .firstOrNull { it.startsWith("MAPS_API_KEY=") }
+    ?.substringAfter("=")
+    ?: ""
 
 android {
     namespace = "com.example.jamming"
@@ -18,9 +25,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
 
-        manifestPlaceholders["MAPS_API_KEY"] =
-            project.properties["MAPS_API_KEY"] as String? ?: ""
 
     }
 

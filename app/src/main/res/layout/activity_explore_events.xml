@@ -8,84 +8,63 @@
     tools:context=".view.ExploreEventsActivity">
 
     <!-- 🔵 פס עליון -->
-    <!-- 🟡 שורת כפתורי פילטר עגולים -->
 
     <LinearLayout
         android:id="@+id/topBar"
-        android:layout_width="411dp"
-        android:layout_height="106dp"
-        android:layout_weight="0"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="95dp"
         android:background="#0B375E"
-        android:gravity="center_vertical"
-        android:minHeight="110dp"
         android:orientation="horizontal"
-        android:padding="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="TextSizeCheck">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- ☰ תפריט -->
         <ImageButton
             android:id="@+id/btnMore"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_margin="16dp"
             android:background="@android:color/transparent"
             android:src="@drawable/outline_menu_24"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:tint="@android:color/white" />
 
+        <!-- רווח קטן בלבד -->
+        <Space
+            android:layout_width="12dp"
+            android:layout_height="0dp" />
+
+        <!-- פרופיל + טקסט -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <Space
-                android:layout_width="12dp"
-                android:layout_height="wrap_content" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/btnProfile"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:background="@android:color/transparent"
-                app:srcCompat="@drawable/baseline_person"
-                app:tint="@android:color/white"
-                tools:ignore="ContentDescription,SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+                android:src="@drawable/baseline_person"
+                app:tint="@android:color/white" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
 
                 <TextView
                     android:id="@+id/exploreTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="0dp"
-                    android:layout_marginBottom="2dp"
-                    android:text="@string/Hello_User_title"
+                    android:text="Hello User"
                     android:textColor="@android:color/white"
-                    android:textSize="22sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/exploreLocation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="2dp"
-                    android:alpha="0.85"
-                    android:text="@string/explore_location"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp" />
-
 
             </LinearLayout>
         </LinearLayout>
@@ -98,105 +77,98 @@
         android:layout_height="wrap_content"
         android:padding="6dp"
         android:background="@android:color/white"
+        android:fillViewport="true"
         app:layout_constraintTop_toBottomOf="@+id/topBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- עטיפה שתופסת את כל הרוחב -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:gravity="center">
 
-            <!-- כפתור מרחק -->
-            <Button
-                android:id="@+id/filterDistance"
-                style="?attr/borderlessButtonStyle"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_margin="6dp"
-                android:backgroundTint="#FF6F6F"
-                android:text="@string/locationTag"
-                android:textColor="@android:color/white"
-                android:textSize="20sp"
-                tools:ignore="TextContrastCheck" />
+            <!-- השורה האמיתית של הכפתורים -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-            <!-- כפתור תאריך -->
-            <Button
-                android:id="@+id/filterDate"
-                style="?attr/borderlessButtonStyle"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_margin="6dp"
-                android:backgroundTint="#FFA84B"
-                android:text="@string/boardTag"
-                android:textColor="@android:color/white"
-                android:textSize="20sp"
-                tools:ignore="TextContrastCheck" />
+                <!-- כפתור מרחק -->
+                <Button
+                    android:id="@+id/filterDistance"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_margin="6dp"
+                    android:backgroundTint="#FF6F6F"
+                    android:text="@string/locationTag"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"/>
 
-            <!-- כפתור שעה -->
-            <Button
-                android:id="@+id/filterTime"
-                style="?attr/borderlessButtonStyle"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_margin="6dp"
-                android:backgroundTint="#FFCE47"
-                android:text="@string/timeTag"
-                android:textColor="@android:color/white"
-                android:textSize="20sp"
-                tools:ignore="TextContrastCheck" />
+                <!-- כפתור תאריך -->
+                <Button
+                    android:id="@+id/filterDate"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_margin="6dp"
+                    android:backgroundTint="#FFA84B"
+                    android:text="@string/boardTag"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"/>
 
-            <!-- כפתור מוזיקה -->
-            <Button
-                android:id="@+id/filterMusic"
-                style="?attr/borderlessButtonStyle"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_margin="6dp"
-                android:backgroundTint="#41C463"
-                android:text="@string/musicTag"
-                android:textColor="@android:color/white"
-                android:textSize="20sp"
-                tools:ignore="TextContrastCheck" />
+                <!-- כפתור שעה -->
+                <Button
+                    android:id="@+id/filterTime"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_margin="6dp"
+                    android:backgroundTint="#FFCE47"
+                    android:text="@string/timeTag"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"/>
 
-            <!-- כפתור גודל אירוע -->
-            <Button
-                android:id="@+id/filterCapacity"
-                style="?attr/borderlessButtonStyle"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_margin="6dp"
-                android:backgroundTint="#63A5FF"
-                android:text="@string/peopleTag"
-                android:textColor="@android:color/white"
-                android:textSize="20sp"
-                tools:ignore="TextContrastCheck" />
+                <!-- כפתור מוזיקה -->
+                <Button
+                    android:id="@+id/filterMusic"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_margin="6dp"
+                    android:backgroundTint="#41C463"
+                    android:text="@string/musicTag"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"/>
 
-            <!-- כפתור מועדפים -->
-            <Button
-                android:id="@+id/filterFavorite"
-                style="?attr/borderlessButtonStyle"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_margin="6dp"
-                android:backgroundTint="#2D7AD8"
-                android:text="@string/starTag"
-                android:textColor="@android:color/white"
-                android:textSize="20sp" />
+                <!-- כפתור גודל -->
+                <Button
+                    android:id="@+id/filterCapacity"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_margin="6dp"
+                    android:backgroundTint="#63A5FF"
+                    android:text="@string/peopleTag"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"/>
 
+            </LinearLayout>
         </LinearLayout>
     </HorizontalScrollView>
+
 
     <!-- 🟢 תת־פילטרים טקסטואליים -->
     <LinearLayout
         android:id="@+id/textFilters"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp"
         android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@+id/filtersScroll"
+        android:padding="8dp"
+        android:weightSum="3"
+        app:layout_constraintTop_toBottomOf="@id/filtersScroll"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -204,28 +176,48 @@
             android:id="@+id/btnEventsNearMe"
             style="?attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:minHeight="48dp"
+            android:layout_weight="1"
             android:layout_marginEnd="12dp"
-            android:backgroundTint="#2E7D32"
+            android:layout_marginHorizontal="6dp"
             android:paddingHorizontal="16dp"
-            android:paddingVertical="10dp"
-            android:text="@string/events_near_me"
+            android:text="Events Near Me"
+            android:textAllCaps="false"
+            android:backgroundTint="@color/secondaryRed"
             android:textColor="@android:color/white"
-            android:textSize="14sp"/>
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btnAllEvents"
+            style="?attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_weight="1"
+            android:paddingHorizontal="16dp"
+            android:text="All Events"
+            android:backgroundTint="@color/primaryPurple"
+            android:textAllCaps="false"
+            android:layout_marginHorizontal="6dp"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/btnMyEvents"
             style="?attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:backgroundTint="#145A94"
+            android:layout_height="wrap_content"
             android:minHeight="48dp"
+            android:minWidth="130dp"
+            android:layout_marginHorizontal="6dp"
             android:paddingHorizontal="16dp"
-            android:paddingVertical="10dp"
-            android:text="@string/my_events"
-            android:textColor="@android:color/white"
-            android:textSize="14sp" />
+            android:text="My Events"
+            android:textAllCaps="false"
+            android:textSize="12sp"
+            android:backgroundTint="@color/divider"
+            android:textColor="@android:color/white"/>
+
     </LinearLayout>
 
 
@@ -234,9 +226,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
-
         android:layout_marginBottom="35dp"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

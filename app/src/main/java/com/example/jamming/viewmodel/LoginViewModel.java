@@ -1,12 +1,12 @@
 package com.example.jamming.viewmodel;
 
+import android.util.Patterns;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.jamming.repository.AuthRepository;
-import java.util.HashMap;
-import java.util.Map;
 
 public class LoginViewModel extends ViewModel {
 
@@ -22,43 +22,32 @@ public class LoginViewModel extends ViewModel {
             return;
         }
 
-        if (identifier.contains("@")) {
-            repo.login(identifier, password)
-                    .addOnSuccessListener(auth -> checkUserType(repo.getCurrentUid()))
-                    .addOnFailureListener(e -> {
+        repo.getUserByUsername(identifier)
+                .addOnSuccessListener(query -> {
+                    if (query.isEmpty()) {
+                        message.setValue("שם המשתמש או סיסמה אינם נכונים");
+                        return;
+                    }
 
-                        String msg = e.getMessage();
+                    String email = query.getDocuments().get(0).getString("email");
+                    if (email == null || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                        message.setValue("כתובת האימייל של המשתמש אינה תקינה");
+                        return;
+                    }
 
-                        if (msg != null && msg.contains("credential")) {
-                            message.setValue("שם משתמש או סיסמה אינם נכונים");
-                        } else {
-                            message.setValue("שגיאה בהתחברות, נסה שוב");
-                        }
-                    });
+                    repo.login(email.trim(), password)
+                            .addOnSuccessListener(auth ->
+                                    checkUserType(repo.getCurrentUid()))
+                            .addOnFailureListener(e ->
+                                    message.setValue("שם משתמש או סיסמה אינם נכונים"));
+                })
+                .addOnFailureListener(e ->
+                        message.setValue("שגיאה בהתחברות"));
 
-
-        } else {
-            repo.getUserByUsername(identifier)
-                    .addOnSuccessListener(query -> {
-
-                        if (query.isEmpty()) {
-                            message.setValue("שם המשתמש או סיסמה אינם נכונים");
-                            return;
-                        }
-
-                        String email = query.getDocuments().get(0).getString("email");
-
-                        repo.login(email, password)
-                                .addOnSuccessListener(auth -> checkUserType(repo.getCurrentUid()))
-                                .addOnFailureListener(e -> message.setValue("שם משתמש או סיסמה אינם נכונים"));
-                    })
-                    .addOnFailureListener(e -> message.setValue(e.getMessage()));
-        }
     }
     private void checkUserType(String uid) {
             repo.getUserUId(uid).addOnSuccessListener(doc -> {
                 if (!doc.exists()) {
-                    message.setValue("פרופיל המשתמש לא קיים");
                             return;}
                         String type = doc.getString("userType");
                         userType.setValue(type);
@@ -71,38 +60,35 @@ public class LoginViewModel extends ViewModel {
     public LiveData<String> getUserType() {
         return userType;
     }
+
     public void resetPassword(String identifier) {
 
         if (identifier == null || identifier.trim().isEmpty()) {
-            message.setValue("נא להזין אימייל או שם משתמש");
+            message.setValue("נא להזין שם משתמש");
             return;
         }
-        if (identifier.contains("@")) {
-            repo.sendPasswordResetEmail(identifier)
-                    .addOnSuccessListener(aVoid ->
-                            message.setValue("נשלח מייל לאיפוס סיסמה"))
-                    .addOnFailureListener(e ->
-                            message.setValue("שגיאה בשליחת המייל"));
-        }
-        else {
-            repo.getUserByUsername(identifier)
-                    .addOnSuccessListener(query -> {
-                        if (query.isEmpty()) {
-                            message.setValue("שם המשתמש לא קיים");
-                            return;
-                        }
 
-                        String email = query.getDocuments().get(0).getString("email");
+        repo.getUserByUsername(identifier)
+                .addOnSuccessListener(query -> {
+                    if (query.isEmpty()) {
+                        message.setValue("שם המשתמש לא קיים");
+                        return;
+                    }
 
-                        repo.sendPasswordResetEmail(email)
-                                .addOnSuccessListener(aVoid ->
-                                        message.setValue("נשלח מייל לאיפוס סיסמה"))
-                                .addOnFailureListener(e ->
-                                        message.setValue("שגיאה בשליחת המייל"));
-                    })
-                    .addOnFailureListener(e ->
-                            message.setValue("שגיאה באיתור המשתמש"));
-        }
+                    String email = query.getDocuments().get(0).getString("email");
+                    if (email == null) {
+                        message.setValue("שגיאה בפרטי המשתמש");
+                        return;
+                    }
+
+                    repo.sendPasswordResetEmail(email)
+                            .addOnSuccessListener(v ->
+                                    message.setValue("נשלח מייל לאיפוס סיסמה"))
+                            .addOnFailureListener(e ->
+                                    message.setValue("שגיאה בשליחת המייל"));
+                })
+                .addOnFailureListener(e ->
+                        message.setValue("שגיאה באיתור המשתמש"));
     }
     public void clearMessage() {
         message.setValue(null);

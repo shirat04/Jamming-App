@@ -1,5 +1,7 @@
 package com.example.jamming.repository;
 
+import android.util.Log;
+
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,14 +21,6 @@ public class AuthRepository {
         return auth.signInWithEmailAndPassword(email, pass);
     }
 
-    // Find user by username (Firestore)
-    public Task<QuerySnapshot> getUserByUsername(String username) {
-        return db.collection("users")
-                .whereEqualTo("username", username)
-                .limit(1)
-                .get();
-    }
-
     // Create user in FirebaseAuth
     public Task<AuthResult> createUser(String email, String pass) {
         return auth.createUserWithEmailAndPassword(email, pass);
@@ -42,8 +36,14 @@ public class AuthRepository {
         return db.collection("users").document(uid).get();
     }
 
-    // Check if username exists
     public Task<QuerySnapshot> isUsernameTaken(String username) {
+        return db.collection("users")
+                .whereEqualTo("username", username)
+                .limit(1)
+                .get();
+    }
+
+    public Task<QuerySnapshot> getUserByUsername(String username) {
         return db.collection("users")
                 .whereEqualTo("username", username)
                 .limit(1)
@@ -54,6 +54,7 @@ public class AuthRepository {
     public String getCurrentUid() {
         return (auth.getCurrentUser() != null) ? auth.getCurrentUser().getUid() : null;
     }
+
 
     public Task<Void> sendPasswordResetEmail(String email) {
         return FirebaseAuth.getInstance().sendPasswordResetEmail(email);

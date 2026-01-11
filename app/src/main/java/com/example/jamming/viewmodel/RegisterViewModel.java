@@ -20,6 +20,7 @@ public class RegisterViewModel extends ViewModel {
             error.setValue("נא למלא את כל השדות");
             return;
         }
+
         if (!pass.equals(confPass)) {
             error.setValue("הסיסמאות אינן תואמות");
             return;
@@ -34,7 +35,6 @@ public class RegisterViewModel extends ViewModel {
         }
         repo.isUsernameTaken(userName)
                 .addOnSuccessListener(query -> {
-
                     if (!query.isEmpty()) {
                         error.setValue("שם משתמש תפוס");
                         return;
@@ -48,6 +48,7 @@ public class RegisterViewModel extends ViewModel {
                             .addOnFailureListener(e -> error.setValue(e.getMessage()));
                 })
                 .addOnFailureListener(e -> error.setValue(e.getMessage()));
+
     }
 
     private void saveUserProfile(String uid, String fullName, String email, String userName, String type) {

@@ -76,8 +76,6 @@ public class CreateNewEventViewModel extends ViewModel {
     }
 
 
-
-
     public boolean[] getCheckedGenres(String[] allGenres) {
         boolean[] checked = new boolean[allGenres.length];
         for (int i = 0; i < allGenres.length; i++) {
@@ -128,9 +126,6 @@ public class CreateNewEventViewModel extends ViewModel {
             errorField.setValue(EventField.CAPACITY);
             return;
         }
-
-
-
 
 
         String ownerId = authRepo.getCurrentUid();

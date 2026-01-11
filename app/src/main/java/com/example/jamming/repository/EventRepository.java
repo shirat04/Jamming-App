@@ -6,6 +6,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class EventRepository {
@@ -65,6 +68,23 @@ public class EventRepository {
         return db.collection("events")
                 .document(eventId)
                 .update("reserved", FieldValue.increment(1));
+    }
+    public Task<List<Event>> getActiveEvents() {
+        return FirebaseFirestore.getInstance()
+                .collection("events")
+                .whereEqualTo("active", true)
+                .get()
+                .continueWith(task -> {
+                    List<Event> list = new ArrayList<>();
+                    for (DocumentSnapshot doc : task.getResult()) {
+                        Event e = doc.toObject(Event.class);
+                        if (e != null) {
+                            e.setId(doc.getId());
+                            list.add(e);
+                        }
+                    }
+                    return list;
+                });
     }
 
     // Decrement reserved seats count

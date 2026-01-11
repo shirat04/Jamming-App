@@ -7,4 +7,24 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="primaryPurple">#4A1D6E</color>   <!-- סגול כהה -->
+    <color name="secondaryRed">#B3261E</color>    <!-- אדום עמוק -->
+    <color name="surfaceDark">#121212</color>     <!-- רקע כהה -->
+    <color name="surfaceLight">#FFFFFF</color>    <!-- לבן -->
+    <color name="divider">#2C2C2C</color>
+    <!-- Primary -->
+    <color name="purpleDeep">#4A1D6E</color>     <!-- Header -->
+    <color name="berryAccent">#B3265E</color>    <!-- Active / Accent -->
+
+    <!-- Surfaces -->
+    <color name="surfaceOffWhite">#F7F7FA</color>
+    <color name="surfaceWhite">#FFFFFF</color>
+
+    <!-- Text -->
+    <color name="textPrimary">#1C1B1F</color>
+    <color name="textSecondary">#6F6F73</color>
+
+    <!-- Borders / Disabled -->
+    <color name="outline">#D0D0D6</color>
+
 </resources>

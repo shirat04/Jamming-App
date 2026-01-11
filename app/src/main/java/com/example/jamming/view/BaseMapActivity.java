@@ -8,8 +8,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.function.Consumer;
 
 public abstract class BaseMapActivity extends AppCompatActivity
@@ -68,6 +71,34 @@ public abstract class BaseMapActivity extends AppCompatActivity
                 .addOnFailureListener(e -> onResult.accept(null));
     }
 
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode,
+            @NonNull String[] permissions,
+            @NonNull int[] grantResults
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == LOCATION_REQUEST_CODE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                enableMyLocationSafe();
+
+                fetchLastLocation(location -> {
+                    if (location != null && mMap != null) {
+                        LatLng here = new LatLng(
+                                location.getLatitude(),
+                                location.getLongitude()
+                        );
+                        mMap.moveCamera(
+                                CameraUpdateFactory.newLatLngZoom(here, 13f)
+                        );
+                    }
+                });
+            }
+        }
+    }
 
     /**
      * כל Activity שמרחיבה את המחלקה הזו
