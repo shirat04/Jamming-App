@@ -36,10 +36,10 @@ public class EventDetailActivity extends BaseActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupBase(
-                getString(R.string.event_details), // או "Event Details"
-                "USER",                              // זה מסך משתמש
+                R.menu.user_menu,
                 R.layout.activity_event_detail
         );
+        hideRightActions();
         db = FirebaseFirestore.getInstance();
         initUI();
 

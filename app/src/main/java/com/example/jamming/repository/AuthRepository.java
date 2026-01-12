@@ -20,6 +20,9 @@ public class AuthRepository {
     public Task<AuthResult> login(String email, String pass) {
         return auth.signInWithEmailAndPassword(email, pass);
     }
+    public void logout() {
+        auth.signOut();
+    }
 
     // Create user in FirebaseAuth
     public Task<AuthResult> createUser(String email, String pass) {

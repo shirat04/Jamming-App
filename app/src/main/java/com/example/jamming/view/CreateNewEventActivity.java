@@ -52,10 +52,12 @@ public class CreateNewEventActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupBase(
-                getString(R.string.create_new_event),
-                "OWNER",
+                R.menu.owner_menu,
                 R.layout.activity_create_new_event
         );
+        setTitleText(getString(R.string.create_new_event));
+        hideRightActions();
+
         viewModel = new ViewModelProvider(this)
                 .get(CreateNewEventViewModel.class);
         calendar = viewModel.getDateTime();

@@ -31,12 +31,14 @@ public class MyEventUserActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupBase(
-                getString(R.string.my_events),
-                "USER",
+                R.menu.user_menu,
                 R.layout.activity_my_event_user
         );
+
+        hideRightActions();
         db = FirebaseFirestore.getInstance();
         container = findViewById(R.id.myEventsContainer);
+        setTitleText(getString(R.string.my_events));
 
         loadMyEvents();
     }

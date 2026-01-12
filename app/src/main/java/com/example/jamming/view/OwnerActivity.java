@@ -7,8 +7,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.jamming.R;
@@ -19,6 +17,7 @@ import com.example.jamming.viewmodel.OwnerViewModel;
 public class OwnerActivity extends BaseActivity {
     private OwnerViewModel viewModel;
     private TextView emptyEventsText;
+    private OwnerMenuHandler menuHandler;
 
     private LinearLayout eventsContainer;
 
@@ -26,10 +25,11 @@ public class OwnerActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupBase(
-                "",
-                "OWNER",
+                R.menu.owner_menu,
                 R.layout.activity_owner
         );
+        showRightActions();
+
 
         Button createEventBtn = findViewById(R.id.createEventButton);
         eventsContainer = findViewById(R.id.eventsContainer);
@@ -37,8 +37,16 @@ public class OwnerActivity extends BaseActivity {
 
 
         viewModel = new ViewModelProvider(this).get(OwnerViewModel.class);
+        menuHandler = new OwnerMenuHandler(this, viewModel);
+
         observeViewModel();
+
         viewModel.loadOwnerName();
+        navigationView.setNavigationItemSelectedListener(item -> {
+            boolean handled = menuHandler.handle(item.getItemId());
+            drawerLayout.closeDrawers();
+            return handled;
+        });
 
         createEventBtn.setOnClickListener(v ->
                 startActivity(new Intent(this, CreateNewEventActivity.class))
@@ -72,6 +80,10 @@ public class OwnerActivity extends BaseActivity {
         viewModel.message.observe(this, msg ->
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
         );
+    }
+    @Override
+    protected boolean onMenuItemSelected(int itemId) {
+        return menuHandler.handle(itemId);
     }
     private void addEventCard(EventRepository.EventWithId e) {
         View card = getLayoutInflater()

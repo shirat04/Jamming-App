@@ -23,6 +23,7 @@ public class ExploreEventsActivity extends BaseMapActivity {
     private Button btnMyEvents, btnEventsNearMe, btnAllEvent;
     private boolean isMapReady = false;
     private List<Event> pendingEvents = new ArrayList<>();
+    private UserMenuHandler menuHandler;
 
 
 
@@ -30,18 +31,22 @@ public class ExploreEventsActivity extends BaseMapActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupBase(
-                "Explore Events",
-                "USER",
+                R.menu.user_menu,
                 R.layout.activity_explore_events
         );
+        showRightActions();
+
         initViews();
         initMap();
         viewModel = new ViewModelProvider(this).get(ExploreEventsViewModel.class);
-        setupListeners();
+        menuHandler = new UserMenuHandler(this, viewModel);
         observeViewModel();
+        setupListeners();
 
         viewModel.loadAllEvents();
         viewModel.loadUserGreeting();
+        menuHandler = new UserMenuHandler(this, viewModel);
+
     }
 
     private void initViews() {
@@ -81,6 +86,10 @@ public class ExploreEventsActivity extends BaseMapActivity {
                 startActivity(new Intent(this, MyEventUserActivity.class))
         );
 
+    }
+    @Override
+    protected boolean onMenuItemSelected(int itemId) {
+        return menuHandler.handle(itemId);
     }
 
     // Observers

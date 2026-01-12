@@ -37,6 +37,10 @@ public class OwnerViewModel extends ViewModel {
                 );
     }
 
+    public void logout() {
+        authRepo.logout();
+    }
+
     public void loadOwnerEvents() {
         String uid = authRepo.getCurrentUid();
 

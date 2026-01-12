@@ -21,24 +21,23 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
 public abstract class BaseActivity extends AppCompatActivity {
-
     protected DrawerLayout drawerLayout;
     protected NavigationView navigationView;
     protected TextView titleText;
-    protected LinearLayout rightActions;
     protected ImageButton btnMenu;
+    protected LinearLayout rightActions;
 
 
-    protected void setupBase(String title, String userType, int contentLayout) {
+
+
+    protected void setupBase(int menuRes, int contentLayout) {
         setContentView(R.layout.activity_base);
 
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);
         titleText = findViewById(R.id.titleText);
-        rightActions = findViewById(R.id.rightActions);
         btnMenu = findViewById(R.id.btnMenu);
-
-        titleText.setText(title);
+        rightActions = findViewById(R.id.rightActions);
 
         btnMenu.setOnClickListener(v ->
                 drawerLayout.openDrawer(GravityCompat.START)
@@ -47,64 +46,36 @@ public abstract class BaseActivity extends AppCompatActivity {
         FrameLayout contentFrame = findViewById(R.id.contentFrame);
         getLayoutInflater().inflate(contentLayout, contentFrame, true);
 
-        navigationView.inflateMenu(
-                "OWNER".equals(userType) ? R.menu.owner_menu : R.menu.user_menu
-        );
+        navigationView.getMenu().clear();
+        navigationView.inflateMenu(menuRes);
 
-        navigationView.setNavigationItemSelectedListener(this::handleMenuClick);
-    }
+        navigationView.setNavigationItemSelectedListener(item -> {
+            boolean handled = onMenuItemSelected(item.getItemId());
+            drawerLayout.closeDrawers();
+            return handled;
+        });
 
+
+}
     protected void setTitleText(String text) {
-        titleText.setText(text);
+        if (titleText != null) {
+            titleText.setText(text);
+        }
     }
-
-    protected void showProfileImage(int drawableRes) {
-        rightActions.removeAllViews();
-
-        ImageButton profile = new ImageButton(this);
-        profile.setImageResource(drawableRes);
-        profile.setBackground(null);
-
-        int size = (int) (36 * getResources().getDisplayMetrics().density);
-        rightActions.addView(profile,
-                new LinearLayout.LayoutParams(size, size));
+    protected boolean onMenuItemSelected(int itemId) {
+        return false;
     }
-
     protected void hideRightActions() {
-        rightActions.removeAllViews();
+        if (rightActions != null) {
+            rightActions.removeAllViews();
+            rightActions.setVisibility(View.GONE);
+        }
     }
 
-    protected void showMenuButton(boolean show) {
-        btnMenu.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
-    private boolean handleMenuClick(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.menu_logout) {
-            FirebaseAuth.getInstance().signOut();
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return true;
+    protected void showRightActions() {
+        if (rightActions != null) {
+            rightActions.setVisibility(View.VISIBLE);
         }
-
-        if (id == R.id.menu_preferences) {
-            startActivity(new Intent(this, profilePreferencesActivity.class));
-            return true;
-        }
-
-        if (id == R.id.menu_notifications) {
-            startActivity(new Intent(this, NotificationsUserActivity.class));
-            return true;
-        }
-
-        if (id == R.id.menu_owner_dashboard) {
-            startActivity(new Intent(this, OwnerActivity.class));
-            return true;
-        }
-
-        drawerLayout.closeDrawers();
-        return true;
     }
 
 }

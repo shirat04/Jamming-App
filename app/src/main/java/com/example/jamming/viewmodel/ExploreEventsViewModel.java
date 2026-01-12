@@ -60,7 +60,9 @@ public class ExploreEventsViewModel extends ViewModel {
                     userGreeting.setValue("Hello " + name);
                 });
     }
-
+    public void logout(){
+        authRepository.logout();
+    }
     public void onUserLocationAvailable(Location location) {
         this.lastKnownLocation = location;
         if (isNearMeMode) {

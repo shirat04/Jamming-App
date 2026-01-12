@@ -53,10 +53,10 @@ public class EditEventActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupBase(
-                getString(R.string.edit_event),
-                "OWNER",
+                R.menu.owner_menu,
                 R.layout.activity_edit_event
         );
+        setTitleText(getString(R.string.edit_event));
         hideRightActions();
 
         viewModel = new ViewModelProvider(this).get(EditEventViewModel.class);
