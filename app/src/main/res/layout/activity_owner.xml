@@ -1,15 +1,9 @@
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <!-- 🔵 התוכן הראשי של המסך -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
 
     <!-- 🟠 Create Event Button -->
     <Button
@@ -21,9 +15,9 @@
         android:layout_marginTop="20dp"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- 🟣 My Events Title -->
     <TextView
@@ -38,8 +32,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-
-    <!-- 🟢 Event List (Scroll View) -->
+    <!-- 🟢 Event List -->
     <ScrollView
         android:id="@+id/eventList"
         android:layout_width="0dp"
@@ -51,49 +44,26 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
-            android:id="@+id/emptyEvents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-        <!-- 🔹 Empty State -->
-        <TextView
-            android:id="@+id/emptyEventsText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:text="You haven’t created any events yet"
-            android:textColor="@android:color/black"
-            android:gravity="center"
-            android:padding="24dp"
-            android:visibility="gone"
-            tools:text="You haven’t created any events yet" />
+            <TextView
+                android:id="@+id/emptyEventsText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="You haven’t created any events yet"
+                android:gravity="center"
+                android:padding="24dp"
+                android:visibility="gone"/>
 
-
-        <LinearLayout
-            android:id="@+id/eventsContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-
-
-            <!-- Event cards will be programmatically added here -->
+            <LinearLayout
+                android:id="@+id/eventsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
 
         </LinearLayout>
-        </LinearLayout>
-
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- ☰ התפריט מהצד -->
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navigationView"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        app:menu="@menu/owner_menu"/>
-
-</androidx.drawerlayout.widget.DrawerLayout>

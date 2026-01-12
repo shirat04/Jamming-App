@@ -22,7 +22,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class MyEventUserActivity extends AppCompatActivity {
+public class MyEventUserActivity extends BaseActivity {
 
     private FirebaseFirestore db;
     private LinearLayout container;
@@ -30,8 +30,11 @@ public class MyEventUserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_event_user);
-
+        setupBase(
+                getString(R.string.my_events),
+                "USER",
+                R.layout.activity_my_event_user
+        );
         db = FirebaseFirestore.getInstance();
         container = findViewById(R.id.myEventsContainer);
 

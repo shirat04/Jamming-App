@@ -4,13 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.jamming.R;
@@ -18,20 +16,21 @@ import com.example.jamming.repository.EventRepository;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.viewmodel.OwnerViewModel;
 
-public class OwnerActivity extends AppCompatActivity {
+public class OwnerActivity extends BaseActivity {
     private OwnerViewModel viewModel;
-    private TextView greeting, emptyEventsText;
+    private TextView emptyEventsText;
 
     private LinearLayout eventsContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_owner);
+        setupBase(
+                "",
+                "OWNER",
+                R.layout.activity_owner
+        );
 
-        greeting = findViewById(R.id.ownerGreeting);
-        DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
-        ImageButton btnMenu = findViewById(R.id.btnMore);
         Button createEventBtn = findViewById(R.id.createEventButton);
         eventsContainer = findViewById(R.id.eventsContainer);
         emptyEventsText = findViewById(R.id.emptyEventsText);
@@ -55,7 +54,7 @@ public class OwnerActivity extends AppCompatActivity {
 
     private void observeViewModel() {
         viewModel.ownerName.observe(this, name ->
-                greeting.setText(getString(R.string.hello_user, name))
+                setTitleText(getString(R.string.hello_user, name))
         );
 
         viewModel.events.observe(this, events -> {
