@@ -9,62 +9,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <!-- 🔵 TOP BAR (Greeting + Profile + Notifications) -->
-    <LinearLayout
-        android:id="@+id/ownerTopBar"
-        android:layout_width="0dp"
-        android:layout_height="120dp"
-        android:background="#0B375E"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:gravity="center_vertical"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <!-- ☰ תפריט -->
-        <ImageButton
-            android:id="@+id/btnMore"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/outline_menu_24"
-            android:contentDescription="@string/menu"
-            app:tint="@android:color/white" />
-
-        <!-- רווח -->
-        <Space
-            android:layout_width="12dp"
-            android:layout_height="wrap_content" />
-        <!-- Profile Icon -->
-        <ImageButton
-            android:id="@+id/btnOwnerProfile"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@android:color/transparent"
-            app:srcCompat="@drawable/baseline_person"
-            app:tint="@android:color/white"
-            tools:ignore="ContentDescription,SpeakableTextPresentCheck,UseAppTint,TouchTargetSizeCheck" />
-
-        <!-- Greeting -->
-        <TextView
-            android:id="@+id/ownerGreeting"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text=""
-            tools:text='hello "owner name"'
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-
-        <Space
-            android:layout_width="12dp"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
 
 
     <!-- 🟠 Create Event Button -->
@@ -77,7 +21,6 @@
         android:layout_marginTop="20dp"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
-        app:layout_constraintTop_toBottomOf="@id/ownerTopBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

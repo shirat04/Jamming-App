@@ -19,7 +19,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class EventDetailActivity extends AppCompatActivity {
+public class EventDetailActivity extends BaseActivity  {
 
     private FirebaseFirestore db;
     private String eventId;
@@ -35,8 +35,11 @@ public class EventDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_event_detail);
-
+        setupBase(
+                getString(R.string.event_details), // או "Event Details"
+                "USER",                              // זה מסך משתמש
+                R.layout.activity_event_detail
+        );
         db = FirebaseFirestore.getInstance();
         initUI();
 
@@ -59,7 +62,6 @@ public class EventDetailActivity extends AppCompatActivity {
 
 
     private void initUI() {
-        // 1. אתחול TextViews
         titleEvent = findViewById(R.id.titleEvent);
         locationTextView = findViewById(R.id.locationTextView);
         dateTextView = findViewById(R.id.dateTextView);
