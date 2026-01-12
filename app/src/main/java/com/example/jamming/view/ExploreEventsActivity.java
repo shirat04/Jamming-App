@@ -3,10 +3,7 @@ package com.example.jamming.view;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.ImageButton;
 import android.widget.TextView;
-import androidx.activity.EdgeToEdge;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
@@ -14,8 +11,6 @@ import com.example.jamming.viewmodel.ExploreEventsViewModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import android.view.View;
 import android.widget.Button;
 
@@ -24,10 +19,6 @@ import java.util.List;
 
 public class ExploreEventsActivity extends BaseMapActivity {
     private ExploreEventsViewModel viewModel;
-
-    private TextView title;
-    private ImageButton btnMenu;
-    private TextView radiusLabel;
     private TextView emptyText;
     private Button btnMyEvents, btnEventsNearMe, btnAllEvent;
     private boolean isMapReady = false;
@@ -38,8 +29,11 @@ public class ExploreEventsActivity extends BaseMapActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_explore_events);
-
+        setupBase(
+                "Explore Events",
+                "USER",
+                R.layout.activity_explore_events
+        );
         initViews();
         initMap();
         viewModel = new ViewModelProvider(this).get(ExploreEventsViewModel.class);
@@ -51,9 +45,8 @@ public class ExploreEventsActivity extends BaseMapActivity {
     }
 
     private void initViews() {
-        title = findViewById(R.id.exploreTitle);
+
         emptyText = findViewById(R.id.emptyText);
-        btnMenu = findViewById(R.id.btnMore);
         btnAllEvent = findViewById(R.id.btnAllEvents);
         btnEventsNearMe = findViewById(R.id.btnEventsNearMe);
         btnMyEvents = findViewById(R.id.btnMyEvents);
@@ -62,11 +55,17 @@ public class ExploreEventsActivity extends BaseMapActivity {
     private void initMap() {
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager()
-                        .findFragmentById(R.id.mapFragment);
+                        .findFragmentById(R.id.mapContainer);
 
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
+        if (mapFragment == null) {
+            mapFragment = SupportMapFragment.newInstance();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.mapContainer, mapFragment)
+                    .commit();
         }
+
+        mapFragment.getMapAsync(this);
     }
     private void setupListeners() {
 
@@ -82,14 +81,11 @@ public class ExploreEventsActivity extends BaseMapActivity {
                 startActivity(new Intent(this, MyEventUserActivity.class))
         );
 
-        btnMenu.setOnClickListener(v -> {
-
-        });
     }
 
     // Observers
     private void observeViewModel() {
-        viewModel.getUserGreeting().observe(this, title::setText);
+        viewModel.getUserGreeting().observe(this, this::setTitleText);
 
         viewModel.getEvents().observe(this, events -> {
             pendingEvents = events;

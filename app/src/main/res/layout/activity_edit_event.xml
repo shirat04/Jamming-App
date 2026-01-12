@@ -7,51 +7,13 @@
     android:layout_height="match_parent"
     tools:context=".view.EditEventActivity">
 
-    <!-- 🔵 TOP BAR -->
-    <LinearLayout
-        android:id="@+id/editEventTopBar"
-        android:layout_width="0dp"
-        android:layout_height="70dp"
-        android:background="#0B375E"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:gravity="center_vertical"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <ImageButton
-            android:id="@+id/btnMore"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/menu"
-            android:src="@drawable/outline_menu_24"
-            app:tint="@android:color/white"
-            tools:ignore="TouchTargetSizeCheck" />
-        <Space
-            android:layout_width="12dp"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:id="@+id/editEventTitleTop"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/edit_event"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-    </LinearLayout>
-
 
     <!-- 📝 EDIT FORM -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="16dp"
-        app:layout_constraintTop_toBottomOf="@id/editEventTopBar"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">

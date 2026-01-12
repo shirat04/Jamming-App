@@ -71,14 +71,10 @@ public class ExploreEventsViewModel extends ViewModel {
         isNearMeMode = false;
         eventRepository.getActiveEvents()
                 .addOnSuccessListener(allEvents -> {
-                    Log.d("EVENTS_DEBUG", "events count = " + allEvents.size());
-
                     events.setValue(allEvents);
                     isEmpty.setValue(allEvents.isEmpty());
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("EVENTS_DEBUG", "error", e);
-
                     events.setValue(new ArrayList<>());
                     isEmpty.setValue(true);
                 });

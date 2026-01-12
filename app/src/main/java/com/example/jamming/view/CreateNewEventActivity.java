@@ -24,7 +24,7 @@ import com.example.jamming.view.dialog.TimePickerDialogFragment;
 import java.util.Calendar;
 
 
-public class CreateNewEventActivity extends AppCompatActivity {
+public class CreateNewEventActivity extends BaseActivity {
 
     private EditText nameInput, capacityInput, descriptionInput, locationInput;
     private TextView dateInput, timeInput, genreText, cancelBtn;
@@ -51,8 +51,11 @@ public class CreateNewEventActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_new_event);
-
+        setupBase(
+                getString(R.string.create_new_event),
+                "OWNER",
+                R.layout.activity_create_new_event
+        );
         viewModel = new ViewModelProvider(this)
                 .get(CreateNewEventViewModel.class);
         calendar = viewModel.getDateTime();
@@ -62,6 +65,7 @@ public class CreateNewEventActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+
         nameInput = findViewById(R.id.eventNameInput);
         capacityInput = findViewById(R.id.eventCapacityInput);
         descriptionInput = findViewById(R.id.eventDescriptionInput);

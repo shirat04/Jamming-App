@@ -15,7 +15,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.function.Consumer;
 
-public abstract class BaseMapActivity extends AppCompatActivity
+public abstract class BaseMapActivity extends BaseActivity
         implements OnMapReadyCallback {
 
     protected GoogleMap mMap;

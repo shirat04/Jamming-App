@@ -24,7 +24,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Calendar;
 
-public class EditEventActivity extends AppCompatActivity {
+public class EditEventActivity extends BaseActivity {
 
     private EditText etTitle, etDescription, etLocation, etDate, etTime, etCapacity;
     private TextView genreText;
@@ -52,7 +52,12 @@ public class EditEventActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_event);
+        setupBase(
+                getString(R.string.edit_event),
+                "OWNER",
+                R.layout.activity_edit_event
+        );
+        hideRightActions();
 
         viewModel = new ViewModelProvider(this).get(EditEventViewModel.class);
         eventId = getIntent().getStringExtra("EVENT_ID");
