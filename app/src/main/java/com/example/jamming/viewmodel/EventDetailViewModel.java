@@ -1,11 +1,8 @@
 package com.example.jamming.viewmodel;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import com.example.jamming.model.Event;
 import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.EventRepository;
@@ -98,32 +95,23 @@ public class EventDetailViewModel extends ViewModel {
                         return;
                     }
 
-                    userRepository.registerEventForUser(uid, eventId)
-                            .addOnSuccessListener(unused -> {
-
-                                eventRepository.incrementReserved(eventId)
-                                        .addOnSuccessListener(u -> {
-
-                                            Event current = eventLiveData.getValue();
-                                            if (current != null) {
-                                                current.setReserved(current.getReserved() + 1);
-                                                eventLiveData.postValue(current);
+                    eventRepository.registerUserIfCapacityAvailable(
+                            eventId,
+                            uid,
+                            () -> {
+                                registrationSuccess.postValue(true);
+                                isAlreadyRegistered.postValue(true);
+                                eventRepository.getEventById(eventId)
+                                        .addOnSuccessListener(doc -> {
+                                            Event updated = doc.toObject(Event.class);
+                                            if (updated != null) {
+                                                eventLiveData.postValue(updated);
                                             }
-
-                                            registrationSuccess.postValue(true);
-                                            isAlreadyRegistered.postValue(true);
-                                        })
-                                        .addOnFailureListener(e ->
-                                                errorMessage.postValue("שגיאה בעדכון האירוע")
-                                        );
-                            })
-                            .addOnFailureListener(e ->
-                                    errorMessage.postValue("שגיאה בהרשמת משתמש")
-                            );
-                })
-                .addOnFailureListener(e ->
-                        errorMessage.postValue("שגיאה בטעינת נתוני משתמש")
-                );
+                                        });
+                            },
+                            msg -> errorMessage.postValue(msg)
+                    );
+                });
     }
 
     public void cancelRegistration() {
@@ -149,14 +137,17 @@ public class EventDetailViewModel extends ViewModel {
 
                                             isAlreadyRegistered.postValue(false);
 
-                                            Event current = eventLiveData.getValue();
-                                            if (current != null) {
-                                                current.setReserved(
-                                                        Math.max(0, current.getReserved() - 1)
-                                                );
-                                                eventLiveData.postValue(current);
-                                            }
+                                            isAlreadyRegistered.postValue(false);
                                             cancelSuccess.postValue(true);
+
+                                            eventRepository.getEventById(eventId)
+                                                    .addOnSuccessListener(doc -> {
+                                                        Event updated = doc.toObject(Event.class);
+                                                        if (updated != null) {
+                                                            eventLiveData.postValue(updated);
+                                                        }
+                                                    });
+
 
                                         })
                                         .addOnFailureListener(e ->

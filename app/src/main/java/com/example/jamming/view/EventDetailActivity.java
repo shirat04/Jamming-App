@@ -81,11 +81,22 @@ public class EventDetailActivity extends BaseActivity  {
     private void observeViewModel() {
 
         viewModel.getEventLiveData().observe(this, event -> {
-            if (event != null) {
-                displayEventData(event);
-                contentLayout.setVisibility(View.VISIBLE);
+            if (event == null) return;
+
+            displayEventData(event);
+            contentLayout.setVisibility(View.VISIBLE);
+
+            boolean isFull = event.getReserved() >= event.getMaxCapacity();
+
+            if (isFull) {
+                registerBtn.setEnabled(false);
+                registerBtn.setText("The event is SOLD-OUT.");
+            } else {
+                registerBtn.setEnabled(true);
+                registerBtn.setText(getString(R.string.register_for_event));
             }
         });
+
 
         viewModel.getErrorMessage().observe(this, msg -> {
             if (msg != null) {

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class EventRepository {
     public static class EventWithId {
@@ -101,5 +102,47 @@ public class EventRepository {
                 .document(eventId)
                 .update("reserved", FieldValue.increment(-1));
     }
+
+    public void registerUserIfCapacityAvailable(
+            String eventId,
+            String uid,
+            Runnable onSuccess,
+            Consumer<String> onError
+    ) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.runTransaction(transaction -> {
+
+                    DocumentReference eventRef =
+                            db.collection("events").document(eventId);
+                    DocumentReference userRef =
+                            db.collection("users").document(uid);
+
+                    DocumentSnapshot eventSnap = transaction.get(eventRef);
+
+                    long reserved = eventSnap.getLong("reserved");
+                    long max = eventSnap.getLong("maxCapacity");
+
+                    if (reserved >= max) {
+                        throw new RuntimeException("EVENT_FULL");
+                    }
+
+                    transaction.update(eventRef,
+                            "reserved", FieldValue.increment(1));
+
+                    transaction.update(userRef,
+                            "registeredEventIds", FieldValue.arrayUnion(eventId));
+
+                    return null;
+                }).addOnSuccessListener(v -> onSuccess.run())
+                .addOnFailureListener(e -> {
+                    if ("EVENT_FULL".equals(e.getMessage())) {
+                        onError.accept("האירוע מלא – לא ניתן להירשם");
+                    } else {
+                        onError.accept("שגיאה בהרשמה");
+                    }
+                });
+    }
+
 
 }
