@@ -199,9 +199,9 @@
                 android:text="@string/register_for_event"
                 android:textSize="18sp"
                 android:textColor="@android:color/white"
-                android:backgroundTint="#1E63E9"
                 android:layout_marginTop="20dp"
-                tools:ignore="VisualLintButtonSize" />
+                tools:ignore="VisualLintButtonSize"
+                android:backgroundTint="@color/button_register_selector"/>
 
             <!-- כפתור להוספה ליומן -->
             <Button

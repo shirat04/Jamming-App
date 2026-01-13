@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -28,8 +27,8 @@ public abstract class BaseMapActivity extends BaseActivity
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        configureMapUi();      // הגדרות UI אחידות
-        onMapReadyCustom();    // לוגיקה ייחודית למסך
+        configureMapUi();
+        onMapReadyCustom();
     }
 
 //הגדרות מפה
@@ -46,7 +45,6 @@ public abstract class BaseMapActivity extends BaseActivity
     }
 
 
-     // הפעלה בטוחה של מיקום משתמש
     protected void enableMyLocationSafe() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {

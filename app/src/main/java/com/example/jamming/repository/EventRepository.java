@@ -6,8 +6,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -70,8 +72,7 @@ public class EventRepository {
                 .update("reserved", FieldValue.increment(1));
     }
     public Task<List<Event>> getActiveEvents() {
-        return FirebaseFirestore.getInstance()
-                .collection("events")
+        return db.collection("events")
                 .whereEqualTo("active", true)
                 .get()
                 .continueWith(task -> {
@@ -92,15 +93,6 @@ public class EventRepository {
         return db.collection("events")
                 .document(eventId)
                 .update("reserved", FieldValue.increment(-1));
-    }
-
-    public Task<Event> getEventByIdAsEvent(String eventId) {
-        return db.collection("events")
-                .document(eventId)
-                .get()
-                .continueWith(task ->
-                        task.getResult().toObject(Event.class)
-                );
     }
 
 }

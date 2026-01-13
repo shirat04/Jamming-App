@@ -23,6 +23,7 @@
     <!-- Text -->
     <color name="textPrimary">#1C1B1F</color>
     <color name="textSecondary">#6F6F73</color>
+    <color name="register_button_blue">#1E63E9</color>
 
     <!-- Borders / Disabled -->
     <color name="outline">#D0D0D6</color>

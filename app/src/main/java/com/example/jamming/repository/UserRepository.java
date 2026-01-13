@@ -111,54 +111,11 @@ public class UserRepository {
                 .document(uid)
                 .update("notificationsEnabled", enabled);
     }
-
     // Delete entire user document
     public Task<Void> deleteUserProfile(String uid) {
         return db.collection("users")
                 .document(uid)
                 .delete();
     }
-
-    // Get events filtered by user's music preferences and distance radius
-    public Task<List<Event>> getEventsByUserPreferences(User user, double userLat, double userLng) {
-
-        List<String> favMusic = user.getFavoriteMusicTypes();
-        int radiusKm = user.getSearchRadiusKm();
-
-        return db.collection("events")
-                .whereArrayContainsAny("musicTypes", favMusic)
-                .get()
-                .continueWithTask(task -> {
-
-                    if (!task.isSuccessful() || task.getResult() == null) {
-                        return Tasks.forException(new Exception("Failed to load events"));
-                    }
-
-                    List<Event> filteredEvents = new ArrayList<>();
-
-                    for (DocumentSnapshot doc : task.getResult().getDocuments()) {
-
-                        Event event = doc.toObject(Event.class);
-                        if (event == null) continue;
-
-                        Double eventLat = doc.getDouble("latitude");
-                        Double eventLng = doc.getDouble("longitude");
-
-                        if (eventLat == null || eventLng == null) {
-                            continue;
-                        }
-
-                        double distance = GeoUtils.calculateDistanceKm(userLat, userLng, eventLat, eventLng);
-
-                        // Add event if within allowed radius
-                        if (distance <= radiusKm) {
-                            filteredEvents.add(event);
-                        }
-                    }
-
-                    return Tasks.forResult(filteredEvents);
-                });
-    }
-
 
 }

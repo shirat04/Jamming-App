@@ -10,7 +10,6 @@ import com.example.jamming.R;
 
 public class ProfilePreferencesActivity extends AppCompatActivity {
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
