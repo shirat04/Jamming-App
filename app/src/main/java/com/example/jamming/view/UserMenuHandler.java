@@ -5,24 +5,19 @@ import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.jamming.R;
-import com.example.jamming.viewmodel.ExploreEventsViewModel;
+import com.example.jamming.repository.AuthRepository;
 
 public class UserMenuHandler {
 
     private final AppCompatActivity activity;
-    private final ExploreEventsViewModel viewModel;
+    private final AuthRepository authRepository = new AuthRepository();
 
-    public UserMenuHandler(
-            AppCompatActivity activity,
-            ExploreEventsViewModel viewModel
-    ) {
+    public UserMenuHandler(AppCompatActivity activity) {
         this.activity = activity;
-        this.viewModel = viewModel;
     }
 
-    public boolean handle(int id) {
-
-        if (id == R.id.menu_user_dashboard) {
+    public boolean handle(int itemId) {
+        if (itemId == R.id.menu_user_dashboard) {
             if (!(activity instanceof ExploreEventsActivity)) {
                 activity.startActivity(
                         new Intent(activity, ExploreEventsActivity.class)
@@ -30,7 +25,7 @@ public class UserMenuHandler {
             }
             return true;
         }
-        if (id == R.id.menu_preferences) {
+        if (itemId == R.id.menu_preferences) {
             if (!(activity instanceof ProfilePreferencesActivity)) {
                 activity.startActivity(
                         new Intent(activity, ProfilePreferencesActivity.class)
@@ -38,7 +33,7 @@ public class UserMenuHandler {
             }
             return true;
         }
-        if (id == R.id.menu_notifications) {
+        if (itemId == R.id.menu_notifications) {
             if (!(activity instanceof NotificationsUserActivity)) {
                 activity.startActivity(
                         new Intent(activity, NotificationsUserActivity.class)
@@ -46,12 +41,22 @@ public class UserMenuHandler {
             }
             return true;
         }
-        if (id == R.id.menu_logout) {
-            viewModel.logout();
 
-            Intent i = new Intent(activity, LoginActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            activity.startActivity(i);
+        if (itemId == R.id.menu_my_events) {
+            if (!(activity instanceof MyEventUserActivity)) {
+                activity.startActivity(
+                        new Intent(activity, MyEventUserActivity.class)
+                );
+            }
+            return true;
+        }
+
+        if (itemId == R.id.menu_logout) {
+            authRepository.logout();
+            activity.startActivity(
+                    new Intent(activity, LoginActivity.class)
+            );
+            activity.finish();
             return true;
         }
 

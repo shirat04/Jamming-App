@@ -31,6 +31,8 @@ public class CreateNewEventActivity extends BaseActivity {
     private Button publishBtn;
     private ImageButton mapButton;
     private Calendar calendar;
+    private OwnerMenuHandler menuHandler;
+
 
 
     private CreateNewEventViewModel viewModel;
@@ -58,9 +60,10 @@ public class CreateNewEventActivity extends BaseActivity {
         setTitleText(getString(R.string.create_new_event));
         hideRightActions();
 
-        viewModel = new ViewModelProvider(this)
-                .get(CreateNewEventViewModel.class);
+        viewModel = new ViewModelProvider(this).get(CreateNewEventViewModel.class);
         calendar = viewModel.getDateTime();
+        menuHandler = new OwnerMenuHandler(this);
+
         initViews();
         observeViewModel();
         setupListeners();
@@ -254,6 +257,9 @@ public class CreateNewEventActivity extends BaseActivity {
         }
         @Override public void afterTextChanged(android.text.Editable s) {}
     }
-
+    @Override
+    protected boolean onMenuItemSelected(int itemId) {
+        return menuHandler.handle(itemId);
+    }
 
 }

@@ -22,6 +22,11 @@ public class EventDetailViewModel extends ViewModel {
     private final MutableLiveData<Boolean> registrationSuccess = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isAlreadyRegistered = new MutableLiveData<>();
     private final MutableLiveData<Boolean> showAlreadyRegisteredMessage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> cancelSuccess = new MutableLiveData<>();
+    public LiveData<Boolean> getCancelSuccess() {
+        return cancelSuccess;
+    }
+
     public LiveData<Boolean> getShowAlreadyRegisteredMessage() {
         return showAlreadyRegisteredMessage;
     }
@@ -45,6 +50,9 @@ public class EventDetailViewModel extends ViewModel {
     }
 
     public void loadEvent(String eventId) {
+        if (this.eventId != null && this.eventId.equals(eventId)) {
+            return;
+        }
         this.eventId = eventId;
 
         eventRepository.getEventById(eventId)
@@ -65,6 +73,7 @@ public class EventDetailViewModel extends ViewModel {
 
         String uid = authRepository.getCurrentUid();
         if (uid == null) return;
+
 
         userRepository.getRegisteredEvents(uid)
                 .addOnSuccessListener(events ->
@@ -116,4 +125,59 @@ public class EventDetailViewModel extends ViewModel {
                         errorMessage.postValue("שגיאה בטעינת נתוני משתמש")
                 );
     }
+
+    public void cancelRegistration() {
+
+        String uid = authRepository.getCurrentUid();
+        if (uid == null) {
+            errorMessage.postValue("שגיאה: משתמש לא מחובר");
+            return;
+        }
+
+        userRepository.getRegisteredEvents(uid)
+                .addOnSuccessListener(registeredEvents -> {
+
+                    if (!registeredEvents.contains(eventId)) {
+                        return;
+                    }
+
+                    userRepository.unregisterEventForUser(uid, eventId)
+                            .addOnSuccessListener(unused -> {
+
+                                eventRepository.decrementReserved(eventId)
+                                        .addOnSuccessListener(u -> {
+
+                                            isAlreadyRegistered.postValue(false);
+
+                                            Event current = eventLiveData.getValue();
+                                            if (current != null) {
+                                                current.setReserved(
+                                                        Math.max(0, current.getReserved() - 1)
+                                                );
+                                                eventLiveData.postValue(current);
+                                            }
+                                            cancelSuccess.postValue(true);
+
+                                        })
+                                        .addOnFailureListener(e ->
+                                                errorMessage.postValue("שגיאה בעדכון האירוע")
+                                        );
+                            })
+                            .addOnFailureListener(e ->
+                                    errorMessage.postValue("שגיאה בביטול הרשמה")
+                            );
+                });
+    }
+    public void resetCancelSuccess() {
+        cancelSuccess.postValue(false);
+    }
+
+    public void resetRegistrationSuccess() {
+        registrationSuccess.postValue(false);
+    }
+
+    public void resetAlreadyRegisteredMessage() {
+        showAlreadyRegisteredMessage.postValue(false);
+    }
+
 }

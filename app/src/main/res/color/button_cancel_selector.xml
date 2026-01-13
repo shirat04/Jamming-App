@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- כפתור פעיל (אפשר לבטל) -->
+    <item
+        android:state_enabled="true"
+        android:color="@color/register_button_blue"/>
+
+    <!-- כפתור כבוי (אי אפשר לבטל) -->
+    <item
+        android:color="#D3D3D3"/>
+
+</selector>

@@ -12,16 +12,12 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-
 import com.example.jamming.R;
 import com.example.jamming.viewmodel.EditEventViewModel;
 import com.google.android.material.snackbar.Snackbar;
-
 import java.util.Calendar;
 
 public class EditEventActivity extends BaseActivity {
@@ -32,8 +28,9 @@ public class EditEventActivity extends BaseActivity {
     private ImageButton btnMap;
 
     private EditEventViewModel viewModel;
-    private String eventId;
     private Calendar c;
+    private OwnerMenuHandler menuHandler;
+
 
     private final ActivityResultLauncher<Intent> mapPickerLauncher =
             registerForActivityResult(
@@ -60,16 +57,15 @@ public class EditEventActivity extends BaseActivity {
         hideRightActions();
 
         viewModel = new ViewModelProvider(this).get(EditEventViewModel.class);
-        eventId = getIntent().getStringExtra("EVENT_ID");
+        String eventId = getIntent().getStringExtra("EVENT_ID");
+        viewModel.init(eventId);
         c = viewModel.getDateTime();
+        menuHandler = new OwnerMenuHandler(this);
+
 
         initViews();
         observeViewModel();
         setupListeners();
-
-        if (eventId != null && !eventId.trim().isEmpty()) {
-            viewModel.loadEvent(eventId);
-        }
     }
 
     private void initViews() {
@@ -188,8 +184,8 @@ public class EditEventActivity extends BaseActivity {
                 mapPickerLauncher.launch(new Intent(this, MapPickerActivity.class))
         );
 
-        btnSave.setOnClickListener(v -> viewModel.saveChanges(eventId));
-        btnDelete.setOnClickListener(v -> viewModel.deleteEvent(eventId));
+        btnSave.setOnClickListener(v -> viewModel.saveChanges());
+        btnDelete.setOnClickListener(v -> viewModel.deleteEvent());
 
         genreText.setOnClickListener(v -> openGenreDialog());
     }
@@ -250,5 +246,9 @@ public class EditEventActivity extends BaseActivity {
             onChanged.run(s == null ? "" : s.toString());
         }
         @Override public void afterTextChanged(Editable s) {}
+    }
+    @Override
+    protected boolean onMenuItemSelected(int itemId) {
+        return menuHandler.handle(itemId);
     }
 }

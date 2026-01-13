@@ -26,8 +26,10 @@ public class EventDetailActivity extends BaseActivity  {
 
     private TextView titleEvent, dateTextView,  locationTextView, eventDescription, capacityEvent, generEevet;
 
-    private Button registerBtn;
+    private Button registerBtn, cancelRegistrationBtn;
     private LinearLayout contentLayout;
+    private UserMenuHandler menuHandler;
+
     private ImageView eventImage;
 
     @Override
@@ -42,6 +44,8 @@ public class EventDetailActivity extends BaseActivity  {
         initUI();
 
         viewModel = new ViewModelProvider(this).get(EventDetailViewModel.class);
+        menuHandler = new UserMenuHandler(this);
+
         observeViewModel();
 
         String eventId = getIntent().getStringExtra("EVENT_ID");
@@ -51,7 +55,11 @@ public class EventDetailActivity extends BaseActivity  {
             return;
         }
         viewModel.loadEvent(eventId);
+
         registerBtn.setOnClickListener(v -> viewModel.registerToEvent());
+        cancelRegistrationBtn.setOnClickListener(v -> {
+            showCancelRegistrationDialog();
+        });
 
     }
 
@@ -64,6 +72,7 @@ public class EventDetailActivity extends BaseActivity  {
         capacityEvent = findViewById(R.id.capacityEvent);
         generEevet = findViewById(R.id.genreTextView);
         registerBtn = findViewById(R.id.registerBtn);
+        cancelRegistrationBtn = findViewById(R.id.CancelRegistrationBtn);
         eventImage = findViewById(R.id.eventImage);
         contentLayout = findViewById(R.id.contentLayout);
 
@@ -84,22 +93,50 @@ public class EventDetailActivity extends BaseActivity  {
             }
         });
         viewModel.getIsAlreadyRegistered().observe(this, isRegistered -> {
-            if (isRegistered != null && isRegistered) {
+            if (isRegistered == null) return;
+
+            if (isRegistered) {
                 registerBtn.setEnabled(false);
+                cancelRegistrationBtn.setEnabled(true);
+            } else {
+                registerBtn.setEnabled(true);
+                cancelRegistrationBtn.setEnabled(false);
             }
         });
+
         viewModel.getShowAlreadyRegisteredMessage().observe(this, show -> {
             if (show != null && show) {
-                Toast.makeText(this, "כבר נרשמת לאירוע הזה", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "You're already registered for this event.", Toast.LENGTH_SHORT).show();
+                viewModel.resetAlreadyRegisteredMessage();
+            }
+        });
+        viewModel.getCancelSuccess().observe(this, success -> {
+            if (success != null && success) {
+                Toast.makeText(this, "Your registration was canceled.", Toast.LENGTH_SHORT).show();
+                viewModel.resetCancelSuccess();
             }
         });
 
 
         viewModel.getRegistrationSuccess().observe(this, success -> {
             if (success != null && success) {
-                Toast.makeText(this, "נרשמת לאירוע 🎉", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "You're registered! 🎉", Toast.LENGTH_SHORT).show();
+                viewModel.resetRegistrationSuccess();
             }
         });
+    }
+
+    private void showCancelRegistrationDialog() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Cancel Registration")
+                .setMessage("Are you sure you want to cancel your registration for the event?")
+                .setPositiveButton("Yes, cancel", (dialog, which) -> {
+                    viewModel.cancelRegistration();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
     }
 
     private void displayEventData(Event event) {
@@ -123,6 +160,11 @@ public class EventDetailActivity extends BaseActivity  {
                         ? String.join(" / ", genres)
                         : "No genre specified"
         );
+    }
+
+    @Override
+    protected boolean onMenuItemSelected(int itemId) {
+        return menuHandler.handle(itemId);
     }
 
 }

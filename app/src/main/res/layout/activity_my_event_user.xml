@@ -22,6 +22,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <TextView
+        android:id="@+id/emptyMessageText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="עוד לא נרשמת לאירועים 🙂"
+        android:textSize="18sp"
+        android:textColor="#555555"
+        android:gravity="center"
+        android:padding="16dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/myEventsSubtitle"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <!-- SCROLLABLE LIST -->
     <ScrollView
         android:id="@+id/myEventsScroll"
@@ -41,5 +56,7 @@
             android:orientation="vertical" />
 
     </ScrollView>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

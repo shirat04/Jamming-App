@@ -37,7 +37,7 @@ public class OwnerActivity extends BaseActivity {
 
 
         viewModel = new ViewModelProvider(this).get(OwnerViewModel.class);
-        menuHandler = new OwnerMenuHandler(this, viewModel);
+        menuHandler = new OwnerMenuHandler(this);
 
         observeViewModel();
 

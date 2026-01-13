@@ -205,15 +205,16 @@
 
             <!-- כפתור להוספה ליומן -->
             <Button
-                android:id="@+id/addToCalendarBtn"
+                android:id="@+id/CancelRegistrationBtn"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
-                android:text="@string/add_to_calendar"
+                android:text="Cancel registration"
                 android:textSize="16sp"
-                android:textColor="#444444"
-                android:backgroundTint="#E5E5E5"
+                android:textColor="@android:color/white"
                 android:layout_marginTop="10dp"
-                tools:ignore="VisualLintButtonSize" />
+                tools:ignore="VisualLintButtonSize"
+                android:enabled="false"
+                android:backgroundTint="@color/button_cancel_selector" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

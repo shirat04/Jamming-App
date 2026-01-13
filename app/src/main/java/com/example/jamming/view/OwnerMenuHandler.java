@@ -5,18 +5,14 @@ import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.jamming.R;
-import com.example.jamming.viewmodel.OwnerViewModel;
+import com.example.jamming.repository.AuthRepository;
 
 public class OwnerMenuHandler {
     private final AppCompatActivity activity;
-    private final OwnerViewModel viewModel;
+    private final AuthRepository authRepository = new AuthRepository();
 
-    public OwnerMenuHandler(
-            AppCompatActivity activity,
-            OwnerViewModel viewModel
-    ) {
+    public OwnerMenuHandler(AppCompatActivity activity) {
         this.activity = activity;
-        this.viewModel = viewModel;
     }
 
     public boolean handle(int id) {
@@ -46,8 +42,16 @@ public class OwnerMenuHandler {
             }
             return true;
         }
+        if (id == R.id.create_new_event) {
+            if (!(activity instanceof CreateNewEventActivity)) {
+                activity.startActivity(
+                        new Intent(activity, CreateNewEventActivity.class)
+                );
+            }
+            return true;
+        }
         if (id == R.id.menu_logout) {
-            viewModel.logout();
+            authRepository.logout();
 
             Intent i = new Intent(activity, LoginActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

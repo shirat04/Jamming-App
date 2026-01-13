@@ -39,13 +39,12 @@ public class ExploreEventsActivity extends BaseMapActivity {
         initViews();
         initMap();
         viewModel = new ViewModelProvider(this).get(ExploreEventsViewModel.class);
-        menuHandler = new UserMenuHandler(this, viewModel);
+        menuHandler = new UserMenuHandler(this);
         observeViewModel();
         setupListeners();
 
         viewModel.loadAllEvents();
         viewModel.loadUserGreeting();
-        menuHandler = new UserMenuHandler(this, viewModel);
 
     }
 

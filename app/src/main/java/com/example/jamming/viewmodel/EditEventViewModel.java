@@ -19,7 +19,7 @@ public class EditEventViewModel extends ViewModel {
 
     private final Calendar dateTime = Calendar.getInstance();
     private double lat, lng;
-    private String address;
+    private String address, eventId;
 
     private final List<String> genres = new ArrayList<>();
 
@@ -96,6 +96,14 @@ public class EditEventViewModel extends ViewModel {
                 })
                 .addOnFailureListener(e -> errorMessage.setValue("שגיאה בטעינת האירוע"));
     }
+    public void init(String eventId) {
+        if (this.eventId != null) return;
+        this.eventId = eventId;
+
+        if (eventId != null && !eventId.trim().isEmpty()) {
+            loadEvent(eventId);
+        }
+    }
 
     // ===== Location =====
     public void onLocationSelected(double lat, double lng, String address) {
@@ -151,9 +159,12 @@ public class EditEventViewModel extends ViewModel {
     }
 
     // ===== Save changes =====
-    public void saveChanges(String eventId) {
+    public void saveChanges() {
         errorField.setValue(null);
-
+        if (eventId == null) {
+            errorMessage.setValue("שגיאה: מזהה אירוע חסר");
+            return;
+        }
         String t = title.getValue() == null ? "" : title.getValue().trim();
         String d = description.getValue() == null ? "" : description.getValue().trim();
         String capStr = capacityText.getValue() == null ? "" : capacityText.getValue().trim();
@@ -191,9 +202,18 @@ public class EditEventViewModel extends ViewModel {
     }
 
     // ===== Delete =====
-    public void deleteEvent(String eventId) {
+    public void deleteEvent() {
+        if (eventId == null) {
+            errorMessage.setValue("שגיאה: מזהה אירוע חסר");
+            return;
+        }
+
         eventRepository.deleteEvent(eventId)
-                .addOnSuccessListener(a -> successMessage.setValue("האירוע נמחק בהצלחה"))
-                .addOnFailureListener(e -> errorMessage.setValue("שגיאה במחיקת האירוע"));
+                .addOnSuccessListener(a ->
+                        successMessage.setValue("האירוע נמחק בהצלחה")
+                )
+                .addOnFailureListener(e ->
+                        errorMessage.setValue("שגיאה במחיקת האירוע")
+                );
     }
 }
