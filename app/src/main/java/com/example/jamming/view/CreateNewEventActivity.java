@@ -13,13 +13,10 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
+import com.example.jamming.R;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.jamming.R;
 import com.example.jamming.viewmodel.CreateNewEventViewModel;
-import com.example.jamming.view.dialog.DatePickerDialogFragment;
-import com.example.jamming.view.dialog.TimePickerDialogFragment;
 
 import java.util.Calendar;
 
@@ -261,5 +258,11 @@ public class CreateNewEventActivity extends BaseActivity {
     protected boolean onMenuItemSelected(int itemId) {
         return menuHandler.handle(itemId);
     }
+
+    public void setTestingViewModel(CreateNewEventViewModel testViewModel) {
+        this.viewModel = testViewModel;
+        observeViewModel();
+    }
+    public CreateNewEventViewModel getViewModel() { return viewModel; }
 
 }

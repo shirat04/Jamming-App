@@ -14,10 +14,18 @@ import java.util.Calendar;
 import java.util.List;
 
 public class CreateNewEventViewModel extends ViewModel {
-    private final AuthRepository authRepo = new AuthRepository();
+    private AuthRepository authRepo;
 
-    private final EventRepository eventRepository = new EventRepository();
+    private EventRepository eventRepository;
+    public CreateNewEventViewModel() {
+        this(new AuthRepository(), new EventRepository());
+    }
 
+    public CreateNewEventViewModel(AuthRepository authRepo,
+                                   EventRepository eventRepository) {
+        this.authRepo = authRepo;
+        this.eventRepository = eventRepository;
+    }
     private final Calendar dateTime = Calendar.getInstance();
 
     private double lat, lng;
@@ -31,6 +39,7 @@ public class CreateNewEventViewModel extends ViewModel {
     private final MutableLiveData<String> toastMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> success = new MutableLiveData<>();
     private final MutableLiveData<EventField> errorField = new MutableLiveData<>();
+
 
     public LiveData<EventField> getErrorField() { return errorField; }
     public LiveData<String> getDateText() { return dateText; }
@@ -151,4 +160,5 @@ public class CreateNewEventViewModel extends ViewModel {
                 .addOnFailureListener(e ->
                         toastMessage.setValue(e.getMessage()));
     }
+
 }

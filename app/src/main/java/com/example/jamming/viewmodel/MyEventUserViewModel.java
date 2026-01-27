@@ -75,7 +75,6 @@ public class MyEventUserViewModel extends ViewModel {
     private void loadEventsByIds(List<String> ids) {
         List<EventWithId> result = new ArrayList<>();
 
-        // whereIn מוגבל ל־10 → chunking
         for (int i = 0; i < ids.size(); i += 10) {
             List<String> chunk = ids.subList(i, Math.min(i + 10, ids.size()));
 
