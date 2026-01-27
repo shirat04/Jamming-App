@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import com.example.jamming.model.Event;
+import com.example.jamming.model.MusicGenre;
 import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.utils.DateUtils;
@@ -30,7 +31,7 @@ public class CreateNewEventViewModel extends ViewModel {
 
     private double lat, lng;
     private String address;
-    private final List<String> genres = new ArrayList<>();
+    private final List<MusicGenre> genres = new ArrayList<>();
 
     private final MutableLiveData<String> dateText = new MutableLiveData<>();
     private final MutableLiveData<String> timeText = new MutableLiveData<>();
@@ -52,7 +53,18 @@ public class CreateNewEventViewModel extends ViewModel {
 
 
     public String getGenresText() {
-        return String.join(" , ", genres);
+        List<String> names = new ArrayList<>();
+        for (MusicGenre g : genres) {
+            names.add(g.getDisplayName());
+        }
+        return String.join(" , ", names);
+    }
+    private List<String> getGenreStrings() {
+        List<String> result = new ArrayList<>();
+        for (MusicGenre g : genres) {
+            result.add(g.getDisplayName());
+        }
+        return result;
     }
 
     public void setDate(int year, int month, int day) {
@@ -70,14 +82,14 @@ public class CreateNewEventViewModel extends ViewModel {
         );
     }
 
-    public void toggleGenre(String genre, boolean checked) {
+    public void toggleGenre(MusicGenre genre, boolean checked) {
         if (checked && !genres.contains(genre)) {
             genres.add(genre);
         } else if (!checked) {
             genres.remove(genre);
         }
 
-        genresText.setValue(String.join(" , ", genres));
+        genresText.setValue(getGenresText());
 
         if (!genres.isEmpty() && errorField.getValue() == EventField.GENRE) {
             errorField.setValue(null);
@@ -85,13 +97,15 @@ public class CreateNewEventViewModel extends ViewModel {
     }
 
 
-    public boolean[] getCheckedGenres(String[] allGenres) {
+
+    public boolean[] getCheckedGenres(MusicGenre[] allGenres) {
         boolean[] checked = new boolean[allGenres.length];
         for (int i = 0; i < allGenres.length; i++) {
             checked[i] = genres.contains(allGenres[i]);
         }
         return checked;
     }
+
     public void onLocationSelected(double lat, double lng, String address) {
         this.lat = lat;
         this.lng = lng;
@@ -147,7 +161,7 @@ public class CreateNewEventViewModel extends ViewModel {
                 ownerId,
                 name,
                 description,
-                new ArrayList<>(genres),
+                getGenreStrings(),
                 address,
                 dateTime.getTimeInMillis(),
                 cap,
@@ -160,5 +174,8 @@ public class CreateNewEventViewModel extends ViewModel {
                 .addOnFailureListener(e ->
                         toastMessage.setValue(e.getMessage()));
     }
+
+
+
 
 }

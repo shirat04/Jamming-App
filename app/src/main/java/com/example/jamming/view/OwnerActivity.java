@@ -10,9 +10,13 @@ import android.widget.Toast;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.jamming.R;
+import com.example.jamming.model.MusicGenre;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.viewmodel.OwnerViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OwnerActivity extends BaseActivity {
     private OwnerViewModel viewModel;
@@ -103,7 +107,7 @@ public class OwnerActivity extends BaseActivity {
         String dateTimeText = DateUtils.formatOnlyDate(ts) + " • " + DateUtils.formatOnlyTime(ts);
         date.setText(dateTimeText);
 
-        genre.setText(String.join(", ", e.event.getMusicTypes()));
+        genre.setText(genresToText(e.event.getMusicTypes()));
         String text = getString(
                 R.string.participants_format,
                 e.event.getReserved(),
@@ -124,4 +128,12 @@ public class OwnerActivity extends BaseActivity {
 
         eventsContainer.addView(card);
     }
+    private String genresToText(List<String> genres) {
+        if (genres == null || genres.isEmpty()) {
+            return "No genre specified";
+        }
+        return String.join(" , ", genres);
+    }
+
+
 }

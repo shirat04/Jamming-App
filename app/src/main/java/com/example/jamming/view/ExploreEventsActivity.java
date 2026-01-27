@@ -7,6 +7,8 @@ import android.widget.TextView;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
+import com.example.jamming.model.EventFilter;
+import com.example.jamming.view.dialog.FilterDialogs;
 import com.example.jamming.viewmodel.ExploreEventsViewModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -15,12 +17,13 @@ import android.view.View;
 import android.widget.Button;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class ExploreEventsActivity extends BaseMapActivity {
     private ExploreEventsViewModel viewModel;
     private TextView emptyText;
-    private Button btnMyEvents, btnEventsNearMe, btnAllEvent;
+    private Button btnMyEvents, btnAllEvent, filterDistance, filterDate, filterTime, filterMusic, filterCapacity;
     private boolean isMapReady = false;
     private List<Event> pendingEvents = new ArrayList<>();
     private UserMenuHandler menuHandler;
@@ -49,11 +52,16 @@ public class ExploreEventsActivity extends BaseMapActivity {
     }
 
     private void initViews() {
-
         emptyText = findViewById(R.id.emptyText);
+
         btnAllEvent = findViewById(R.id.btnAllEvents);
-        btnEventsNearMe = findViewById(R.id.btnEventsNearMe);
         btnMyEvents = findViewById(R.id.btnMyEvents);
+
+        filterDistance = findViewById(R.id.filterDistance);
+        filterDate = findViewById(R.id.filterDate);
+        filterTime = findViewById(R.id.filterTime);
+        filterMusic = findViewById(R.id.filterMusic);
+        filterCapacity = findViewById(R.id.filterCapacity);
     }
 
     private void initMap() {
@@ -74,16 +82,89 @@ public class ExploreEventsActivity extends BaseMapActivity {
     private void setupListeners() {
 
         btnAllEvent.setOnClickListener(v ->
-                viewModel.loadAllEvents()
-        );
-
-        btnEventsNearMe.setOnClickListener(v ->
-                viewModel.loadEventsNearMe()
+                viewModel.clearFilter()
         );
 
         btnMyEvents.setOnClickListener(v ->
                 startActivity(new Intent(this, MyEventUserActivity.class))
         );
+
+        filterCapacity.setOnClickListener(v -> {
+            EventFilter f = viewModel.getFilter().getValue();
+
+            FilterDialogs.showCapacity(
+                    this,
+                    f.getMinAvailableSpots(),
+                    f.getMaxAvailableSpots(),
+                    (min, max) ->
+                            viewModel.updateFilter(fl ->
+                                    fl.setAvailableSpotsRange(min, max)
+                            )
+            );
+        });
+
+        filterMusic.setOnClickListener(v -> {
+            EventFilter f = viewModel.getFilter().getValue();
+
+            FilterDialogs.showMusic(
+                    this,
+                    new HashSet<>(f.getMusicTypes()),
+                    new String[]{"Rock", "Jazz", "Pop", "Hip Hop", "Electronic"},
+                    selected ->
+                            viewModel.updateFilter(fl ->
+                                    fl.setMusicTypes(selected)
+                            )
+            );
+        });
+
+        filterTime.setOnClickListener(v -> {
+            EventFilter f = viewModel.getFilter().getValue();
+
+            FilterDialogs.showTimeRange(
+                    getSupportFragmentManager(),
+                    this,
+                    f.getStartMinute(),
+                    f.getEndMinute(),
+                    (start, end) ->
+                            viewModel.updateFilter(fl ->
+                                    fl.setTimeRange(start, end)
+                            )
+            );
+        });
+
+        filterDate.setOnClickListener(v -> {
+            EventFilter f = viewModel.getFilter().getValue();
+
+            FilterDialogs.showDateRange(
+                    getSupportFragmentManager(),
+                    this,
+                    f.getStartDateMillis(),
+                    f.getEndDateMillis(),
+                    (start, end) ->
+                            viewModel.updateFilter(fl ->
+                                    fl.setDateRange(start, end)
+                            )
+            );
+        });
+
+        filterDistance.setOnClickListener(v -> {
+            fetchLastLocation(location -> {
+                if (location == null) return;
+
+                EventFilter f = viewModel.getFilter().getValue();
+
+                FilterDialogs.showDistance(
+                        this,
+                        location,
+                        f.getRadiusKm(),
+                        (lat, lng, radiusKm) ->
+                                viewModel.updateFilter(fl ->
+                                        fl.setLocation(lat, lng, radiusKm)
+                                )
+                );
+            });
+        });
+
 
     }
     @Override
@@ -95,11 +176,12 @@ public class ExploreEventsActivity extends BaseMapActivity {
     private void observeViewModel() {
         viewModel.getUserGreeting().observe(this, this::setTitleText);
 
-        viewModel.getEvents().observe(this, events -> {
+        viewModel.getFilteredEvents().observe(this, events -> {
             pendingEvents = events;
             if (!isMapReady || mMap == null) return;
             drawEventsOnMap(events);
         });
+
 
         viewModel.getIsEmpty().observe(this, isEmpty ->
                 emptyText.setVisibility(isEmpty ? View.VISIBLE : View.GONE)
@@ -131,8 +213,6 @@ public class ExploreEventsActivity extends BaseMapActivity {
             LatLng israel = new LatLng(31.0461, 34.8516);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(israel, 7f));
         }
-
-        viewModel.onUserLocationAvailable(location);
     }
 
     private void setupMarkerClick() {

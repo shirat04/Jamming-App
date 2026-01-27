@@ -16,6 +16,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
+import com.example.jamming.model.MusicGenre;
 import com.example.jamming.viewmodel.EditEventViewModel;
 import com.google.android.material.snackbar.Snackbar;
 import java.util.Calendar;
@@ -88,7 +89,7 @@ public class EditEventActivity extends BaseActivity {
         viewModel.getDateText().observe(this, text -> setIfDifferent(etDate, text));
         viewModel.getTimeText().observe(this, text -> setIfDifferent(etTime, text));
         viewModel.getCapacityText().observe(this, text -> setIfDifferent(etCapacity, text));
-        viewModel.getGenresText().observe(this, text -> {
+        viewModel.getGenres().observe(this, text -> {
             if (text == null || text.trim().isEmpty()) {
                 genreText.setText("");
             } else {
@@ -191,16 +192,22 @@ public class EditEventActivity extends BaseActivity {
     }
 
     private void openGenreDialog() {
-        String[] genres = getResources().getStringArray(R.array.music_genres);
-        boolean[] checked = viewModel.getCheckedGenres(genres);
+        MusicGenre[] allGenres = MusicGenre.values();
+        String[] displayNames = new String[allGenres.length];
+        for (int i = 0; i < allGenres.length; i++) {
+            displayNames[i] = allGenres[i].getDisplayName();
+        }
+        boolean[] checked = viewModel.getCheckedGenres(allGenres);
 
         new AlertDialog.Builder(this)
                 .setTitle("Select music genres")
-                .setMultiChoiceItems(genres, checked,
-                        (dialog, which, isChecked) -> viewModel.toggleGenre(genres[which], isChecked)
+                .setMultiChoiceItems(
+                        displayNames,
+                        checked,
+                        (dialog, which, isChecked) ->
+                                viewModel.toggleGenre(allGenres[which], isChecked)
                 )
-                .setPositiveButton("OK", (d, w) -> {
-                })
+                .setPositiveButton("OK", null)
                 .setNegativeButton("Cancel", null)
                 .show();
     }

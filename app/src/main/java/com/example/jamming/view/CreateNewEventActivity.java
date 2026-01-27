@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import com.example.jamming.R;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.jamming.model.MusicGenre;
 import com.example.jamming.viewmodel.CreateNewEventViewModel;
 
 import java.util.Calendar;
@@ -219,15 +220,18 @@ public class CreateNewEventActivity extends BaseActivity {
     }
     private void openGenreDialog() {
 
-        String[] allGenres = getResources()
-                .getStringArray(R.array.music_genres);
+        MusicGenre[] allGenres = MusicGenre.values();
+        String[] labels = new String[allGenres.length];
+        for (int i = 0; i < allGenres.length; i++) {
+            labels[i] = allGenres[i].getDisplayName();
+        }
 
         boolean[] checked = viewModel.getCheckedGenres(allGenres);
 
         new AlertDialog.Builder(this)
                 .setTitle("Select music genres")
                 .setMultiChoiceItems(
-                        allGenres,
+                        labels,
                         checked,
                         (dialog, which, isChecked) ->
                                 viewModel.toggleGenre(

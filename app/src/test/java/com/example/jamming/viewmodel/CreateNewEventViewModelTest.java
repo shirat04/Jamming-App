@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import com.example.jamming.model.Event;
+import com.example.jamming.model.MusicGenre;
 import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.view.EventField;
@@ -49,7 +50,7 @@ public class CreateNewEventViewModelTest {
         viewModel.onLocationSelected(32.0, 34.8, "Tel Aviv");
         viewModel.setDate(2026, 0, 10);
         viewModel.setTime(20, 0);
-        viewModel.toggleGenre("Rock", true);
+        viewModel.toggleGenre(MusicGenre.ROCK, true);
 
         // Act
         viewModel.publish("", "100", "Test description");
@@ -67,11 +68,10 @@ public class CreateNewEventViewModelTest {
     @Test
     public void getCheckedGenres_returnsCorrectCheckedArray() {
         // Arrange
-        String[] allGenres = {"Rock", "Jazz", "Pop"};
+        MusicGenre[] allGenres = {MusicGenre.ROCK, MusicGenre.JAZZ, MusicGenre.POP};
 
-        viewModel.toggleGenre("Rock", true);
-        viewModel.toggleGenre("Pop", true);
-
+        viewModel.toggleGenre(MusicGenre.ROCK, true);
+        viewModel.toggleGenre(MusicGenre.POP, true);
         // Act
         boolean[] checked = viewModel.getCheckedGenres(allGenres);
 
@@ -103,7 +103,7 @@ public class CreateNewEventViewModelTest {
         viewModel.onLocationSelected(32.0, 34.8, "Tel Aviv");
         viewModel.setDate(2026, 0, 10);
         viewModel.setTime(20, 0);
-        viewModel.toggleGenre("Rock", true);
+        viewModel.toggleGenre(MusicGenre.ROCK, true);
 
         // Act
         viewModel.publish("Live Concert", "150", "Great music night");

@@ -45,7 +45,21 @@ public class Event {
     public String getOwnerId() { return ownerId; }
     public String getName() { return name; }
     public String getDescription() { return description; }
-    public List<String> getMusicTypes() { return musicTypes; }
+    public List<MusicGenre> getMusicGenresEnum() {
+        List<MusicGenre> result = new ArrayList<>();
+        if (musicTypes == null) return result;
+
+        for (String s : musicTypes) {
+            try {
+                result.add(MusicGenre.fromDisplayName(s));
+            } catch (Exception ignored) {}
+        }
+        return result;
+    }
+    public List<String> getMusicTypes() {
+        return musicTypes;
+    }
+
     public String getAddress() { return address; }
     public long getDateTime() { return dateTime; }
     public int getMaxCapacity() { return maxCapacity; }

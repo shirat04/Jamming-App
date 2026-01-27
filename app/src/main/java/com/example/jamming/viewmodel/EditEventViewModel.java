@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import com.example.jamming.model.Event;
+import com.example.jamming.model.MusicGenre;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.view.EventField;
@@ -21,7 +22,7 @@ public class EditEventViewModel extends ViewModel {
     private double lat, lng;
     private String address, eventId;
 
-    private final List<String> genres = new ArrayList<>();
+    private final List<MusicGenre> genres = new ArrayList<>();
 
     private final MutableLiveData<String> title = new MutableLiveData<>("");
     private final MutableLiveData<String> description = new MutableLiveData<>("");
@@ -46,7 +47,7 @@ public class EditEventViewModel extends ViewModel {
     public LiveData<String> getDateText() { return dateText; }
     public LiveData<String> getTimeText() { return timeText; }
     public LiveData<String> getCapacityText() { return capacityText; }
-    public LiveData<String> getGenresText() { return genresText; }
+    public LiveData<String> getGenres() { return genresText; }
     public Calendar getDateTime() {return dateTime;}
 
     public LiveData<EventField> getErrorField() { return errorField; }
@@ -83,9 +84,14 @@ public class EditEventViewModel extends ViewModel {
 
                     genres.clear();
                     if (event.getMusicTypes() != null) {
-                        genres.addAll(event.getMusicTypes());
+                        for (String s : event.getMusicTypes()) {
+                            try {
+                                genres.add(MusicGenre.fromDisplayName(s));
+                            } catch (IllegalArgumentException ignored) {
+                            }
+                        }
                     }
-                    genresText.setValue(String.join(" , ", genres));
+                    genresText.setValue(getGenresText());
 
                     dateTime.setTimeInMillis(event.getDateTime());
                     dateText.setValue(DateUtils.formatOnlyDate(event.getDateTime()));
@@ -135,7 +141,7 @@ public class EditEventViewModel extends ViewModel {
     }
 
     // ===== Genres =====
-    public void toggleGenre(String genre, boolean checked) {
+    public void toggleGenre(MusicGenre genre, boolean checked) {
         if (genre == null) return;
 
         if (checked && !genres.contains(genre)) {
@@ -144,19 +150,30 @@ public class EditEventViewModel extends ViewModel {
             genres.remove(genre);
         }
 
-        genresText.setValue(String.join(" , ", genres));
+        genresText.setValue(getGenresText());
+
         if (!genres.isEmpty() && errorField.getValue() == EventField.GENRE) {
             errorField.setValue(null);
         }
     }
 
-    public boolean[] getCheckedGenres(String[] allGenres) {
+    private String getGenresText() {
+        List<String> names = new ArrayList<>();
+        for (MusicGenre g : genres) {
+            names.add(g.getDisplayName());
+        }
+        return String.join(" , ", names);
+    }
+
+
+    public boolean[] getCheckedGenres(MusicGenre[] allGenres) {
         boolean[] checked = new boolean[allGenres.length];
         for (int i = 0; i < allGenres.length; i++) {
             checked[i] = genres.contains(allGenres[i]);
         }
         return checked;
     }
+
 
     // ===== Save changes =====
     public void saveChanges() {

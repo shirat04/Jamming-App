@@ -13,11 +13,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
+import com.example.jamming.model.MusicGenre;
 import com.example.jamming.viewmodel.EventDetailViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -166,11 +168,14 @@ public class EventDetailActivity extends BaseActivity  {
         capacityEvent.setText(capacity);
 
         List<String> genres = event.getMusicTypes();
-        generEevet.setText(
-                genres != null && !genres.isEmpty()
-                        ? String.join(" / ", genres)
-                        : "No genre specified"
-        );
+
+        if (genres == null || genres.isEmpty()) {
+            generEevet.setText("No genre specified");
+        } else {
+            generEevet.setText(String.join(" , ", genres));
+        }
+
+
     }
 
     @Override

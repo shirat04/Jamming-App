@@ -12,9 +12,11 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
+import com.example.jamming.model.MusicGenre;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.viewmodel.MyEventUserViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -112,11 +114,14 @@ public class MyEventUserActivity extends BaseActivity {
         location.setText(event.getAddress());
 
         List<String> genres = event.getMusicTypes();
-        genre.setText(
-                genres != null && !genres.isEmpty()
-                        ? String.join(" / ", genres)
-                        : "No genre"
-        );
+
+        if (genres != null && !genres.isEmpty()) {
+            genre.setText(String.join(" , ", genres));
+        } else {
+            genre.setText("No genre");
+        }
+
+
 
         capacity.setText(
                 event.getReserved() + " / " + event.getMaxCapacity() + " משתתפים"
