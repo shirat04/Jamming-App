@@ -21,6 +21,6 @@
         android:stepSize="1"
         android:value="10"
         android:valueFrom="1"
-        android:valueTo="50" />
+        android:valueTo="200" />
 
 </LinearLayout>

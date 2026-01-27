@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.model.MusicGenre;
+import com.example.jamming.utils.DateUtils;
 import com.example.jamming.viewmodel.EventDetailViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.auth.FirebaseAuth;
@@ -157,22 +158,29 @@ public class EventDetailActivity extends BaseActivity  {
         titleEvent.setText(event.getName());
         locationTextView.setText(event.getAddress());
 
-        String formattedDate = DateFormat
-                .getDateInstance(DateFormat.MEDIUM)
-                .format(new Date(event.getDateTime()));
-        dateTextView.setText(formattedDate);
+        String dateTimeText =
+                DateUtils.formatOnlyDate(event.getDateTime())
+                        + " • "
+                        + DateUtils.formatOnlyTime(event.getDateTime());
+
+        dateTextView.setText(dateTimeText);
+
 
         eventDescription.setText(event.getDescription());
 
         String capacity = event.getReserved() + " / " + event.getMaxCapacity() + " משתתפים";
         capacityEvent.setText(capacity);
 
-        List<String> genres = event.getMusicTypes();
+        List<MusicGenre> genres = event.getMusicGenresEnum();
 
         if (genres == null || genres.isEmpty()) {
             generEevet.setText("No genre specified");
         } else {
-            generEevet.setText(String.join(" , ", genres));
+            List<String> names = new ArrayList<>();
+            for (MusicGenre g : genres) {
+                names.add(g.getDisplayName());
+            }
+            generEevet.setText(String.join(" , ", names));
         }
 
 
