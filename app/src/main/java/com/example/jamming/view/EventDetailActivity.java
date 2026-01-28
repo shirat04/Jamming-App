@@ -177,8 +177,8 @@ public class EventDetailActivity extends BaseActivity  {
             generEevet.setText("No genre specified");
         } else {
             List<String> names = new ArrayList<>();
-            for (MusicGenre g : genres) {
-                names.add(g.getDisplayName());
+            for (MusicGenre gener : genres) {
+                names.add(gener.getDisplayName());
             }
             generEevet.setText(String.join(" , ", names));
         }

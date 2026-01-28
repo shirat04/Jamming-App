@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.model.EventFilter;
+import com.example.jamming.model.MusicGenre;
 import com.example.jamming.view.dialog.FilterDialogs;
 import com.example.jamming.viewmodel.ExploreEventsViewModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -105,17 +106,27 @@ public class ExploreEventsActivity extends BaseMapActivity {
 
         filterMusic.setOnClickListener(v -> {
             EventFilter f = viewModel.getFilter().getValue();
+            if (f == null) return;
+
+            MusicGenre[] allGenres = MusicGenre.values();
+
+            String[] displayNames = new String[allGenres.length];
+            for (int i = 0; i < allGenres.length; i++) {
+                displayNames[i] = allGenres[i].getDisplayName();
+            }
 
             FilterDialogs.showMusic(
                     this,
                     new HashSet<>(f.getMusicTypes()),
-                    new String[]{"Rock", "Jazz", "Pop", "Hip Hop", "Electronic"},
+                    allGenres,
                     selected ->
                             viewModel.updateFilter(fl ->
                                     fl.setMusicTypes(selected)
                             )
             );
+
         });
+
 
         filterTime.setOnClickListener(v -> {
             EventFilter f = viewModel.getFilter().getValue();

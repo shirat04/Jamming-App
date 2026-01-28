@@ -7,9 +7,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.lifecycle.ViewModelProvider;
-
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.model.MusicGenre;
@@ -113,25 +111,23 @@ public class MyEventUserActivity extends BaseActivity {
         title.setText(event.getName());
         location.setText(event.getAddress());
 
-        List<String> genres = event.getMusicTypes();
+        List<MusicGenre> genres = event.getMusicGenresEnum();
 
         if (genres != null && !genres.isEmpty()) {
-            genre.setText(String.join(" , ", genres));
+            List<String> names = new ArrayList<>();
+            for (MusicGenre g : genres) {
+                names.add(g.getDisplayName());
+            }
+            genre.setText(String.join(" , ", names));
         } else {
             genre.setText("No genre");
         }
+        String capacityText = event.getReserved() + " / " + event.getMaxCapacity() + " משתתפים";
+        capacity.setText(capacityText);
 
-
-
-        capacity.setText(
-                event.getReserved() + " / " + event.getMaxCapacity() + " משתתפים"
-        );
-
-        date.setText(
-                DateUtils.formatOnlyDate(event.getDateTime()) +
-                        " • " +
-                        DateUtils.formatOnlyTime(event.getDateTime())
-        );
+        String dateTimeText = DateUtils.formatOnlyDate(event.getDateTime()) +
+                " • " + DateUtils.formatOnlyTime(event.getDateTime());
+        date.setText(dateTimeText);
 
 
         cancelBtn.setOnClickListener(v ->

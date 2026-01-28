@@ -8,14 +8,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.lifecycle.ViewModelProvider;
-
 import com.example.jamming.R;
-import com.example.jamming.model.MusicGenre;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.viewmodel.OwnerViewModel;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class OwnerActivity extends BaseActivity {

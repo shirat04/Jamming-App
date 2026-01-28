@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -18,7 +19,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText usernameInput, passwordInput;
     private LoginViewModel loginViewModel;
+    ProgressBar progressBar;
 
+    private Button loginBtn,registerBtn;
     private TextView errorText, forgotPassword;
 
 
@@ -27,13 +30,13 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        usernameInput = findViewById(R.id.usernameInput);   // יכול להיות אימייל או username
+        usernameInput = findViewById(R.id.usernameInput);
         passwordInput = findViewById(R.id.passwordInput);
-        Button loginBtn = findViewById(R.id.loginButton);
-        Button registerBtn = findViewById(R.id.registerText);
+        loginBtn = findViewById(R.id.loginButton);
+        registerBtn = findViewById(R.id.registerText);
         errorText = findViewById(R.id.errorTextView);
         forgotPassword = findViewById(R.id.forgotPasswordText);
-
+        progressBar = findViewById(R.id.loginProgressBar);
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
         TextWatcher clearMessageWatcher = new TextWatcher() {
@@ -76,8 +79,23 @@ public class LoginActivity extends AppCompatActivity {
                 errorText.setText(msg);
                 errorText.setVisibility(View.VISIBLE);
             } else {
-                errorText.setVisibility(View.GONE);
+                errorText.setVisibility(View.INVISIBLE);
             }
+        });
+
+        loginViewModel.getIsLoading().observe(this, isLoading -> {
+            if (isLoading) {
+                progressBar.setVisibility(View.VISIBLE);
+                loginBtn.setEnabled(false);
+            } else {
+                progressBar.setVisibility(View.GONE);
+                loginBtn.setEnabled(true);
+            }
+        });
+
+        loginViewModel.getIsLoading().observe(this, isLoading -> {
+            loginBtn.setEnabled(!isLoading);
+            loginBtn.setAlpha(isLoading ? 0.6f : 1f);
         });
 
 

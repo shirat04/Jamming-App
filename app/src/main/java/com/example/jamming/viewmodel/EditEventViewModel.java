@@ -201,6 +201,10 @@ public class EditEventViewModel extends ViewModel {
             return;
         }
 
+        List<String> genreStrings = new ArrayList<>();
+        for (MusicGenre g : genres) {
+            genreStrings.add(g.getDisplayName());
+        }
         if (genres.isEmpty()) { errorField.setValue(EventField.GENRE); return; }
 
         Map<String, Object> updates = new HashMap<>();
@@ -211,7 +215,7 @@ public class EditEventViewModel extends ViewModel {
         updates.put("longitude", lng);
         updates.put("maxCapacity", cap);
         updates.put("dateTime", dateTime.getTimeInMillis());
-        updates.put("musicTypes", new ArrayList<>(genres));
+        updates.put("musicTypes", genreStrings);
 
         eventRepository.updateEvent(eventId, updates)
                 .addOnSuccessListener(a -> successMessage.setValue("האירוע עודכן בהצלחה"))

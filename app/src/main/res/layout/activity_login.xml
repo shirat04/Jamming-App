@@ -21,22 +21,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-
-    <!--    &lt;!&ndash; Title &ndash;&gt;-->
-<!--    <TextView-->
-<!--        android:id="@+id/loginTitle"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="Jamming"-->
-<!--        android:textSize="40sp"-->
-<!--        android:textStyle="bold"-->
-<!--        android:textColor="#0B375E"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        android:layout_marginTop="40dp"/>-->
-
     <!-- Username Field -->
     <TextView
         android:id="@+id/subTitle"
@@ -93,10 +77,11 @@
         android:layout_height="93dp"
         android:layout_marginTop="30dp"
         android:layout_marginEnd="128dp"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/errorTextView"
         tools:visibility="visible" />
+
 
     <Button
         android:id="@+id/loginButton"

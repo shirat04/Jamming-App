@@ -14,6 +14,8 @@ public class LoginViewModel extends ViewModel {
     private final AuthRepository repo = new AuthRepository();
     public MutableLiveData<String> message = new MutableLiveData<>();
     public MutableLiveData<String> userType = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
+
 
     public void login(String identifier, String password) {
 
@@ -21,45 +23,57 @@ public class LoginViewModel extends ViewModel {
             message.setValue("נא למלא את כל השדות");
             return;
         }
+        isLoading.setValue(true);
 
         repo.getUserByUsername(identifier)
                 .addOnSuccessListener(query -> {
                     if (query.isEmpty()) {
+                        stopLoading();
                         message.setValue("שם המשתמש או סיסמה אינם נכונים");
                         return;
                     }
 
                     String email = query.getDocuments().get(0).getString("email");
                     if (email == null || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                        stopLoading();
                         message.setValue("כתובת האימייל של המשתמש אינה תקינה");
                         return;
                     }
 
                     repo.login(email.trim(), password)
-                            .addOnSuccessListener(auth ->
-                                    checkUserType(repo.getCurrentUid()))
-                            .addOnFailureListener(e ->
-                                    message.setValue("שם משתמש או סיסמה אינם נכונים"));
+                            .addOnSuccessListener(auth -> {
+                                checkUserType(repo.getCurrentUid());
+                            })
+                            .addOnFailureListener(e -> {
+                                stopLoading();
+                                message.setValue("שם משתמש או סיסמה אינם נכונים");
+                            });
                 })
-                .addOnFailureListener(e ->
-                        message.setValue("שגיאה בהתחברות"));
+                .addOnFailureListener(e -> {
+                    stopLoading();
+                    message.setValue("שגיאה בהתחברות");
+                });
 
     }
     private void checkUserType(String uid) {
-            repo.getUserUId(uid).addOnSuccessListener(doc -> {
-                if (!doc.exists()) {
-                            return;}
-                        String type = doc.getString("userType");
-                        userType.setValue(type);
-                    })
-                    .addOnFailureListener(e -> message.setValue(e.getMessage()));
-        }
+        repo.getUserUId(uid)
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) return;
+                    userType.setValue(doc.getString("userType"));
+                })
+                .addOnFailureListener(e -> {
+                    message.setValue(e.getMessage());
+                });
+    }
     public LiveData<String> getMessage() {
         return message;
     }
     public LiveData<String> getUserType() {
         return userType;
     }
+    public LiveData<Boolean> getIsLoading() {return isLoading;}
+    public void stopLoading() {isLoading.setValue(false);}
+
 
     public void resetPassword(String identifier) {
 

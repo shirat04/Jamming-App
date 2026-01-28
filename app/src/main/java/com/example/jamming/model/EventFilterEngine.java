@@ -1,9 +1,6 @@
 package com.example.jamming.model;
 
-import com.example.jamming.model.Event;
-import com.example.jamming.model.EventFilter;
 import com.example.jamming.utils.GeoUtils;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -17,28 +14,28 @@ public class EventFilterEngine {
         if (filter == null) return events;
 
         List<Event> result = new ArrayList<>();
-        for (Event e : events) {
-            if (matches(e, filter)) {
-                result.add(e);
+        for (Event event : events) {
+            if (matches(event, filter)) {
+                result.add(event);
             }
         }
         return result;
     }
 
-    private static boolean matches(Event e, EventFilter f) {
+    private static boolean matches(Event event, EventFilter eventFilter) {
 
-        if (!e.isActive() || !e.canRegister()) {
+        if (!event.isActive() || !event.canRegister()) {
             return false;
         }
 
-        // 🎵 Music types
-        if (!f.getMusicTypes().isEmpty()) {
+        //  Music types
+        if (!eventFilter.getMusicTypes().isEmpty()) {
             boolean match = false;
-            for (String genreStr : e.getMusicTypes()) {
+            for (String genreStr : event.getMusicTypes()) {
                 try {
                     MusicGenre genreEnum = MusicGenre.fromDisplayName(genreStr);
 
-                    if (f.getMusicTypes().contains(genreEnum)) {
+                    if (eventFilter.getMusicTypes().contains(genreEnum)) {
                         match = true;
                         break;
                     }
@@ -51,39 +48,39 @@ public class EventFilterEngine {
         }
 
         // 📍 Location
-        if (f.getRadiusKm() != null) {
+        if (eventFilter.getRadiusKm() != null) {
             double dist = GeoUtils.calculateDistanceKm(
-                    f.getCenterLat(),
-                    f.getCenterLng(),
-                    e.getLatitude(),
-                    e.getLongitude()
+                    eventFilter.getCenterLat(),
+                    eventFilter.getCenterLng(),
+                    event.getLatitude(),
+                    event.getLongitude()
             );
-            if (dist > f.getRadiusKm()) return false;
+            if (dist > eventFilter.getRadiusKm()) return false;
         }
 
         // 📅 Date range
-        if (f.getStartDateMillis() != null && f.getEndDateMillis() != null) {
-            long t = e.getDateTime();
-            if (t < f.getStartDateMillis() || t > f.getEndDateMillis())
+        if (eventFilter.getStartDateMillis() != null && eventFilter.getEndDateMillis() != null) {
+            long t = event.getDateTime();
+            if (t < eventFilter.getStartDateMillis() || t > eventFilter.getEndDateMillis())
                 return false;
         }
 
         // ⏰ Time range
-        if (f.getStartMinute() != null && f.getEndMinute() != null) {
-            int minutes = minutesFromMidnight(e.getDateTime());
-            if (minutes < f.getStartMinute() || minutes > f.getEndMinute())
+        if (eventFilter.getStartMinute() != null && eventFilter.getEndMinute() != null) {
+            int minutes = minutesFromMidnight(event.getDateTime());
+            if (minutes < eventFilter.getStartMinute() || minutes > eventFilter.getEndMinute())
                 return false;
         }
 
         // 👥 Available spots
-        int available = e.getAvailableSpots();
+        int available = event.getAvailableSpots();
 
-        if (f.getMinAvailableSpots() != null
-                && available < f.getMinAvailableSpots())
+        if (eventFilter.getMinAvailableSpots() != null
+                && available < eventFilter.getMinAvailableSpots())
             return false;
 
-        if (f.getMaxAvailableSpots() != null
-                && available > f.getMaxAvailableSpots())
+        if (eventFilter.getMaxAvailableSpots() != null
+                && available > eventFilter.getMaxAvailableSpots())
             return false;
 
         return true;

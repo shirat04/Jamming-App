@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.jamming.R;
+import com.example.jamming.model.MusicGenre;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.slider.Slider;
 
@@ -19,7 +20,7 @@ import java.util.Set;
 public class FilterDialogs {
 
     public interface GenresCallback {
-        void onSelected(Set<String> selected);
+        void onSelected(Set<MusicGenre> selected);
     }
 
     public interface TimeRangeCallback {
@@ -42,30 +43,36 @@ public class FilterDialogs {
 
     public static void showMusic(
             Context ctx,
-            Set<String> current,
-            String[] allMusicTypes,
+            Set<MusicGenre> current,
+            MusicGenre[] allGenres,
             GenresCallback callback
     ) {
-        boolean[] checked = new boolean[allMusicTypes.length];
-        for (int i = 0; i < allMusicTypes.length; i++) {
-            checked[i] = current.contains(allMusicTypes[i]);
+        String[] displayNames = new String[allGenres.length];
+        boolean[] checked = new boolean[allGenres.length];
+
+        for (int i = 0; i < allGenres.length; i++) {
+            displayNames[i] = allGenres[i].getDisplayName();
+            checked[i] = current.contains(allGenres[i]);
         }
 
         new AlertDialog.Builder(ctx)
-                .setTitle("בחר ז'אנרים")
-                .setMultiChoiceItems(allMusicTypes, checked, (d, which, isChecked) -> {
+                .setTitle("Select genres")
+                .setMultiChoiceItems(displayNames, checked, (d, which, isChecked) -> {
                     checked[which] = isChecked;
                 })
-                .setPositiveButton("אישור", (d, w) -> {
-                    Set<String> result = new HashSet<>();
-                    for (int i = 0; i < allMusicTypes.length; i++) {
-                        if (checked[i]) result.add(allMusicTypes[i]);
+                .setPositiveButton("OK", (d, w) -> {
+                    Set<MusicGenre> result = new HashSet<>();
+                    for (int i = 0; i < allGenres.length; i++) {
+                        if (checked[i]) {
+                            result.add(allGenres[i]);
+                        }
                     }
-                    callback.onSelected(result); // ריק = הכל
+                    callback.onSelected(result);
                 })
-                .setNegativeButton("ביטול", null)
+                .setNegativeButton("Cancel", null)
                 .show();
     }
+
 
     /* ===================== TIME RANGE ===================== */
 
