@@ -76,21 +76,15 @@ public class Event {
     public void setMusicTypes(List<String> musicTypes) { this.musicTypes = musicTypes; }
     public void setAddress(String address) { this.address = address; }
     public void setDateTime(long dateTime) { this.dateTime = dateTime; }
-    public void setMaxCapacity(int maxCapacity) { this.maxCapacity = maxCapacity; }
-    public void setReserved(int reserved) { this.reserved = reserved; }
     public void setActive(boolean active) { isActive = active; }
     public void setLatitude(double latitude) { this.latitude = latitude; }
     public void setLongitude(double longitude) { this.longitude = longitude; }
 
-    public boolean isFull() {
-        return reserved >= maxCapacity;
-    }
+    public boolean isFull() {return reserved >= maxCapacity;}
 
     public int getAvailableSpots() {
         return maxCapacity - reserved;
     }
 
-    public boolean canRegister() {
-        return isActive && !isFull();
-    }
+    public boolean canRegister() {return isActive && !isFull();}
 }

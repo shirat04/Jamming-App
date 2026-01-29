@@ -17,13 +17,12 @@ public class TimePickerDialogFragment extends DialogFragment {
     }
 
     private OnTimeSelectedListener listener;
-
+    private String title;
     public static TimePickerDialogFragment newInstance(
-            OnTimeSelectedListener listener
-    ) {
-        TimePickerDialogFragment fragment =
-                new TimePickerDialogFragment();
+            OnTimeSelectedListener listener,String title) {
+        TimePickerDialogFragment fragment = new TimePickerDialogFragment();
         fragment.listener = listener;
+        fragment.title = title;
         return fragment;
     }
 
@@ -31,18 +30,23 @@ public class TimePickerDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 
-        Calendar c = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
 
-        return new TimePickerDialog(
+        TimePickerDialog dialog = new TimePickerDialog(
                 requireContext(),
                 (view, hour, minute) -> {
                     if (listener != null) {
                         listener.onTimeSelected(hour, minute);
                     }
                 },
-                c.get(Calendar.HOUR_OF_DAY),
-                c.get(Calendar.MINUTE),
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
                 true
         );
+        if (title != null) {
+            dialog.setTitle(title);
+        }
+
+        return dialog;
     }
 }

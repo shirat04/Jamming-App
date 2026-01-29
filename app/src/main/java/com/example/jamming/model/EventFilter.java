@@ -25,6 +25,10 @@ public class EventFilter {
     private Integer minAvailableSpots;
     private Integer maxAvailableSpots;
 
+    // maxCapacity spots range
+    private Integer minCapacity;
+    private Integer maxCapacity;
+
     /* ===== Getters / Setters ===== */
 
     // Returns selected music genres
@@ -74,4 +78,13 @@ public class EventFilter {
 
     public Integer getMinAvailableSpots() { return minAvailableSpots; }
     public Integer getMaxAvailableSpots() { return maxAvailableSpots; }
+    public Integer getMinCapacity() { return minCapacity; }
+    public Integer getMaxCapacity() { return maxCapacity; }
+
+
+    public void setCapacityRange(Integer min, Integer max) {
+        this.minCapacity = min;
+        this.maxCapacity = max;
+    }
+
 }

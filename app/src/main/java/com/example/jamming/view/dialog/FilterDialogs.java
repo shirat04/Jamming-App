@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.example.jamming.R;
 import com.example.jamming.model.MusicGenre;
-import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.slider.Slider;
 
 import java.util.Calendar;
@@ -19,25 +18,17 @@ import java.util.Set;
 
 public class FilterDialogs {
 
-    public interface GenresCallback {
-        void onSelected(Set<MusicGenre> selected);
+    public interface GenresCallback { void onSelected(Set<MusicGenre> selected);}
+
+    public interface TimeRangeCallback { void onSelected(int startMinute, int endMinute);}
+
+    public interface DateRangeCallback { void onSelected(long startMillis, long endMillis);}
+
+    public interface CapacityCombinedCallback {
+        void onSelected(Integer minAvailable, Integer maxAvailable, Integer minCapacity, Integer maxCapacity);
     }
 
-    public interface TimeRangeCallback {
-        void onSelected(int startMinute, int endMinute);
-    }
-
-    public interface DateRangeCallback {
-        void onSelected(long startMillis, long endMillis);
-    }
-
-    public interface CapacityCallback {
-        void onSelected(int minAvailable, int maxAvailable);
-    }
-
-    public interface DistanceCallback {
-        void onSelected(double lat, double lng, int radiusKm);
-    }
+    public interface DistanceCallback { void onSelected(double lat, double lng, int radiusKm);}
 
     /* ===================== MUSIC ===================== */
 
@@ -86,26 +77,22 @@ public class FilterDialogs {
         final int[] start = { currentStartMinute != null ? currentStartMinute : 18 * 60 };
         final int[] end   = { currentEndMinute != null ? currentEndMinute : 23 * 60 };
 
-        // בוחרים שעה התחלה
-        TimePickerDialogFragment.newInstance((h, m) -> {
-            start[0] = h * 60 + m;
+        TimePickerDialogFragment.newInstance(
+                (h, m) -> {
+                    start[0] = h * 60 + m;
 
-            // ואז שעה סיום
-            TimePickerDialogFragment.newInstance((h2, m2) -> {
-                end[0] = h2 * 60 + m2;
+                    TimePickerDialogFragment.newInstance(
+                            (h2, m2) -> {
+                                end[0] = h2 * 60 + m2;
+                                callback.onSelected(start[0], end[0]);
+                            },
+                            "Select end time"
+                    ).show(fm, "timeEnd");
 
-                if (end[0] < start[0]) {
-                    new AlertDialog.Builder(ctx)
-                            .setMessage("שעת סיום חייבת להיות אחרי שעת התחלה")
-                            .setPositiveButton("אישור", null)
-                            .show();
-                    return;
-                }
+                },
+                "Select start time"
+        ).show(fm, "timeStart");
 
-                callback.onSelected(start[0], end[0]);
-            }).show(fm, "timeEnd");
-
-        }).show(fm, "timeStart");
     }
 
     /* ===================== DATE RANGE ===================== */
@@ -120,25 +107,32 @@ public class FilterDialogs {
         final long[] start = { currentStart != null ? currentStart : System.currentTimeMillis() };
         final long[] end   = { currentEnd != null ? currentEnd : System.currentTimeMillis() };
 
-        DatePickerDialogFragment.newInstance((y, mo, d) -> {
-            start[0] = toStartOfDayMillis(y, mo, d);
+        DatePickerDialogFragment.newInstance(
+                (y, mo, d) -> {
+                    start[0] = toStartOfDayMillis(y, mo, d);
 
-            DatePickerDialogFragment.newInstance((y2, mo2, d2) -> {
-                end[0] = toEndOfDayMillis(y2, mo2, d2);
+                    DatePickerDialogFragment.newInstance(
+                            (y2, mo2, d2) -> {
+                                end[0] = toEndOfDayMillis(y2, mo2, d2);
 
-                if (end[0] < start[0]) {
-                    new AlertDialog.Builder(ctx)
-                            .setMessage("תאריך סיום חייב להיות אחרי תאריך התחלה")
-                            .setPositiveButton("אישור", null)
-                            .show();
-                    return;
-                }
+                                if (end[0] < start[0]) {
+                                    new AlertDialog.Builder(ctx)
+                                            .setMessage("End date must be after start date")
+                                            .setPositiveButton("OK", null)
+                                            .show();
+                                    return;
+                                }
 
-                callback.onSelected(start[0], end[0]);
-            }).show(fm, "dateEnd");
+                                callback.onSelected(start[0], end[0]);
+                            },
+                            "Select end date"
+                    ).show(fm, "dateEnd");
 
-        }).show(fm, "dateStart");
+                },
+                "Select start date"
+        ).show(fm, "dateStart");
     }
+
 
     private static long toStartOfDayMillis(int y, int mo, int d) {
         Calendar c = Calendar.getInstance();
@@ -154,53 +148,65 @@ public class FilterDialogs {
         return c.getTimeInMillis();
     }
 
-    /* ===================== CAPACITY (AVAILABLE SPOTS) ===================== */
+    /* ===================== CAPACITY (AVAILABLE SPOTS, MAXIMUM SPOTS) ===================== */
 
-    public static void showCapacity(Context ctx, Integer currentMin, Integer currentMax, CapacityCallback callback) {
+    public static void showCapacityCombinedFilter(
+            Context ctx,
+            Integer curMinAvailable,
+            Integer curMaxAvailable,
+            Integer curMinCapacity,
+            Integer curMaxCapacity,
+            CapacityCombinedCallback callback
+    ) {
         View v = LayoutInflater.from(ctx)
                 .inflate(R.layout.dialog_capacity_filter, null);
 
-        EditText minInput = v.findViewById(R.id.inputMinCapacity);
-        EditText maxInput = v.findViewById(R.id.inputMaxCapacity);
+        EditText minAvail = v.findViewById(R.id.inputMinAvailable);
+        EditText maxAvail = v.findViewById(R.id.inputMaxAvailable);
+        EditText minCap   = v.findViewById(R.id.inputMinCapacity);
+        EditText maxCap   = v.findViewById(R.id.inputMaxCapacity);
 
-        if (currentMin != null) {
-            minInput.setText(String.valueOf(currentMin));
-        }
-        if (currentMax != null) {
-            maxInput.setText(String.valueOf(currentMax));
-        }
+        if (curMinAvailable != null) minAvail.setText(String.valueOf(curMinAvailable));
+        if (curMaxAvailable != null) maxAvail.setText(String.valueOf(curMaxAvailable));
+        if (curMinCapacity != null)  minCap.setText(String.valueOf(curMinCapacity));
+        if (curMaxCapacity != null)  maxCap.setText(String.valueOf(curMaxCapacity));
 
         new AlertDialog.Builder(ctx)
-                .setTitle("סינון לפי קיבולת")
+                .setTitle("Seat Filtering")
                 .setView(v)
                 .setPositiveButton("אישור", (d, w) -> {
 
-                    String minStr = minInput.getText().toString().trim();
-                    String maxStr = maxInput.getText().toString().trim();
+                    Integer minA = parseIntOrNull(minAvail.getText().toString());
+                    Integer maxA = parseIntOrNull(maxAvail.getText().toString());
+                    Integer minC = parseIntOrNull(minCap.getText().toString());
+                    Integer maxC = parseIntOrNull(maxCap.getText().toString());
 
-                    Integer min = minStr.isEmpty() ? null : Integer.parseInt(minStr);
-                    Integer max = maxStr.isEmpty() ? null : Integer.parseInt(maxStr);
-
-                    // בדיקות תקינות
-                    if (min != null && min < 0) min = 0;
-                    if (max != null && max < 0) max = 0;
-
-                    if (min != null && max != null && max < min) {
-                        new AlertDialog.Builder(ctx)
-                                .setMessage("הערך 'עד' חייב להיות גדול או שווה ל-'מ־'")
-                                .setPositiveButton("אישור", null)
-                                .show();
+                    if (minA != null && maxA != null && maxA < minA) {
+                        showError(ctx, "טווח כיסאות פנויים לא תקין");
+                        return;
+                    }
+                    if (minC != null && maxC != null && maxC < minC) {
+                        showError(ctx, "טווח גודל אירוע לא תקין");
                         return;
                     }
 
-                    callback.onSelected(
-                            min != null ? min : 0,
-                            max != null ? max : Integer.MAX_VALUE
-                    );
+                    callback.onSelected(minA, maxA, minC, maxC);
                 })
                 .setNegativeButton("ביטול", null)
                 .show();
     }
+    private static Integer parseIntOrNull(String s) {
+        s = s.trim();
+        return s.isEmpty() ? null : Integer.parseInt(s);
+    }
+
+    private static void showError(Context ctx, String message) {
+        new AlertDialog.Builder(ctx)
+                .setMessage(message)
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
 
     /* ===================== DISTANCE ===================== */
 

@@ -63,6 +63,15 @@ public class ExploreEventsActivity extends BaseMapActivity {
         filterTime = findViewById(R.id.filterTime);
         filterMusic = findViewById(R.id.filterMusic);
         filterCapacity = findViewById(R.id.filterCapacity);
+        filterTooltipText();
+    }
+
+    private void filterTooltipText(){
+        filterDistance.setTooltipText("Filter by location");
+        filterDate.setTooltipText("Filter by date");
+        filterTime.setTooltipText("Filter by time");
+        filterMusic.setTooltipText("Filter by music genre");
+        filterCapacity.setTooltipText("Filter by available spots and event size");
     }
 
     private void initMap() {
@@ -91,22 +100,28 @@ public class ExploreEventsActivity extends BaseMapActivity {
         );
 
         filterCapacity.setOnClickListener(v -> {
-            EventFilter f = viewModel.getFilter().getValue();
+            EventFilter eventFilter = viewModel.getFilter().getValue();
+            if (eventFilter == null) return;
 
-            FilterDialogs.showCapacity(
+            FilterDialogs.showCapacityCombinedFilter(
                     this,
-                    f.getMinAvailableSpots(),
-                    f.getMaxAvailableSpots(),
-                    (min, max) ->
-                            viewModel.updateFilter(fl ->
-                                    fl.setAvailableSpotsRange(min, max)
-                            )
+                    eventFilter.getMinAvailableSpots(),
+                    eventFilter.getMaxAvailableSpots(),
+                    eventFilter.getMinCapacity(),
+                    eventFilter.getMaxCapacity(),
+                    (minA, maxA, minC, maxC) ->
+                            viewModel.updateFilter(filter -> {
+                                filter.setAvailableSpotsRange(minA, maxA);
+                                filter.setCapacityRange(minC, maxC);
+                            })
             );
         });
 
+
+
         filterMusic.setOnClickListener(v -> {
-            EventFilter f = viewModel.getFilter().getValue();
-            if (f == null) return;
+            EventFilter eventFilter = viewModel.getFilter().getValue();
+            if (eventFilter == null) return;
 
             MusicGenre[] allGenres = MusicGenre.values();
 
@@ -117,11 +132,11 @@ public class ExploreEventsActivity extends BaseMapActivity {
 
             FilterDialogs.showMusic(
                     this,
-                    new HashSet<>(f.getMusicTypes()),
+                    new HashSet<>(eventFilter.getMusicTypes()),
                     allGenres,
                     selected ->
-                            viewModel.updateFilter(fl ->
-                                    fl.setMusicTypes(selected)
+                            viewModel.updateFilter(filter ->
+                                    filter.setMusicTypes(selected)
                             )
             );
 
@@ -129,31 +144,31 @@ public class ExploreEventsActivity extends BaseMapActivity {
 
 
         filterTime.setOnClickListener(v -> {
-            EventFilter f = viewModel.getFilter().getValue();
+            EventFilter eventFilter = viewModel.getFilter().getValue();
 
             FilterDialogs.showTimeRange(
                     getSupportFragmentManager(),
                     this,
-                    f.getStartMinute(),
-                    f.getEndMinute(),
+                    eventFilter.getStartMinute(),
+                    eventFilter.getEndMinute(),
                     (start, end) ->
-                            viewModel.updateFilter(fl ->
-                                    fl.setTimeRange(start, end)
+                            viewModel.updateFilter(filter ->
+                                    filter.setTimeRange(start, end)
                             )
             );
         });
 
         filterDate.setOnClickListener(v -> {
-            EventFilter f = viewModel.getFilter().getValue();
+            EventFilter eventFilter = viewModel.getFilter().getValue();
 
             FilterDialogs.showDateRange(
                     getSupportFragmentManager(),
                     this,
-                    f.getStartDateMillis(),
-                    f.getEndDateMillis(),
+                    eventFilter.getStartDateMillis(),
+                    eventFilter.getEndDateMillis(),
                     (start, end) ->
-                            viewModel.updateFilter(fl ->
-                                    fl.setDateRange(start, end)
+                            viewModel.updateFilter(filter ->
+                                    filter.setDateRange(start, end)
                             )
             );
         });
@@ -162,15 +177,15 @@ public class ExploreEventsActivity extends BaseMapActivity {
             fetchLastLocation(location -> {
                 if (location == null) return;
 
-                EventFilter f = viewModel.getFilter().getValue();
+                EventFilter eventFilter = viewModel.getFilter().getValue();
 
                 FilterDialogs.showDistance(
                         this,
                         location,
-                        f.getRadiusKm(),
+                        eventFilter.getRadiusKm(),
                         (lat, lng, radiusKm) ->
-                                viewModel.updateFilter(fl ->
-                                        fl.setLocation(lat, lng, radiusKm)
+                                viewModel.updateFilter(filter ->
+                                        filter.setLocation(lat, lng, radiusKm)
                                 )
                 );
             });

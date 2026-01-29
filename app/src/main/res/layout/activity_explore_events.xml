@@ -18,13 +18,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- עטיפה שתופסת את כל הרוחב -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:gravity="center">
 
-            <!-- השורה האמיתית של הכפתורים -->
+            <TextView
+                android:id="@+id/filterText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filter events by:"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#777777"
+
+                android:background="@android:color/white"
+                android:padding="12dp" />
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

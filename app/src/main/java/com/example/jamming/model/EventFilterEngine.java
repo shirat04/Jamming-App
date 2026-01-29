@@ -7,10 +7,7 @@ import java.util.List;
 
 public class EventFilterEngine {
 
-    public static List<Event> filter(
-            List<Event> events,
-            EventFilter filter
-    ) {
+    public static List<Event> filter(List<Event> events, EventFilter filter) {
         if (filter == null) return events;
 
         List<Event> result = new ArrayList<>();
@@ -83,7 +80,19 @@ public class EventFilterEngine {
                 && available > eventFilter.getMaxAvailableSpots())
             return false;
 
+        // Event size (maximum capacity)
+        int capacity = event.getMaxCapacity();
+
+        if (eventFilter.getMinCapacity() != null
+                && capacity < eventFilter.getMinCapacity())
+            return false;
+
+        if (eventFilter.getMaxCapacity() != null
+                && capacity > eventFilter.getMaxCapacity())
+            return false;
+
         return true;
+
     }
 
     private static int minutesFromMidnight(long millis) {

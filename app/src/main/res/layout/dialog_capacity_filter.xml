@@ -5,13 +5,59 @@
     android:orientation="vertical"
     android:padding="20dp">
 
+    <!-- ===== Dialog Title ===== -->
+
+    <!-- ===== Available Seats ===== -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="כמות משתתפים רצויה"
+        android:text="Available seats"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:layout_marginBottom="12dp"/>
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+        <EditText
+            android:id="@+id/inputMaxAvailable"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Max"
+            android:inputType="number" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" to "
+            android:gravity="center" />
+
+        <EditText
+            android:id="@+id/inputMinAvailable"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Min"
+            android:inputType="number" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <!-- ===== Event Size ===== -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event size  - Maximum Spots"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,29 +65,26 @@
         android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/inputMinCapacity"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="מ־"
-            android:inputType="number"
-            android:imeOptions="actionNext"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="  עד  "
-            android:textSize="16sp"
-            android:gravity="center"/>
-
-        <EditText
             android:id="@+id/inputMaxCapacity"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="עד"
-            android:inputType="number"
-            android:imeOptions="actionDone"/>
+            android:hint="Max"
+            android:inputType="number" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" to "
+            android:gravity="center" />
+
+        <EditText
+            android:id="@+id/inputMinCapacity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Min"
+            android:inputType="number" />
 
     </LinearLayout>
 
