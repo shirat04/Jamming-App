@@ -7,7 +7,7 @@ import com.example.jamming.model.Event;
 import com.example.jamming.model.MusicGenre;
 import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.EventRepository;
-import com.example.jamming.view.EventField;
+import com.example.jamming.model.EventField;
 import com.google.android.gms.tasks.Task;
 
 import org.junit.Before;

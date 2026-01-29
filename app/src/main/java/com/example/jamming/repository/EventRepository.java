@@ -73,12 +73,6 @@ public class EventRepository {
                 .delete();
     }
 
-    // Increment reserved seats count
-    public Task<Void> incrementReserved(String eventId) {
-        return db.collection("events")
-                .document(eventId)
-                .update("reserved", FieldValue.increment(1));
-    }
     public Task<List<Event>> getActiveEvents() {
         return db.collection("events")
                 .whereEqualTo("active", true)

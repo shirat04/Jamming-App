@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.model.MusicGenre;
+import com.example.jamming.navigation.UserMenuHandler;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.viewmodel.MyEventUserViewModel;
 
@@ -97,7 +98,7 @@ public class MyEventUserActivity extends BaseActivity {
     private void addEventCard(String eventId, Event event) {
 
         View card = getLayoutInflater()
-                .inflate(R.layout.item_my_event_card, container, false);
+                .inflate(R.layout.activity_item_my_event_card, container, false);
 
         TextView title = card.findViewById(R.id.myEventTitle);
         TextView location = card.findViewById(R.id.myEventLocation);
@@ -115,8 +116,8 @@ public class MyEventUserActivity extends BaseActivity {
 
         if (genres != null && !genres.isEmpty()) {
             List<String> names = new ArrayList<>();
-            for (MusicGenre g : genres) {
-                names.add(g.getDisplayName());
+            for (MusicGenre musicGenre : genres) {
+                names.add(musicGenre.getDisplayName());
             }
             genre.setText(String.join(" , ", names));
         } else {

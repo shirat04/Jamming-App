@@ -3,21 +3,6 @@ package com.example.jamming.utils;
 import android.location.Location;
 
 public class GeoUtils {
-
-    // Calculates distance (in KM) between two coordinate pairs
-    public static double distanceInKm(
-            Location userLocation,
-            double lat2,
-            double lng2
-    ) {
-        return calculateDistanceKm(
-                userLocation.getLatitude(),
-                userLocation.getLongitude(),
-                lat2,
-                lng2
-        );
-    }
-
     public static double calculateDistanceKm(
             double lat1,
             double lng1,

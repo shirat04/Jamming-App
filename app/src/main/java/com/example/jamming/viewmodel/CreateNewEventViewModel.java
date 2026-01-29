@@ -8,7 +8,7 @@ import com.example.jamming.model.MusicGenre;
 import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.utils.DateUtils;
-import com.example.jamming.view.EventField;
+import com.example.jamming.model.EventField;
 
 import java.util.ArrayList;
 import java.util.Calendar;

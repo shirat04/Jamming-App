@@ -14,6 +14,16 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.function.Consumer;
 
+
+/**
+ * Abstract base activity for screens that use Google Maps.
+
+ * Handles common map setup such as UI configuration,
+ * location permission handling, and fetching the user's
+ * last known location.
+
+ * Subclasses implement onMapReadyCustom() for screen-specific logic.
+ */
 public abstract class BaseMapActivity extends BaseActivity
         implements OnMapReadyCallback {
 

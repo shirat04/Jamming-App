@@ -1,4 +1,4 @@
-package com.example.jamming.view;
+package com.example.jamming.navigation;
 
 import android.content.Intent;
 
@@ -6,6 +6,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.jamming.R;
 import com.example.jamming.repository.AuthRepository;
+import com.example.jamming.view.ExploreEventsActivity;
+import com.example.jamming.view.LoginActivity;
+import com.example.jamming.view.MyEventUserActivity;
+import com.example.jamming.view.NotificationsUserActivity;
+import com.example.jamming.view.UserProfileActivity;
 
 public class UserMenuHandler {
 
@@ -25,10 +30,10 @@ public class UserMenuHandler {
             }
             return true;
         }
-        if (itemId == R.id.menu_preferences) {
-            if (!(activity instanceof ProfilePreferencesActivity)) {
+        if (itemId == R.id.menu_profile) {
+            if (!(activity instanceof UserProfileActivity)) {
                 activity.startActivity(
-                        new Intent(activity, ProfilePreferencesActivity.class)
+                        new Intent(activity, UserProfileActivity.class)
                 );
             }
             return true;

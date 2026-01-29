@@ -16,13 +16,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Jamming">
         <activity
-            android:name=".view.EditProfileUserActivity"
-            android:exported="false" />
-        <activity
             android:name=".view.MapPickerActivity"
             android:exported="false" />
         <activity
-            android:name=".view.UpdateOwnerDetailsActivity"
+            android:name=".view.UpdateOwnerProfileActivity"
             android:exported="false" />
         <activity
             android:name=".view.EditEventActivity"
@@ -40,7 +37,7 @@
             android:name=".view.MyEventUserActivity"
             android:exported="false" />
         <activity
-            android:name=".view.ProfilePreferencesActivity"
+            android:name=".view.UserProfileActivity"
             android:exported="false" />
         <activity
             android:name=".view.EventDetailActivity"
@@ -50,6 +47,9 @@
             android:exported="false" />
         <activity
             android:name=".view.ExploreEventsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.OwnerProfileActivity"
             android:exported="false" />
         <activity
             android:name=".view.OwnerActivity"

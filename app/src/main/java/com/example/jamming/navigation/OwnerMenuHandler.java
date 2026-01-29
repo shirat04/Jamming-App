@@ -1,4 +1,4 @@
-package com.example.jamming.view;
+package com.example.jamming.navigation;
 
 import android.content.Intent;
 
@@ -6,6 +6,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.jamming.R;
 import com.example.jamming.repository.AuthRepository;
+import com.example.jamming.view.CreateNewEventActivity;
+import com.example.jamming.view.LoginActivity;
+import com.example.jamming.view.NotificationsOwnerActivity;
+import com.example.jamming.view.OwnerActivity;
+import com.example.jamming.view.OwnerProfileActivity;
 
 public class OwnerMenuHandler {
     private final AppCompatActivity activity;
@@ -27,9 +32,9 @@ public class OwnerMenuHandler {
         }
 
         if (id == R.id.menu_profile) {
-            if (!(activity instanceof UpdateOwnerDetailsActivity)) {
+            if (!(activity instanceof OwnerProfileActivity)) {
                 activity.startActivity(
-                        new Intent(activity, UpdateOwnerDetailsActivity.class)
+                        new Intent(activity, OwnerProfileActivity.class)
                 );
                 return true;
             }

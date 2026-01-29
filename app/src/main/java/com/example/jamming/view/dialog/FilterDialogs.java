@@ -159,7 +159,7 @@ public class FilterDialogs {
             CapacityCombinedCallback callback
     ) {
         View v = LayoutInflater.from(ctx)
-                .inflate(R.layout.dialog_capacity_filter, null);
+                .inflate(R.layout.activity_dialog_capacity_filter, null);
 
         EditText minAvail = v.findViewById(R.id.inputMinAvailable);
         EditText maxAvail = v.findViewById(R.id.inputMaxAvailable);
@@ -224,7 +224,7 @@ public class FilterDialogs {
             return;
         }
 
-        View v = LayoutInflater.from(ctx).inflate(R.layout.dialog_distance_filter, null);
+        View v = LayoutInflater.from(ctx).inflate(R.layout.activity_dialog_distance_filter, null);
         Slider slider = v.findViewById(R.id.radiusSlider);
         TextView label = v.findViewById(R.id.radiusLabel);
 

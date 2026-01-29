@@ -2,14 +2,11 @@ package com.example.jamming.view;
 
 import android.content.Intent;
 import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
-
 import com.example.jamming.R;
 import com.example.jamming.utils.AddressUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -17,11 +14,14 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
 
+/**
+ * Activity that allows the user to pick a location on a Google Map.
+
+ * The user can search for a place or select a point on the map.
+ * A validated address and coordinates are returned to the caller.
+ */
 public class MapPickerActivity extends BaseMapActivity {
 
     private double selectedLat = Double.NaN;
@@ -35,7 +35,7 @@ public class MapPickerActivity extends BaseMapActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map_picker);
+        setContentView(R.layout.activity_map_user);
 
         etSearchLocation = findViewById(R.id.etSearchLocation);
         btnSearch = findViewById(R.id.btnSearch);
@@ -67,11 +67,7 @@ public class MapPickerActivity extends BaseMapActivity {
 
     @Override
     protected void onMapReadyCustom() {
-        Log.d("MAP_DEBUG", "Map is ready, type NORMAL");
-
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        Log.d("MAP_DEBUG", "Map is ready, type NORMAL");
-
         enableMyLocationSafe();
 
         fetchLastLocation(location -> {
@@ -104,38 +100,30 @@ public class MapPickerActivity extends BaseMapActivity {
             selectedLat = latLng.latitude;
             selectedLng = latLng.longitude;
 
-            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
             try {
-                List<Address> addresses =
-                        geocoder.getFromLocation(selectedLat, selectedLng, 1);
+                Address addr = AddressUtils.getAddressFromLatLng(
+                        this, selectedLat, selectedLng
+                );
 
-                if (addresses != null && !addresses.isEmpty()) {
-                    Address adder = addresses.get(0);
-
-                    String street = adder.getThoroughfare();
-                    String house  = adder.getSubThoroughfare();
-                    String city   = adder.getLocality();
-
-                    boolean hasStreet = street != null && !street.trim().isEmpty();
-                    boolean hasHouse  = house  != null && !house.trim().isEmpty();
-                    boolean hasCity   = city   != null && !city.trim().isEmpty();
-
-                    if (hasStreet && hasHouse && hasCity) {
-                        selectedAddress = street + " " + house + ", " + city;   // כתובת מלאה
-                    } else if (hasStreet && hasCity) {
-                        selectedAddress = street + ", " + city;                 // בלי מספר בית
-                    } else {
-                        selectedAddress = "";
-                        Toast.makeText(this, "לא ניתן לזהות כתובת. נסי לבחור נקודה מדויקת יותר", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                } else {
+                if (!AddressUtils.hasStreetAndCity(addr)) {
                     selectedAddress = "";
-                    Toast.makeText(this, "לא ניתן לזהות כתובת. נסי לבחור נקודה מדויקת יותר", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(
+                            this,
+                            "לא ניתן לזהות כתובת. נסי לבחור נקודה מדויקת יותר",
+                            Toast.LENGTH_SHORT
+                    ).show();
+                    return;
                 }
+
+                selectedAddress = AddressUtils.formatAddress(addr);
+
             } catch (IOException e) {
                 selectedAddress = "";
-                Toast.makeText(this, "שגיאה בזיהוי כתובת. נסי שוב", Toast.LENGTH_SHORT).show();
+                Toast.makeText(
+                        this,
+                        "שגיאה בזיהוי כתובת. נסי שוב",
+                        Toast.LENGTH_SHORT
+                ).show();
             }
         });
     }
@@ -162,42 +150,31 @@ public class MapPickerActivity extends BaseMapActivity {
     }
 
     private void searchLocationOnMap(String query) {
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         try {
-            List<Address> results = geocoder.getFromLocationName(query, 1);
+            Address address =
+                    AddressUtils.getAddressFromQuery(this, query);
 
-            if (results != null && !results.isEmpty()) {
-                Address address = results.get(0);
-
-                String street = address.getThoroughfare();
-                String house = address.getSubThoroughfare();
-                boolean missingStreet = (street == null || street.trim().isEmpty());
-                boolean missingHouse  = (house == null  || house.trim().isEmpty());
-
-                if (missingStreet || missingHouse) {
-                    Toast.makeText(
-                            this,
-                            "הכתובת לא נמצאה במדויק. נא לבחור נקודה ידנית במפה",
-                            Toast.LENGTH_LONG
-                    ).show();
-                    return;
-                }
-
-                LatLng latLng = new LatLng(
-                        address.getLatitude(),
-                        address.getLongitude()
-                );
-
-                mMap.clear();
-                mMap.addMarker(new MarkerOptions().position(latLng));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
-
-                selectedLat = latLng.latitude;
-                selectedLng = latLng.longitude;
-                selectedAddress = AddressUtils.formatAddress(address);
-            } else {
-                Toast.makeText(this, "לא נמצאה תוצאה", Toast.LENGTH_SHORT).show();
+            if (!AddressUtils.hasStreetAndCity(address)) {
+                Toast.makeText(
+                        this,
+                        "הכתובת לא נמצאה במדויק. נא לבחור נקודה ידנית במפה",
+                        Toast.LENGTH_LONG
+                ).show();
+                return;
             }
+
+            LatLng latLng = new LatLng(
+                    address.getLatitude(),
+                    address.getLongitude()
+            );
+
+            mMap.clear();
+            mMap.addMarker(new MarkerOptions().position(latLng));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+
+            selectedLat = latLng.latitude;
+            selectedLng = latLng.longitude;
+            selectedAddress = AddressUtils.formatAddress(address);
 
         } catch (IOException e) {
             Toast.makeText(this, "שגיאה בחיפוש", Toast.LENGTH_SHORT).show();

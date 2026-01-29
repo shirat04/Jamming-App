@@ -1,5 +1,4 @@
 package com.example.jamming.view;// קובץ: EventDetailActivity.java
-import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -8,20 +7,16 @@ import android.widget.TextView;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.model.MusicGenre;
+import com.example.jamming.navigation.UserMenuHandler;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.viewmodel.EventDetailViewModel;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FieldValue;
-import java.text.DateFormat;
+
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class EventDetailActivity extends BaseActivity  {

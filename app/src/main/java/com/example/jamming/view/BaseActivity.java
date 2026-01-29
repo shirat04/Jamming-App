@@ -1,15 +1,9 @@
 package com.example.jamming.view;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
-import android.content.Intent;
-import android.view.Gravity;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,7 +12,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.jamming.R;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.auth.FirebaseAuth;
 
 public abstract class BaseActivity extends AppCompatActivity {
     protected DrawerLayout drawerLayout;
@@ -31,7 +24,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
 
     protected void setupBase(int menuRes, int contentLayout) {
-        setContentView(R.layout.activity_base);
+        setContentView(R.layout.activity_base_menu);
 
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);

@@ -1,4 +1,4 @@
-package com.example.jamming.view;
+package com.example.jamming.model;
 
 public enum EventField {
     TITLE,

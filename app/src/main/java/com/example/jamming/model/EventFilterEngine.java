@@ -1,11 +1,14 @@
 package com.example.jamming.model;
 
+import com.example.jamming.utils.DateUtils;
 import com.example.jamming.utils.GeoUtils;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 public class EventFilterEngine {
+
+
 
     public static List<Event> filter(List<Event> events, EventFilter filter) {
         if (filter == null) return events;
@@ -44,7 +47,7 @@ public class EventFilterEngine {
             if (!match) return false;
         }
 
-        // 📍 Location
+        // Location
         if (eventFilter.getRadiusKm() != null) {
             double dist = GeoUtils.calculateDistanceKm(
                     eventFilter.getCenterLat(),
@@ -55,21 +58,21 @@ public class EventFilterEngine {
             if (dist > eventFilter.getRadiusKm()) return false;
         }
 
-        // 📅 Date range
+        // Date range
         if (eventFilter.getStartDateMillis() != null && eventFilter.getEndDateMillis() != null) {
             long t = event.getDateTime();
             if (t < eventFilter.getStartDateMillis() || t > eventFilter.getEndDateMillis())
                 return false;
         }
 
-        // ⏰ Time range
+        // Time range
         if (eventFilter.getStartMinute() != null && eventFilter.getEndMinute() != null) {
-            int minutes = minutesFromMidnight(event.getDateTime());
+            int minutes = DateUtils.minutesFromMidnight(event.getDateTime());
             if (minutes < eventFilter.getStartMinute() || minutes > eventFilter.getEndMinute())
                 return false;
         }
 
-        // 👥 Available spots
+        // Available spots
         int available = event.getAvailableSpots();
 
         if (eventFilter.getMinAvailableSpots() != null
@@ -95,10 +98,5 @@ public class EventFilterEngine {
 
     }
 
-    private static int minutesFromMidnight(long millis) {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(millis);
-        return c.get(Calendar.HOUR_OF_DAY) * 60
-                + c.get(Calendar.MINUTE);
-    }
+
 }
