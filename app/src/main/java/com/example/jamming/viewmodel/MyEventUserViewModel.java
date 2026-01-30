@@ -62,7 +62,7 @@ public class MyEventUserViewModel extends ViewModel {
         userRepository.getRegisteredEvents(uid)
                 .addOnSuccessListener(ids -> {
                     if (ids == null || ids.isEmpty()) {
-                        emptyMessage.postValue("עוד לא נרשמת לאירועים 🙂");
+                        emptyMessage.postValue("You haven't registered for events yet.");
                         myEvents.postValue(new ArrayList<>());
                         return;
                     }
@@ -77,18 +77,28 @@ public class MyEventUserViewModel extends ViewModel {
     private void loadEventsByIds(List<String> ids) {
         List<EventWithId> result = new ArrayList<>();
 
+        int totalChunks = (int) Math.ceil(ids.size() / 10.0);
+        MutableLiveData<Integer> completedChunks = new MutableLiveData<>(0);
+
         for (int i = 0; i < ids.size(); i += 10) {
             List<String> chunk = ids.subList(i, Math.min(i + 10, ids.size()));
 
             eventRepository.getEventsByIds(chunk)
                     .addOnSuccessListener(snapshot -> {
-                        snapshot.getDocuments().forEach(doc -> {
+                        for (var doc : snapshot.getDocuments()) {
                             Event event = doc.toObject(Event.class);
                             if (event != null) {
                                 result.add(new EventWithId(doc.getId(), event));
                             }
-                        });
-                        myEvents.postValue(sortEventsLogically(result));
+                        }
+
+                        Integer current = completedChunks.getValue();
+                        int done = (current != null ? current : 0) + 1;
+                        completedChunks.setValue(done);
+
+                        if (done == totalChunks) {
+                            myEvents.postValue(sortEventsLogically(result));
+                        }
                     })
                     .addOnFailureListener(e ->
                             errorMessage.postValue("שגיאה בטעינת אירועים")
