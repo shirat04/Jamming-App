@@ -25,12 +25,12 @@ import java.util.Calendar;
 public class EditEventActivity extends BaseActivity {
 
     private EditText etTitle, etDescription, etLocation, etDate, etTime, etCapacity;
-    private TextView genreText;
-    private Button btnSave, btnDelete;
+    private TextView genreText, cancelText;
+    private Button btnSave;
     private ImageButton btnMap;
 
     private EditEventViewModel viewModel;
-    private Calendar c;
+    private Calendar calendar;
     private OwnerMenuHandler menuHandler;
 
 
@@ -61,7 +61,7 @@ public class EditEventActivity extends BaseActivity {
         viewModel = new ViewModelProvider(this).get(EditEventViewModel.class);
         String eventId = getIntent().getStringExtra("EVENT_ID");
         viewModel.init(eventId);
-        c = viewModel.getDateTime();
+        calendar = viewModel.getDateTime();
         menuHandler = new OwnerMenuHandler(this);
 
 
@@ -79,7 +79,7 @@ public class EditEventActivity extends BaseActivity {
         etCapacity = findViewById(R.id.etEventCapacity);
         genreText = findViewById(R.id.selectGenreText);
         btnSave = findViewById(R.id.btnSaveEvent);
-        btnDelete = findViewById(R.id.btnDeleteEvent);
+        cancelText = findViewById(R.id.btnCancelEvent);
         btnMap = findViewById(R.id.btnOpenMap);
     }
 
@@ -195,7 +195,7 @@ public class EditEventActivity extends BaseActivity {
         );
 
         btnSave.setOnClickListener(v -> viewModel.saveChanges());
-        btnDelete.setOnClickListener(v -> viewModel.deleteEvent());
+        cancelText.setOnClickListener(v -> finish());
 
         genreText.setOnClickListener(v -> openGenreDialog());
     }
@@ -226,9 +226,9 @@ public class EditEventActivity extends BaseActivity {
                 (view, y, m, d) -> {
                     viewModel.setDate(y, m, d);
                 },
-                c.get(Calendar.YEAR),
-                c.get(Calendar.MONTH),
-                c.get(Calendar.DAY_OF_MONTH)
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
         ).show();
     }
 
@@ -238,8 +238,8 @@ public class EditEventActivity extends BaseActivity {
                     viewModel.setTime(h, m);
                     etTime.setError(null);
                 },
-                c.get(Calendar.HOUR_OF_DAY),
-                c.get(Calendar.MINUTE),
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
                 true
         ).show();
     }

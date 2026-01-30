@@ -136,21 +136,19 @@
                 android:text="@string/save_changes"
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp"
-                android:backgroundTint="#1E63E9"
                 android:textColor="@android:color/white"
                 tools:ignore="VisualLintButtonSize" />
 
-
-            <!-- DELETE BUTTON -->
-            <Button
-                android:id="@+id/btnDeleteEvent"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="@string/delete_event"
+            <TextView
+                android:id="@+id/btnCancelEvent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel"
                 android:textStyle="bold"
-                android:backgroundTint="#E53935"
-                android:textColor="@android:color/white"
-                tools:ignore="VisualLintButtonSize" />
+                android:layout_gravity="center_horizontal"
+                android:textColor="#0B375E"
+                android:textSize="18sp"/>
+
         </LinearLayout>
     </ScrollView>
 

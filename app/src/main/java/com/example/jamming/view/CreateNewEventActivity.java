@@ -78,7 +78,7 @@ public class CreateNewEventActivity extends BaseActivity {
         timeInput = findViewById(R.id.timeInput);
         genreText = findViewById(R.id.genreSpinner);
         publishBtn = findViewById(R.id.publishEventBtn);
-        cancelBtn = findViewById(R.id.cancelBtn);
+        cancelBtn = findViewById(R.id.cancelText);
         mapButton = findViewById(R.id.mapButton);
     }
 
@@ -92,6 +92,7 @@ public class CreateNewEventActivity extends BaseActivity {
                 timeInput.setError(null);
                 capacityInput.setError(null);
                 genreText.setError(null);
+                descriptionInput.setError(null);
                 return;
             }
 
@@ -125,6 +126,11 @@ public class CreateNewEventActivity extends BaseActivity {
                     capacityInput.setError("קיבולת לא תקינה");
                     capacityInput.requestFocus();
                     break;
+                case DESCRIPTION:
+                    descriptionInput.setError("נא להזין תיאור לאירוע");
+                    descriptionInput.requestFocus();
+                    break;
+
 
             }
         });
@@ -207,6 +213,12 @@ public class CreateNewEventActivity extends BaseActivity {
         capacityInput.addTextChangedListener(new SimpleTextWatcher(() ->
                 capacityInput.setError(null)
         ));
+        descriptionInput.addTextChangedListener(
+                new SimpleTextWatcher(() ->
+                        descriptionInput.setError(null)
+                )
+        );
+
         genreText.setOnClickListener(v -> openGenreDialog());
 
 

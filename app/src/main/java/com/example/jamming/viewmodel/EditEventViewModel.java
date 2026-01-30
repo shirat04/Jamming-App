@@ -197,6 +197,14 @@ public class EditEventViewModel extends ViewModel {
         if (address == null || address.trim().isEmpty()) { errorField.setValue(EventField.LOCATION); return; }
         if (!isDateSet) { errorField.setValue(EventField.DATE); return; }
         if (!isTimeSet) { errorField.setValue(EventField.TIME); return; }
+        long now = System.currentTimeMillis();
+        long selectedTime = dateTime.getTimeInMillis();
+
+        if (selectedTime <= now) {
+            errorField.setValue(EventField.TIME);
+            errorMessage.setValue("An event cannot be updated for a time that has already passed.");
+            return;
+        }
 
         int cap;
         try {

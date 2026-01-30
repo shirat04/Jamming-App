@@ -158,7 +158,7 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/cancelBtn"
+                android:id="@+id/cancelText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/cancel"

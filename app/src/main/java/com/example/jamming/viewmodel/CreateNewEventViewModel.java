@@ -136,6 +136,15 @@ public class CreateNewEventViewModel extends ViewModel {
             return;
         }
 
+        long now = System.currentTimeMillis();
+        long selectedTime = dateTime.getTimeInMillis();
+
+        if (selectedTime <= now) {
+            errorField.setValue(EventField.TIME);
+            toastMessage.setValue("Cannot create an event for a time that has already passed.");
+            return;
+        }
+
         if (genres.isEmpty()) {
             errorField.setValue(EventField.GENRE);
             return;
@@ -147,6 +156,11 @@ public class CreateNewEventViewModel extends ViewModel {
             if (cap <= 0) throw new NumberFormatException();
         } catch (Exception e) {
             errorField.setValue(EventField.CAPACITY);
+            return;
+        }
+
+        if (description == null || description.trim().isEmpty()) {
+            errorField.setValue(EventField.DESCRIPTION);
             return;
         }
 
