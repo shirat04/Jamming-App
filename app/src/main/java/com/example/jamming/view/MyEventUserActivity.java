@@ -83,7 +83,7 @@ public class MyEventUserActivity extends BaseActivity {
 
         viewModel.getCancelSuccess().observe(this, success -> {
             if (success != null && success) {
-                Toast.makeText(this, "ההרשמה בוטלה", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Registration canceled", Toast.LENGTH_SHORT).show();
                 viewModel.resetCancelSuccess();
             }
         });
@@ -95,6 +95,18 @@ public class MyEventUserActivity extends BaseActivity {
         });
     }
 
+    private void showCancelRegistrationDialog(String eventId) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Cancel Registration")
+                .setMessage("Are you sure you want to cancel your registration for this event?")
+                .setPositiveButton("Yes, cancel", (dialog, which) -> {
+                    viewModel.cancelRegistration(eventId);
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
+    }
     private void addEventCard(String eventId, Event event) {
 
         View card = getLayoutInflater()
@@ -123,7 +135,7 @@ public class MyEventUserActivity extends BaseActivity {
         } else {
             genre.setText("No genre");
         }
-        String capacityText = event.getReserved() + " / " + event.getMaxCapacity() + " משתתפים";
+        String capacityText = " Participants: " + event.getReserved() + " / " + event.getMaxCapacity();
         capacity.setText(capacityText);
 
         String dateTimeText = DateUtils.formatOnlyDate(event.getDateTime()) +
@@ -131,9 +143,7 @@ public class MyEventUserActivity extends BaseActivity {
         date.setText(dateTimeText);
 
 
-        cancelBtn.setOnClickListener(v ->
-                viewModel.cancelRegistration(eventId)
-        );
+        cancelBtn.setOnClickListener(v -> showCancelRegistrationDialog(eventId));
 
         detailsBtn.setOnClickListener(v -> {
             Intent i = new Intent(this, EventDetailActivity.class);

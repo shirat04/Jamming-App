@@ -163,7 +163,7 @@ public class EventDetailActivity extends BaseActivity  {
 
         eventDescription.setText(event.getDescription());
 
-        String capacity = event.getReserved() + " / " + event.getMaxCapacity() + " משתתפים";
+        String capacity = " Participants: " + event.getReserved() + " / " + event.getMaxCapacity() ;
         capacityEvent.setText(capacity);
 
         List<MusicGenre> genres = event.getMusicGenresEnum();

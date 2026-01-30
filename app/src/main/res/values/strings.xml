@@ -174,7 +174,7 @@
         <item>Open Mic</item>
     </string-array>
 
-    <string name="participants_format">%1$d/%2$d משתתפים</string>
+    <string name="participants_format">Participants: %1$d / %2$d</string>
 
     <string name="hello_user">Hello %1$s</string>
     <string name="event_details">Event Details</string>
