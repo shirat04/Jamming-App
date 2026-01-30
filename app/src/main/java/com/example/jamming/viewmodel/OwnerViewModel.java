@@ -70,6 +70,15 @@ public class OwnerViewModel extends ViewModel {
                             upcoming.add(wrapped);
                         }
                     }
+                    upcoming.sort((a, b) ->
+                            Long.compare(a.event.getDateTime(), b.event.getDateTime())
+                    );
+
+                    past.sort((a, b) ->
+                            Long.compare(b.event.getDateTime(), a.event.getDateTime())
+                    );
+
+
                     upcomingEvents.setValue(upcoming);
                     pastEvents.setValue(past);
                 })

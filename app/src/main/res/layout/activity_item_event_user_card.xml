@@ -29,7 +29,7 @@
             android:id="@+id/eventStatusLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="EVENT HAS ENDED"
+            android:text="THIS EVENT HAS ENDED"
             android:textStyle="bold"
             android:textColor="#B00020"
             android:background="#33B00020"

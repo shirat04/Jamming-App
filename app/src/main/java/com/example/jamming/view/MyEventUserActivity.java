@@ -124,7 +124,7 @@ public class MyEventUserActivity extends BaseActivity {
         boolean isPast = wrapper.isPast;
 
         View card = getLayoutInflater()
-                .inflate(R.layout.activity_item_my_event_card, container, false);
+                .inflate(R.layout.activity_item_event_user_card, container, false);
 
         TextView title = card.findViewById(R.id.myEventTitle);
         TextView location = card.findViewById(R.id.myEventLocation);
