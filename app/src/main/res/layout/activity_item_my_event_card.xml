@@ -25,6 +25,20 @@
             android:textStyle="bold"
             android:textColor="@color/black"/>
 
+        <TextView
+            android:id="@+id/eventStatusLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="EVENT HAS ENDED"
+            android:textStyle="bold"
+            android:textColor="#B00020"
+            android:background="#33B00020"
+            android:padding="6dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="6dp"
+            android:visibility="gone"/>
+
+
         <!-- מיקום -->
         <LinearLayout
             android:layout_width="match_parent"

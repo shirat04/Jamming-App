@@ -67,7 +67,7 @@ public class MyEventUserActivity extends BaseActivity {
             container.setVisibility(View.VISIBLE);
 
             for (MyEventUserViewModel.EventWithId e : events) {
-                addEventCard(e.id, e.event);
+                addEventCard(e);
             }
         });
 
@@ -107,7 +107,21 @@ public class MyEventUserActivity extends BaseActivity {
                 })
                 .show();
     }
-    private void addEventCard(String eventId, Event event) {
+
+    private void showRemoveEventDialog(String eventId) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Remove event")
+                .setMessage("This event has already ended.\nDo you want to remove it from your list?")
+                .setPositiveButton("Yes, remove", (dialog, which) -> {
+                    viewModel.removeEventFromMyList(eventId);
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void addEventCard(MyEventUserViewModel.EventWithId wrapper) {
+        Event event = wrapper.event;
+        boolean isPast = wrapper.isPast;
 
         View card = getLayoutInflater()
                 .inflate(R.layout.activity_item_my_event_card, container, false);
@@ -117,6 +131,8 @@ public class MyEventUserActivity extends BaseActivity {
         TextView date = card.findViewById(R.id.myEventDate);
         TextView genre = card.findViewById(R.id.myEventGenre);
         TextView capacity = card.findViewById(R.id.myEventCapacity);
+        TextView statusLabel = card.findViewById(R.id.eventStatusLabel);
+
 
         Button cancelBtn = card.findViewById(R.id.btnCancelMyEvent);
         Button detailsBtn = card.findViewById(R.id.btnMyEventDetails);
@@ -125,6 +141,11 @@ public class MyEventUserActivity extends BaseActivity {
         location.setText(event.getAddress());
 
         List<MusicGenre> genres = event.getMusicGenresEnum();
+        if (isPast) {
+            statusLabel.setVisibility(View.VISIBLE);
+            card.setAlpha(0.75f);
+        }
+
 
         if (genres != null && !genres.isEmpty()) {
             List<String> names = new ArrayList<>();
@@ -143,11 +164,22 @@ public class MyEventUserActivity extends BaseActivity {
         date.setText(dateTimeText);
 
 
-        cancelBtn.setOnClickListener(v -> showCancelRegistrationDialog(eventId));
+        if (isPast) {
+            cancelBtn.setText("Remove");
+            cancelBtn.setOnClickListener(v ->
+                    showRemoveEventDialog(wrapper.id)
+            );
+
+        } else {
+            cancelBtn.setText("Cancel registration");
+            cancelBtn.setOnClickListener(v ->
+                    showCancelRegistrationDialog(wrapper.id)
+            );
+        }
 
         detailsBtn.setOnClickListener(v -> {
             Intent i = new Intent(this, EventDetailActivity.class);
-            i.putExtra("EVENT_ID", eventId);
+            i.putExtra("EVENT_ID", wrapper.id);
             startActivity(i);
         });
 

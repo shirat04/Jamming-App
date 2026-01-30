@@ -13,10 +13,7 @@ import com.example.jamming.model.EventFilterEngine;
 import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.repository.UserRepository;
-import com.example.jamming.utils.GeoUtils;
-
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class ExploreEventsViewModel extends ViewModel {

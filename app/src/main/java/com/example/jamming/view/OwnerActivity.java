@@ -1,6 +1,5 @@
 package com.example.jamming.view;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -50,6 +49,10 @@ public class OwnerActivity extends BaseActivity {
             return handled;
         });
 
+        findViewById(R.id.btnPastEvents).setOnClickListener(v ->
+                startActivity(new Intent(this, OwnerPastEventsActivity.class))
+        );
+
         createEventBtn.setOnClickListener(v ->
                 startActivity(new Intent(this, CreateNewEventActivity.class))
         );
@@ -67,8 +70,9 @@ public class OwnerActivity extends BaseActivity {
                 setTitleText(getString(R.string.hello_user, name))
         );
 
-        viewModel.events.observe(this, events -> {
+        viewModel.upcomingEvents.observe(this, events -> {
             eventsContainer.removeAllViews();
+
             if (events == null || events.isEmpty()) {
                 emptyEventsText.setVisibility(View.VISIBLE);
             } else {
@@ -78,6 +82,7 @@ public class OwnerActivity extends BaseActivity {
                 }
             }
         });
+
 
         viewModel.message.observe(this, msg ->
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()

@@ -31,10 +31,12 @@ public class EditEventViewModel extends ViewModel {
     private final MutableLiveData<String> timeText = new MutableLiveData<>("");
     private final MutableLiveData<String> capacityText = new MutableLiveData<>("");
     private final MutableLiveData<String> genresText = new MutableLiveData<>("");
+    private final MutableLiveData<Boolean> editingAllowed = new MutableLiveData<>(true);
 
     private final MutableLiveData<EventField> errorField = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<String> successMessage = new MutableLiveData<>();
+    public LiveData<Boolean> getEditingAllowed() {return editingAllowed;}
     public LiveData<String> getSuccessMessage() { return successMessage; }
 
     private boolean isDateSet = false;
@@ -73,6 +75,10 @@ public class EditEventViewModel extends ViewModel {
                         return;
                     }
 
+                    if (event.getDateTime() < System.currentTimeMillis()) {
+                        editingAllowed.setValue(false);
+                        return;
+                    }
                     title.setValue(event.getName());
                     description.setValue(event.getDescription());
                     capacityText.setValue(String.valueOf(event.getMaxCapacity()));

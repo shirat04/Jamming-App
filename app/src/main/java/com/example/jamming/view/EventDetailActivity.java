@@ -83,33 +83,11 @@ public class EventDetailActivity extends BaseActivity  {
 
             displayEventData(event);
             contentLayout.setVisibility(View.VISIBLE);
-
-            boolean isFull = event.getReserved() >= event.getMaxCapacity();
-
-            if (isFull) {
-                registerBtn.setEnabled(false);
-                registerBtn.setText("The event is SOLD-OUT.");
-            } else {
-                registerBtn.setEnabled(true);
-                registerBtn.setText(getString(R.string.register_for_event));
-            }
         });
-
 
         viewModel.getErrorMessage().observe(this, msg -> {
             if (msg != null) {
                 Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-            }
-        });
-        viewModel.getIsAlreadyRegistered().observe(this, isRegistered -> {
-            if (isRegistered == null) return;
-
-            if (isRegistered) {
-                registerBtn.setEnabled(false);
-                cancelRegistrationBtn.setEnabled(true);
-            } else {
-                registerBtn.setEnabled(true);
-                cancelRegistrationBtn.setEnabled(false);
             }
         });
 
@@ -126,13 +104,28 @@ public class EventDetailActivity extends BaseActivity  {
             }
         });
 
-
         viewModel.getRegistrationSuccess().observe(this, success -> {
             if (success != null && success) {
                 Toast.makeText(this, "You're registered! 🎉", Toast.LENGTH_SHORT).show();
                 viewModel.resetRegistrationSuccess();
             }
         });
+
+        viewModel.getRegistrationUiState().observe(this, state -> {
+            if (state == null) return;
+
+            registerBtn.setEnabled(state.canRegister);
+            cancelRegistrationBtn.setEnabled(state.canCancel);
+            registerBtn.setText(state.registerButtonText);
+
+            cancelRegistrationBtn.setVisibility(View.VISIBLE);
+
+            if (!state.canRegister && !state.canCancel) {
+                cancelRegistrationBtn.setVisibility(View.GONE);
+            }
+        });
+
+
     }
 
     private void showCancelRegistrationDialog() {

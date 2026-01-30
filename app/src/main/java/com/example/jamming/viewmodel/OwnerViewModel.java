@@ -17,8 +17,9 @@ public class OwnerViewModel extends ViewModel {
     private final UserRepository userRepo = new UserRepository();
     public MutableLiveData<String> ownerName = new MutableLiveData<>();
 
-    public MutableLiveData<List<EventRepository.EventWithId>> events = new MutableLiveData<>();
     public MutableLiveData<String> message = new MutableLiveData<>();
+    public MutableLiveData<List<EventRepository.EventWithId>> upcomingEvents = new MutableLiveData<>();
+    public MutableLiveData<List<EventRepository.EventWithId>> pastEvents = new MutableLiveData<>();
 
     public void loadOwnerName() {
         String uid = authRepo.getCurrentUid();
@@ -51,14 +52,26 @@ public class OwnerViewModel extends ViewModel {
 
         eventRepo.getEventsByOwner(uid)
                 .addOnSuccessListener(query -> {
-                    List<EventRepository.EventWithId> list = new ArrayList<>();
+                    List<EventRepository.EventWithId> upcoming = new ArrayList<>();
+                    List<EventRepository.EventWithId> past = new ArrayList<>();
+
+                    long now = System.currentTimeMillis();
+
                     for (QueryDocumentSnapshot doc : query) {
-                        list.add(new EventRepository.EventWithId(
-                                doc.toObject(Event.class),
-                                doc.getId()
-                        ));
+                        Event e = doc.toObject(Event.class);
+                        if (e == null) continue;
+
+                        EventRepository.EventWithId wrapped =
+                                new EventRepository.EventWithId(e, doc.getId());
+
+                        if (e.getDateTime() < now) {
+                            past.add(wrapped);
+                        } else {
+                            upcoming.add(wrapped);
+                        }
                     }
-                    events.setValue(list);
+                    upcomingEvents.setValue(upcoming);
+                    pastEvents.setValue(past);
                 })
                 .addOnFailureListener(e ->
                         message.setValue("Failed to load events")
@@ -66,27 +79,14 @@ public class OwnerViewModel extends ViewModel {
     }
 
     public void deleteEvent(String eventId) {
-        List<EventRepository.EventWithId> current = events.getValue();
-        if (current == null) return;
-
-        List<EventRepository.EventWithId> backup = new ArrayList<>(current);
-
-        List<EventRepository.EventWithId> updated = new ArrayList<>();
-        for (EventRepository.EventWithId e : current) {
-            if (!e.id.equals(eventId)) {
-                updated.add(e);
-            }
-        }
-        events.setValue(updated);
-
         eventRepo.deleteEvent(eventId)
-                .addOnSuccessListener(v ->
-                        message.setValue("Event cancelled")
-                )
-                .addOnFailureListener(e -> {
-                    events.setValue(backup);
-                    message.setValue("Error cancelling event");
-                });
+                .addOnSuccessListener(v -> {
+                    message.setValue("Event deleted");
+                    loadOwnerEvents();
+                })
+                .addOnFailureListener(e ->
+                        message.setValue("Error deleting event")
+                );
     }
 
 

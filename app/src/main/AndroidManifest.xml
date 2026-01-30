@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Jamming">
         <activity
+            android:name=".view.OwnerPastEventsActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.MapPickerActivity"
             android:exported="false" />
         <activity

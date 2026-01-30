@@ -10,6 +10,9 @@
         android:id="@+id/menu_notifications"
         android:title="Notifications" />
     <item
+        android:id="@+id/menu_past_event"
+        android:title="Past Events" />
+    <item
         android:id="@+id/create_new_event"
         android:title="Create New Event" />
     <item

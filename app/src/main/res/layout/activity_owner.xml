@@ -5,19 +5,45 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- 🟠 Create Event Button -->
-    <Button
-        android:id="@+id/createEventButton"
+    <!-- 🔵 Buttons Row -->
+    <LinearLayout
+        android:id="@+id/topButtonsRow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/add_event"
-        android:textStyle="bold"
+        android:orientation="horizontal"
         android:layout_marginTop="20dp"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
+        android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 🟠 Create Event Button -->
+        <Button
+            android:id="@+id/createEventButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_event"
+            android:textStyle="bold"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:backgroundTint="@color/purple_500"
+            android:textColor="@android:color/white"/>
+
+        <Space
+            android:layout_width="12dp"
+            android:layout_height="wrap_content"/>
+
+        <!-- 🟢 Past Events Button -->
+        <Button
+            android:id="@+id/btnPastEvents"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Past Events"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:backgroundTint="@color/teal_700"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
 
     <!-- 🟣 My Events Title -->
     <TextView
@@ -28,7 +54,7 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@id/createEventButton"
+        app:layout_constraintTop_toBottomOf="@id/topButtonsRow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -62,7 +88,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"/>
-
         </LinearLayout>
     </ScrollView>
 

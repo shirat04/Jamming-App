@@ -86,5 +86,5 @@ public class Event {
         return maxCapacity - reserved;
     }
 
-    public boolean canRegister() {return isActive && !isFull();}
+    public boolean isPastEvent() {return getDateTime() < System.currentTimeMillis();}
 }

@@ -79,16 +79,26 @@ public class EventRepository {
                 .get()
                 .continueWith(task -> {
                     List<Event> list = new ArrayList<>();
+                    long now = System.currentTimeMillis();
+
                     for (DocumentSnapshot doc : task.getResult()) {
                         Event e = doc.toObject(Event.class);
-                        if (e != null) {
-                            e.setId(doc.getId());
-                            list.add(e);
+                        if (e == null) continue;
+
+                        e.setId(doc.getId());
+
+                        if (e.getDateTime() < now) {
+                            db.collection("events")
+                                    .document(e.getId())
+                                    .update("active", false);
+                            continue;
                         }
+                        list.add(e);
                     }
                     return list;
                 });
     }
+
 
     // Decrement reserved seats count
     public Task<Void> decrementReserved(String eventId) {

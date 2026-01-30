@@ -161,6 +161,14 @@ public class EditEventActivity extends BaseActivity {
             }
         });
 
+        viewModel.getEditingAllowed().observe(this, allowed -> {
+            if (allowed != null && !allowed) {
+                Toast.makeText(this, "Past events cannot be edited", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
+
+
     }
 
     private void setupListeners() {

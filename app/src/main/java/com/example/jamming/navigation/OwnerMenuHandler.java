@@ -10,6 +10,7 @@ import com.example.jamming.view.CreateNewEventActivity;
 import com.example.jamming.view.LoginActivity;
 import com.example.jamming.view.NotificationsOwnerActivity;
 import com.example.jamming.view.OwnerActivity;
+import com.example.jamming.view.OwnerPastEventsActivity;
 import com.example.jamming.view.OwnerProfileActivity;
 
 public class OwnerMenuHandler {
@@ -35,6 +36,14 @@ public class OwnerMenuHandler {
             if (!(activity instanceof OwnerProfileActivity)) {
                 activity.startActivity(
                         new Intent(activity, OwnerProfileActivity.class)
+                );
+                return true;
+            }
+        }
+        if (id == R.id.menu_past_event) {
+            if (!(activity instanceof OwnerPastEventsActivity)) {
+                activity.startActivity(
+                        new Intent(activity, OwnerPastEventsActivity.class)
                 );
                 return true;
             }

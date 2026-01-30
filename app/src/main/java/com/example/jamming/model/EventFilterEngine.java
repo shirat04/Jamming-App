@@ -24,9 +24,14 @@ public class EventFilterEngine {
 
     private static boolean matches(Event event, EventFilter eventFilter) {
 
-        if (!event.isActive() || !event.canRegister()) {
+        if (!event.isActive()) {
             return false;
         }
+        long now = System.currentTimeMillis();
+        if (event.getDateTime() < now) {
+            return false;
+        }
+
 
         //  Music types
         if (!eventFilter.getMusicTypes().isEmpty()) {

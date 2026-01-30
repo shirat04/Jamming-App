@@ -3,12 +3,12 @@ package com.example.jamming.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import com.example.jamming.model.Event;
 import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.repository.UserRepository;
-
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,14 +39,16 @@ public class MyEventUserViewModel extends ViewModel {
         return errorMessage;
     }
 
-    // עטיפה קטנה לאירוע + id
     public static class EventWithId {
         public final String id;
         public final Event event;
+        public final boolean isPast;
+
 
         public EventWithId(String id, Event event) {
             this.id = id;
             this.event = event;
+            this.isPast = event.getDateTime() < System.currentTimeMillis();
         }
     }
 
@@ -86,7 +88,7 @@ public class MyEventUserViewModel extends ViewModel {
                                 result.add(new EventWithId(doc.getId(), event));
                             }
                         });
-                        myEvents.postValue(result);
+                        myEvents.postValue(sortEventsLogically(result));
                     })
                     .addOnFailureListener(e ->
                             errorMessage.postValue("שגיאה בטעינת אירועים")
@@ -109,6 +111,43 @@ public class MyEventUserViewModel extends ViewModel {
                 .addOnFailureListener(e ->
                         errorMessage.postValue("שגיאה בביטול הרשמה")
                 );
+    }
+
+    public void removeEventFromMyList(String eventId) {
+        String uid = authRepository.getCurrentUid();
+        if (uid == null) return;
+
+        userRepository.unregisterEventForUser(uid, eventId)
+                .addOnSuccessListener(v -> loadMyEvents())
+                .addOnFailureListener(e ->
+                        errorMessage.postValue("Failed to remove event")
+                );
+    }
+
+    private List<EventWithId> sortEventsLogically(List<EventWithId> events) {
+        long now = System.currentTimeMillis();
+
+        List<EventWithId> future = new ArrayList<>();
+        List<EventWithId> past = new ArrayList<>();
+
+        for (EventWithId e : events) {
+            if (e.event.getDateTime() >= now) {
+                future.add(e);
+            } else {
+                past.add(e);
+            }
+        }
+        future.sort(Comparator.comparingLong(e -> e.event.getDateTime()));
+
+        past.sort((a, b) ->
+                Long.compare(b.event.getDateTime(), a.event.getDateTime())
+        );
+
+        List<EventWithId> result = new ArrayList<>();
+        result.addAll(future);
+        result.addAll(past);
+
+        return result;
     }
 
     public void resetCancelSuccess() {
