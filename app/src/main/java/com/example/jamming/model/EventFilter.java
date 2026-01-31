@@ -1,12 +1,14 @@
 package com.example.jamming.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class EventFilter {
 
     // Selected music genres (no duplicates)
-    private Set<MusicGenre> musicTypes = new HashSet<>();
+    private List<MusicGenre> musicTypes = new ArrayList<>();
 
     // Location filter (center point + radius)
     private Double centerLat;
@@ -32,12 +34,12 @@ public class EventFilter {
     /* ===== Getters / Setters ===== */
 
     // Returns selected music genres
-    public Set<MusicGenre> getMusicTypes() {
+    public List<MusicGenre> getMusicTypes() {
         return musicTypes;
     }
 
     // Sets selected music genres
-    public void setMusicTypes(Set<MusicGenre> musicTypes) {
+    public void setMusicTypes(List<MusicGenre> musicTypes) {
         this.musicTypes = musicTypes;
     }
 
@@ -53,19 +55,21 @@ public class EventFilter {
     public Integer getRadiusKm() { return radiusKm; }
 
     // Sets allowed time range (in minutes)
-    public void setTimeRange(int startMinute, int endMinute) {
+    public void setTimeRange(Integer startMinute, Integer endMinute) {
         this.startMinute = startMinute;
         this.endMinute = endMinute;
     }
+
 
     public Integer getStartMinute() { return startMinute; }
     public Integer getEndMinute() { return endMinute; }
 
     // Sets allowed date range (timestamps)
-    public void setDateRange(long start, long end) {
+    public void setDateRange(Long start, Long end) {
         this.startDateMillis = start;
         this.endDateMillis = end;
     }
+
 
     public Long getStartDateMillis() { return startDateMillis; }
     public Long getEndDateMillis() { return endDateMillis; }

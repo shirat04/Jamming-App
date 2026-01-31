@@ -1,11 +1,9 @@
 package com.example.jamming.repository;
 
-import com.example.jamming.model.Event;
+import com.example.jamming.model.EventFilter;
 import com.example.jamming.model.User;
-import com.example.jamming.utils.GeoUtils;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -16,7 +14,15 @@ import java.util.Map;
 
 public class UserRepository {
 
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db;
+
+    public UserRepository() {
+        this.db = FirebaseFirestore.getInstance();
+    }
+
+    public UserRepository(FirebaseFirestore db) {
+        this.db = db;
+    }
 
     // Get user document by UID
     public Task<DocumentSnapshot> getUserById(String uid) {
@@ -49,6 +55,20 @@ public class UserRepository {
                 .document(uid)
                 .update(updates);
     }
+    public Task<EventFilter> getLastEventFilter(String uid) {
+        return getUserById(uid).continueWith(task -> {
+            if (!task.isSuccessful() || task.getResult() == null) {
+                return null;
+            }
+
+            User user = task.getResult().toObject(User.class);
+            return user != null ? user.getLastEventFilter() : null;
+        });
+    }
+    public void saveLastEventFilter(String uid, EventFilter filter) {
+        updateUserField(uid, "lastEventFilter", filter);
+    }
+
 
     // Add an event to the user's registered events list
     public Task<Void> registerEventForUser(String uid, String eventId) {

@@ -13,14 +13,11 @@ public class User {
     private String profileImageUrl;
     private List<String> registeredEventIds;
 
-    // העדפות - שדות רגילים
-    private int searchRadiusKm;
-    private List<String> favoriteMusicTypes;
     private boolean notificationsEnabled;
+    private EventFilter lastEventFilter;
+
     public User() {
         this.registeredEventIds = new ArrayList<>();
-        this.favoriteMusicTypes = new ArrayList<>();
-        this.searchRadiusKm = 10;
         this.notificationsEnabled = true;
     }
 
@@ -32,8 +29,6 @@ public class User {
         this.phone = phone;
         this.username = username;
         this.registeredEventIds = new ArrayList<>();
-        this.favoriteMusicTypes = new ArrayList<>();
-        this.searchRadiusKm = 10;
         this.notificationsEnabled = true;
     }
 
@@ -66,19 +61,18 @@ public class User {
         return registeredEventIds;
     }
 
-    public int getSearchRadiusKm() {
-        return searchRadiusKm;
+    public EventFilter getLastEventFilter() {
+        return lastEventFilter;
     }
 
-    public List<String> getFavoriteMusicTypes() {
-        return favoriteMusicTypes;
+    public void setLastEventFilter(EventFilter lastEventFilter) {
+        this.lastEventFilter = lastEventFilter;
     }
 
     public boolean isNotificationsEnabled() {
         return notificationsEnabled;
     }
 
-    // Setters - חובה ל-Firebase
     public void setFirebaseId(String id) {
         this.firebaseId = id;
     }
@@ -101,14 +95,6 @@ public class User {
 
     public void setRegisteredEventIds(List<String> registeredEventIds) {
         this.registeredEventIds = registeredEventIds;
-    }
-
-    public void setSearchRadiusKm(int searchRadiusKm) {
-        this.searchRadiusKm = searchRadiusKm;
-    }
-
-    public void setFavoriteMusicTypes(List<String> favoriteMusicTypes) {
-        this.favoriteMusicTypes = favoriteMusicTypes;
     }
 
     public void setNotificationsEnabled(boolean notificationsEnabled) {

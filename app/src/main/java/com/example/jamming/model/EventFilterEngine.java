@@ -70,12 +70,26 @@ public class EventFilterEngine {
                 return false;
         }
 
-        // Time range
+        // Time range (supports overnight ranges)
         if (eventFilter.getStartMinute() != null && eventFilter.getEndMinute() != null) {
             int minutes = DateUtils.minutesFromMidnight(event.getDateTime());
-            if (minutes < eventFilter.getStartMinute() || minutes > eventFilter.getEndMinute())
-                return false;
+
+            int start = eventFilter.getStartMinute();
+            int end   = eventFilter.getEndMinute();
+
+            boolean matchesTime;
+
+            if (start <= end) {
+                // Same-day range (e.g. 10:00–18:00)
+                matchesTime = minutes >= start && minutes <= end;
+            } else {
+                // Overnight range (e.g. 23:00–03:00)
+                matchesTime = minutes >= start || minutes <= end;
+            }
+
+            if (!matchesTime) return false;
         }
+
 
         // Available spots
         int available = event.getAvailableSpots();

@@ -26,8 +26,15 @@ public class EventRepository {
         }
     }
 
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db;
 
+    public EventRepository() {
+        this.db = FirebaseFirestore.getInstance();
+    }
+
+    public EventRepository(FirebaseFirestore db) {
+        this.db = db;
+    }
 
     // Create new event in Firestore
     public Task<Void> createEvent(Event event) {
@@ -113,8 +120,6 @@ public class EventRepository {
             Runnable onSuccess,
             Consumer<String> onError
     ) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         db.runTransaction(transaction -> {
 
                     DocumentReference eventRef =
