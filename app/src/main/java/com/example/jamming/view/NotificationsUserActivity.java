@@ -1,22 +1,28 @@
 package com.example.jamming.view;
 
 import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
 import com.example.jamming.R;
+import com.example.jamming.navigation.UserMenuHandler;
 
-public class NotificationsUserActivity extends AppCompatActivity {
+public class NotificationsUserActivity extends BaseActivity {
+
+    private UserMenuHandler menuHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_notifications_user);
 
+        setupBase(
+                R.menu.user_menu,
+                R.layout.activity_notifications_user
+        );
+
+        setTitleText("Notifications");
+        menuHandler = new UserMenuHandler(this);
+    }
+
+    @Override
+    protected boolean onMenuItemSelected(int itemId) {
+        return menuHandler.handle(itemId);
     }
 }

@@ -24,6 +24,9 @@
             android:name=".view.UpdateOwnerProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".view.UpdateUserProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.EditEventActivity"
             android:exported="false" />
         <activity

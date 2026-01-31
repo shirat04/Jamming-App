@@ -1,17 +1,28 @@
 package com.example.jamming.view;
 
 import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.jamming.R;
+import com.example.jamming.navigation.UserMenuHandler;
 
-public class UserProfileActivity extends AppCompatActivity {
+public class UserProfileActivity extends BaseActivity {
+
+    private UserMenuHandler menuHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_profile);
 
+        setupBase(
+                R.menu.user_menu,
+                R.layout.activity_user_profile
+        );
+
+        setTitleText("My Profile");
+        menuHandler = new UserMenuHandler(this);
+    }
+
+    @Override
+    protected boolean onMenuItemSelected(int itemId) {
+        return menuHandler.handle(itemId);
     }
 }
