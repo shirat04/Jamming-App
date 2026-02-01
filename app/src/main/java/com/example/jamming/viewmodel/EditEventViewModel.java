@@ -8,22 +8,55 @@ import com.example.jamming.model.MusicGenre;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.model.EventField;
+import com.example.jamming.utils.GenreUtils;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * ViewModel responsible for editing an existing event.
+ *
+ * This ViewModel manages:
+ * - Loading event data from the repository
+ * - Exposing editable fields to the UI via LiveData
+ * - Validating user input
+ * - Updating the event in Firestore
+ *
+ * The ViewModel does not hold any reference to UI components
+ * and follows the MVVM architecture principles.
+ */
 public class EditEventViewModel extends ViewModel {
 
-    private final EventRepository eventRepository = new EventRepository();
+    private final EventRepository eventRepository;
 
+    /**
+     * Default constructor used in production.
+     * Initializes the ViewModel with the default repository.
+     */
+    public EditEventViewModel() {
+        this(new EventRepository());
+    }
+
+    /**
+     * Constructor for dependency injection.
+     * Allows passing a mock repository for testing.
+     */
+    public EditEventViewModel(EventRepository eventRepository) {
+        this.eventRepository = eventRepository;
+    }
+
+    /** Holds the selected date and time of the event */
     private final Calendar dateTime = Calendar.getInstance();
+
     private double lat, lng;
     private String address, eventId;
 
+    /** Selected music genres */
     private final List<MusicGenre> genres = new ArrayList<>();
 
+    /* ===== UI State (LiveData) ===== */
     private final MutableLiveData<String> title = new MutableLiveData<>("");
     private final MutableLiveData<String> description = new MutableLiveData<>("");
     private final MutableLiveData<String> locationText = new MutableLiveData<>("");
@@ -31,54 +64,56 @@ public class EditEventViewModel extends ViewModel {
     private final MutableLiveData<String> timeText = new MutableLiveData<>("");
     private final MutableLiveData<String> capacityText = new MutableLiveData<>("");
     private final MutableLiveData<String> genresText = new MutableLiveData<>("");
+
+    /** Indicates whether editing this event is still allowed (e.g., event not in the past) */
     private final MutableLiveData<Boolean> editingAllowed = new MutableLiveData<>(true);
 
+    /** Validation and result feedback */
     private final MutableLiveData<EventField> errorField = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<String> successMessage = new MutableLiveData<>();
+
+    /* ===== LiveData getters exposed to the View ===== */
     public LiveData<Boolean> getEditingAllowed() {return editingAllowed;}
     public LiveData<String> getSuccessMessage() { return successMessage; }
-
-    private boolean isDateSet = false;
-    private boolean isTimeSet = false;
-
-    // ===== LiveData getters =====
     public LiveData<String> getTitle() { return title; }
     public LiveData<String> getDescription() { return description; }
     public LiveData<String> getLocationText() { return locationText; }
     public LiveData<String> getDateText() { return dateText; }
     public LiveData<String> getTimeText() { return timeText; }
     public LiveData<String> getCapacityText() { return capacityText; }
-    public LiveData<String> getGenres() { return genresText; }
+    public LiveData<String> getGenresText() { return genresText; }
     public Calendar getDateTime() {return dateTime;}
-
     public LiveData<EventField> getErrorField() { return errorField; }
     public LiveData<String> getErrorMessage() { return errorMessage; }
 
-    // ===== Setters from UI (Activity) =====
+    /* ===== Setters triggered by UI input ===== */
     public void onTitleChanged(String v) { title.setValue(v == null ? "" : v); }
     public void onDescriptionChanged(String v) { description.setValue(v == null ? "" : v); }
     public void onCapacityChanged(String v) { capacityText.setValue(v == null ? "" : v); }
 
-    // ===== Load event =====
-    public void loadEvent(String eventId) {
+    /* ===== Event loading ===== */
+    /**
+     * Loads an event from the repository and initializes the ViewModel state.
+     */
+    private void loadEvent(String eventId) {
+        this.eventId = eventId;
         eventRepository.getEventById(eventId)
                 .addOnSuccessListener(doc -> {
                     if (doc == null || !doc.exists()) {
-                        errorMessage.setValue("שגיאה בטעינת האירוע");
+                        errorMessage.setValue("Failed to load event");
                         return;
                     }
 
                     Event event = doc.toObject(Event.class);
                     if (event == null) {
-                        errorMessage.setValue("שגיאה בטעינת האירוע");
+                        errorMessage.setValue("Failed to load event");
                         return;
                     }
+                    // Determine whether editing is still allowed
+                    editingAllowed.setValue(isEditingAllowed(event));
 
-                    if (event.getDateTime() < System.currentTimeMillis()) {
-                        editingAllowed.setValue(false);
-                        return;
-                    }
+                    // Populate editable fields
                     title.setValue(event.getName());
                     description.setValue(event.getDescription());
                     capacityText.setValue(String.valueOf(event.getMaxCapacity()));
@@ -88,52 +123,58 @@ public class EditEventViewModel extends ViewModel {
                     lng = event.getLongitude();
                     locationText.setValue(address);
 
+                    // Load and convert genres
                     genres.clear();
                     if (event.getMusicTypes() != null) {
                         for (String s : event.getMusicTypes()) {
                             try {
                                 genres.add(MusicGenre.fromDisplayName(s));
                             } catch (IllegalArgumentException ignored) {
+                                // Ignore unknown genres
                             }
                         }
                     }
-                    genresText.setValue(getGenresText());
+                    genresText.setValue(GenreUtils.genresToTextFromEnums(genres));
 
+                    // Initialize date and time
                     dateTime.setTimeInMillis(event.getDateTime());
                     dateText.setValue(DateUtils.formatOnlyDate(event.getDateTime()));
                     timeText.setValue(DateUtils.formatOnlyTime(event.getDateTime()));
 
-                    isDateSet = true;
-                    isTimeSet = true;
                 })
                 .addOnFailureListener(e -> errorMessage.setValue("שגיאה בטעינת האירוע"));
     }
+
+    /**
+     * Initializes the ViewModel with an event ID.
+     * Ensures the event is loaded only once.
+     */
     public void init(String eventId) {
         if (this.eventId != null) return;
-        this.eventId = eventId;
 
         if (eventId != null && !eventId.trim().isEmpty()) {
             loadEvent(eventId);
         }
     }
 
-    // ===== Location =====
+    /* ===== Location handling ===== */
     public void onLocationSelected(double lat, double lng, String address) {
         this.lat = lat;
         this.lng = lng;
         this.address = address;
         locationText.setValue(address == null ? "" : address);
+
+        // Clear location error once valid input is provided
         if (address != null && !address.trim().isEmpty()) {
             if (errorField.getValue() == EventField.LOCATION) errorField.setValue(null);
         }
     }
 
-    // ===== Date & Time =====
+    /* ===== Date & Time handling ===== */
     public void setDate(int year, int month, int day) {
         dateTime.set(Calendar.YEAR, year);
         dateTime.set(Calendar.MONTH, month);
         dateTime.set(Calendar.DAY_OF_MONTH, day);
-        isDateSet = true;
         dateText.setValue(DateUtils.formatOnlyDate(dateTime.getTimeInMillis()));
         if (errorField.getValue() == EventField.DATE) errorField.setValue(null);
     }
@@ -141,12 +182,11 @@ public class EditEventViewModel extends ViewModel {
     public void setTime(int hour, int minute) {
         dateTime.set(Calendar.HOUR_OF_DAY, hour);
         dateTime.set(Calendar.MINUTE, minute);
-        isTimeSet = true;
         timeText.setValue(DateUtils.formatOnlyTime(dateTime.getTimeInMillis()));
         if (errorField.getValue() == EventField.TIME) errorField.setValue(null);
     }
 
-    // ===== Genres =====
+    /* ===== Genre handling ===== */
     public void toggleGenre(MusicGenre genre, boolean checked) {
         if (genre == null) return;
 
@@ -156,22 +196,18 @@ public class EditEventViewModel extends ViewModel {
             genres.remove(genre);
         }
 
-        genresText.setValue(getGenresText());
+        genresText.setValue(GenreUtils.genresToTextFromEnums(genres));
 
+        // Clear genre validation error if at least one genre is selected
         if (!genres.isEmpty() && errorField.getValue() == EventField.GENRE) {
             errorField.setValue(null);
         }
     }
 
-    private String getGenresText() {
-        List<String> names = new ArrayList<>();
-        for (MusicGenre g : genres) {
-            names.add(g.getDisplayName());
-        }
-        return String.join(" , ", names);
-    }
-
-
+    /**
+     * Returns a boolean array representing which genres are selected.
+     * Used for restoring UI selection state.
+     */
     public boolean[] getCheckedGenres(MusicGenre[] allGenres) {
         boolean[] checked = new boolean[allGenres.length];
         for (int i = 0; i < allGenres.length; i++) {
@@ -180,14 +216,31 @@ public class EditEventViewModel extends ViewModel {
         return checked;
     }
 
+    /**
+     * Determines whether editing the given event is still allowed.
+     * Editing is blocked if the event time is already in the past.
+     */
+    private boolean isEditingAllowed(Event event) {
+        return event.getDateTime() >= System.currentTimeMillis();
+    }
 
-    // ===== Save changes =====
+
+    /* ===== Save changes ===== */
+    /**
+     * Validates all input fields and updates the event in the repository.
+     * Reports validation errors using EventField for precise UI feedback.
+     */
     public void saveChanges() {
         errorField.setValue(null);
         if (eventId == null) {
-            errorMessage.setValue("שגיאה: מזהה אירוע חסר");
+            errorMessage.setValue("Missing event ID");
             return;
         }
+        if (!Boolean.TRUE.equals(editingAllowed.getValue())) {
+            errorMessage.setValue("Editing this event is no longer allowed.");
+            return;
+        }
+
         String t = title.getValue() == null ? "" : title.getValue().trim();
         String d = description.getValue() == null ? "" : description.getValue().trim();
         String capStr = capacityText.getValue() == null ? "" : capacityText.getValue().trim();
@@ -195,8 +248,16 @@ public class EditEventViewModel extends ViewModel {
         if (t.isEmpty()) { errorField.setValue(EventField.TITLE); return; }
         if (d.isEmpty()) { errorField.setValue(EventField.DESCRIPTION); return; }
         if (address == null || address.trim().isEmpty()) { errorField.setValue(EventField.LOCATION); return; }
-        if (!isDateSet) { errorField.setValue(EventField.DATE); return; }
-        if (!isTimeSet) { errorField.setValue(EventField.TIME); return; }
+        if (dateText.getValue() == null || dateText.getValue().isEmpty()) {
+            errorField.setValue(EventField.DATE);
+            return;
+        }
+
+        if (timeText.getValue() == null || timeText.getValue().isEmpty()) {
+            errorField.setValue(EventField.TIME);
+            return;
+        }
+
         long now = System.currentTimeMillis();
         long selectedTime = dateTime.getTimeInMillis();
 
@@ -214,12 +275,10 @@ public class EditEventViewModel extends ViewModel {
             errorField.setValue(EventField.CAPACITY);
             return;
         }
-
-        List<String> genreStrings = new ArrayList<>();
-        for (MusicGenre g : genres) {
-            genreStrings.add(g.getDisplayName());
-        }
         if (genres.isEmpty()) { errorField.setValue(EventField.GENRE); return; }
+
+        // Build update map
+        List<String> genreStrings = GenreUtils.genresToStrings(genres);
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("name", t);
@@ -235,20 +294,5 @@ public class EditEventViewModel extends ViewModel {
                 .addOnSuccessListener(a -> successMessage.setValue("האירוע עודכן בהצלחה"))
                 .addOnFailureListener(e -> errorMessage.setValue("שגיאה בעדכון האירוע"));
     }
-
-    // ===== Delete =====
-    public void deleteEvent() {
-        if (eventId == null) {
-            errorMessage.setValue("שגיאה: מזהה אירוע חסר");
-            return;
-        }
-
-        eventRepository.deleteEvent(eventId)
-                .addOnSuccessListener(a ->
-                        successMessage.setValue("האירוע נמחק בהצלחה")
-                )
-                .addOnFailureListener(e ->
-                        errorMessage.setValue("שגיאה במחיקת האירוע")
-                );
-    }
+    
 }

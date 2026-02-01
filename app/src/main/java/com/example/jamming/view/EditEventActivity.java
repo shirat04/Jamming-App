@@ -90,7 +90,7 @@ public class EditEventActivity extends BaseActivity {
         viewModel.getDateText().observe(this, text -> setIfDifferent(etDate, text));
         viewModel.getTimeText().observe(this, text -> setIfDifferent(etTime, text));
         viewModel.getCapacityText().observe(this, text -> setIfDifferent(etCapacity, text));
-        viewModel.getGenres().observe(this, text -> {
+        viewModel.getGenresText().observe(this, text -> {
             if (text == null || text.trim().isEmpty()) {
                 genreText.setText("");
             } else {

@@ -135,7 +135,7 @@ public class CreateNewEventActivity extends BaseActivity {
             }
         });
 
-        viewModel.getGenresTextLive().observe(this, text -> {
+        viewModel.getGenresText().observe(this, text -> {
             genreText.setText(text);
             if (text != null && !text.trim().isEmpty()) {
                 genreText.setError(null);

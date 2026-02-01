@@ -9,30 +9,54 @@ import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.model.EventField;
+import com.example.jamming.utils.GenreUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * ViewModel responsible for managing the state and logic
+ * of the "Create New Event" screen.
+ *
+ * Handles user input validation, UI state exposure via LiveData,
+ * and communication with repositories.
+ */
 public class CreateNewEventViewModel extends ViewModel {
     private AuthRepository authRepo;
-
     private EventRepository eventRepository;
+
+    /**
+     * Default constructor used in production.
+     * Initializes repositories with their default implementations.
+     */
     public CreateNewEventViewModel() {
         this(new AuthRepository(), new EventRepository());
     }
 
+    /**
+     * Constructor for dependency injection (used mainly for testing).
+     *
+     * @param authRepo Authentication repository
+     * @param eventRepository Event data repository
+     */
     public CreateNewEventViewModel(AuthRepository authRepo,
                                    EventRepository eventRepository) {
         this.authRepo = authRepo;
         this.eventRepository = eventRepository;
     }
+
+    /** Selected date and time of the event */
     private final Calendar dateTime = Calendar.getInstance();
 
+    /** Selected location data */
     private double lat, lng;
     private String address;
+
+    /** Selected music genres */
     private final List<MusicGenre> genres = new ArrayList<>();
 
+    /** UI state exposed to the View */
     private final MutableLiveData<String> dateText = new MutableLiveData<>();
     private final MutableLiveData<String> timeText = new MutableLiveData<>();
     private final MutableLiveData<String> locationText = new MutableLiveData<>();
@@ -41,39 +65,32 @@ public class CreateNewEventViewModel extends ViewModel {
     private final MutableLiveData<Boolean> success = new MutableLiveData<>();
     private final MutableLiveData<EventField> errorField = new MutableLiveData<>();
 
-
+    /* ===== LiveData getters ===== */
     public LiveData<EventField> getErrorField() { return errorField; }
     public LiveData<String> getDateText() { return dateText; }
     public LiveData<String> getTimeText() { return timeText; }
     public LiveData<String> getLocationText() { return locationText; }
-    public LiveData<String> getGenresTextLive() {return genresText;}
+    public LiveData<String> getGenresText() {return genresText;}
     public LiveData<String> getToastMessage() { return toastMessage; }
     public LiveData<Boolean> getSuccess() { return success; }
     public Calendar getDateTime() {return dateTime;}
 
 
-    public String getGenresText() {
-        List<String> names = new ArrayList<>();
-        for (MusicGenre g : genres) {
-            names.add(g.getDisplayName());
-        }
-        return String.join(" , ", names);
-    }
-    private List<String> getGenreStrings() {
-        List<String> result = new ArrayList<>();
-        for (MusicGenre g : genres) {
-            result.add(g.getDisplayName());
-        }
-        return result;
-    }
-
+    /**
+     * Sets the selected date and updates the UI text.
+     */
     public void setDate(int year, int month, int day) {
-        dateTime.set(year, month, day);
+        dateTime.set(Calendar.YEAR, year);
+        dateTime.set(Calendar.MONTH, month);
+        dateTime.set(Calendar.DAY_OF_MONTH, day);
         dateText.setValue(
                 DateUtils.formatOnlyDate(dateTime.getTimeInMillis())
         );
     }
 
+    /**
+     * Sets the selected time and updates the UI text.
+     */
     public void setTime(int hour, int minute) {
         dateTime.set(Calendar.HOUR_OF_DAY, hour);
         dateTime.set(Calendar.MINUTE, minute);
@@ -82,6 +99,9 @@ public class CreateNewEventViewModel extends ViewModel {
         );
     }
 
+    /**
+     * Adds or removes a music genre based on user selection.
+     */
     public void toggleGenre(MusicGenre genre, boolean checked) {
         if (checked && !genres.contains(genre)) {
             genres.add(genre);
@@ -89,15 +109,18 @@ public class CreateNewEventViewModel extends ViewModel {
             genres.remove(genre);
         }
 
-        genresText.setValue(getGenresText());
+        genresText.setValue(GenreUtils.genresToTextFromEnums(genres));
 
+        // Clear genre error once at least one genre is selected
         if (!genres.isEmpty() && errorField.getValue() == EventField.GENRE) {
             errorField.setValue(null);
         }
     }
 
-
-
+    /**
+     * Returns a boolean array representing which genres are selected.
+     * Used to restore UI state.
+     */
     public boolean[] getCheckedGenres(MusicGenre[] allGenres) {
         boolean[] checked = new boolean[allGenres.length];
         for (int i = 0; i < allGenres.length; i++) {
@@ -106,6 +129,9 @@ public class CreateNewEventViewModel extends ViewModel {
         return checked;
     }
 
+    /**
+     * Updates location data after user selects a location on the map.
+     */
     public void onLocationSelected(double lat, double lng, String address) {
         this.lat = lat;
         this.lng = lng;
@@ -113,6 +139,10 @@ public class CreateNewEventViewModel extends ViewModel {
         locationText.setValue(address);
     }
 
+    /**
+     * Validates user input and attempts to create a new event.
+     * Reports validation errors using EventField for precise UI feedback.
+     */
     public void publish(String name, String capacity, String description) {
         errorField.setValue(null);
 
@@ -139,6 +169,7 @@ public class CreateNewEventViewModel extends ViewModel {
         long now = System.currentTimeMillis();
         long selectedTime = dateTime.getTimeInMillis();
 
+        // Prevent creation of events in the past
         if (selectedTime <= now) {
             errorField.setValue(EventField.TIME);
             toastMessage.setValue("Cannot create an event for a time that has already passed.");
@@ -167,7 +198,7 @@ public class CreateNewEventViewModel extends ViewModel {
 
         String ownerId = authRepo.getCurrentUid();
         if (ownerId == null) {
-            toastMessage.setValue("שגיאת משתמש");
+            toastMessage.setValue("User error");
             return;
         }
 
@@ -175,7 +206,7 @@ public class CreateNewEventViewModel extends ViewModel {
                 ownerId,
                 name,
                 description,
-                getGenreStrings(),
+                GenreUtils.genresToStrings(genres),
                 address,
                 dateTime.getTimeInMillis(),
                 cap,
