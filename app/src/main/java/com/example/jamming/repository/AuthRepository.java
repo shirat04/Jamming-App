@@ -13,8 +13,18 @@ import java.util.Map;
 
 public class AuthRepository {
 
-    private final FirebaseAuth auth = FirebaseAuth.getInstance();
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseAuth auth;
+    private final FirebaseFirestore db;
+
+    public AuthRepository() {
+        this.auth = FirebaseAuth.getInstance();
+        this.db = FirebaseFirestore.getInstance();
+    }
+
+    public AuthRepository(FirebaseAuth auth, FirebaseFirestore db) {
+        this.auth = auth;
+        this.db = db;
+    }
 
     // Login with email
     public Task<AuthResult> login(String email, String pass) {
