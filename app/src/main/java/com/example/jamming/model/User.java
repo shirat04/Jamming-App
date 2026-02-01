@@ -21,7 +21,7 @@ public class User {
         this.notificationsEnabled = true;
     }
 
-    // Constructor מלא
+
     public User(String firebaseId, String fullName, String email, String phone, String username) {
         this.firebaseId = firebaseId;
         this.fullName = fullName;
@@ -101,17 +101,6 @@ public class User {
         this.notificationsEnabled = notificationsEnabled;
     }
 
-    public void registerToEvent(String eventId) {
-        if (!registeredEventIds.contains(eventId)) {
-            registeredEventIds.add(eventId);
-        }
-    }
 
-    public void unregisterFromEvent(String eventId) {
-        registeredEventIds.remove(eventId);
-    }
 
-    public boolean isRegisteredTo(String eventId) {
-        return registeredEventIds.contains(eventId);
-    }
 }

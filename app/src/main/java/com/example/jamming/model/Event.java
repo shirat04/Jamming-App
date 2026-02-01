@@ -52,7 +52,9 @@ public class Event {
         for (String s : musicTypes) {
             try {
                 result.add(MusicGenre.fromDisplayName(s));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                // ignore unknown / legacy values from DB
+            }
         }
         return result;
     }
@@ -80,11 +82,9 @@ public class Event {
     public void setLatitude(double latitude) { this.latitude = latitude; }
     public void setLongitude(double longitude) { this.longitude = longitude; }
 
-    public boolean isFull() {return reserved >= maxCapacity;}
 
     public int getAvailableSpots() {
         return maxCapacity - reserved;
     }
 
-    public boolean isPastEvent() {return getDateTime() < System.currentTimeMillis();}
 }

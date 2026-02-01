@@ -3,13 +3,22 @@ package com.example.jamming.model;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.utils.GeoUtils;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
+/**
+ * Engine responsible for filtering events based on a given EventFilter.
+ * Applies multiple criteria such as activity status, genre, location,
+ * date range, time range, and capacity constraints.
+ */
 public class EventFilterEngine {
 
-
-
+    /**
+     * Filters a list of events according to the provided filter.
+     *
+     * @param events List of events to filter
+     * @param filter EventFilter containing filtering criteria
+     * @return List of events that match the filter
+     */
     public static List<Event> filter(List<Event> events, EventFilter filter) {
         if (filter == null) return events;
 
@@ -22,18 +31,27 @@ public class EventFilterEngine {
         return result;
     }
 
+    /**
+     * Checks whether a single event matches all filter conditions.
+     *
+     * @param event Event to check
+     * @param eventFilter Filtering criteria
+     * @return True if the event matches all conditions, false otherwise
+     */
     private static boolean matches(Event event, EventFilter eventFilter) {
 
+        // Ignore inactive events
         if (!event.isActive()) {
             return false;
         }
+
+        // Ignore events that already occurred
         long now = System.currentTimeMillis();
         if (event.getDateTime() < now) {
             return false;
         }
 
-
-        //  Music types
+        // Filter by music genres
         if (!eventFilter.getMusicTypes().isEmpty()) {
             boolean match = false;
             for (String genreStr : event.getMusicTypes()) {
@@ -46,13 +64,14 @@ public class EventFilterEngine {
                     }
 
                 } catch (IllegalArgumentException ignored) {
+                    // Ignore unknown or unsupported genre values
                 }
             }
 
             if (!match) return false;
         }
 
-        // Location
+        // Filter by geographic distance
         if (eventFilter.getRadiusKm() != null) {
             double dist = GeoUtils.calculateDistanceKm(
                     eventFilter.getCenterLat(),
@@ -63,14 +82,14 @@ public class EventFilterEngine {
             if (dist > eventFilter.getRadiusKm()) return false;
         }
 
-        // Date range
+        // Filter by date range
         if (eventFilter.getStartDateMillis() != null && eventFilter.getEndDateMillis() != null) {
             long t = event.getDateTime();
             if (t < eventFilter.getStartDateMillis() || t > eventFilter.getEndDateMillis())
                 return false;
         }
 
-        // Time range (supports overnight ranges)
+        // Filter by time range (supports overnight ranges)
         if (eventFilter.getStartMinute() != null && eventFilter.getEndMinute() != null) {
             int minutes = DateUtils.minutesFromMidnight(event.getDateTime());
 
@@ -91,7 +110,7 @@ public class EventFilterEngine {
         }
 
 
-        // Available spots
+        // Filter by available spots
         int available = event.getAvailableSpots();
 
         if (eventFilter.getMinAvailableSpots() != null
@@ -102,7 +121,7 @@ public class EventFilterEngine {
                 && available > eventFilter.getMaxAvailableSpots())
             return false;
 
-        // Event size (maximum capacity)
+        // Filter by event capacity
         int capacity = event.getMaxCapacity();
 
         if (eventFilter.getMinCapacity() != null

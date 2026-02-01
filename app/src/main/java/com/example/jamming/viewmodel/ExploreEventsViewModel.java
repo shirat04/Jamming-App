@@ -17,18 +17,21 @@ public class ExploreEventsViewModel extends ViewModel {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final AuthRepository authRepository;
-
-
-    private final MutableLiveData<String> userGreeting = new MutableLiveData<>();
-    private final MutableLiveData<List<Event>> events = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isEmpty = new MutableLiveData<>();
-
-
+    public enum EmptyState {
+        NONE,
+        NO_EVENTS_AT_ALL,
+        NO_MATCHING_FILTERS
+    }
     public ExploreEventsViewModel() {
         authRepository = new AuthRepository();
         userRepository = new UserRepository();
         eventRepository = new EventRepository();
     }
+    private final MutableLiveData<String> userGreeting = new MutableLiveData<>();
+    private final MutableLiveData<List<Event>> events = new MutableLiveData<>();
+    private final MutableLiveData<EmptyState> emptyState = new MutableLiveData<>(EmptyState.NONE);
+
+    public LiveData<EmptyState> getEmptyState() {return emptyState;}
     private final MutableLiveData<EventFilter> filter = new MutableLiveData<>();
 
     private final MutableLiveData<List<Event>> filteredEvents = new MutableLiveData<>(new ArrayList<>());
@@ -40,10 +43,6 @@ public class ExploreEventsViewModel extends ViewModel {
 
     public LiveData<List<Event>> getEvents() {
         return events;
-    }
-
-    public LiveData<Boolean> getIsEmpty() {
-        return isEmpty;
     }
     public LiveData<EventFilter> getFilter() {return filter;}
     public LiveData<List<Event>> getFilteredEvents() {return filteredEvents;}
@@ -61,6 +60,19 @@ public class ExploreEventsViewModel extends ViewModel {
         String uid = authRepository.getCurrentUid();
         if (uid != null) {
             userRepository.saveLastEventFilter(uid, current);
+        }
+    }
+
+    private void updateEmptyState(
+            List<Event> allEvents,
+            List<Event> filteredEvents
+    ) {
+        if (allEvents == null || allEvents.isEmpty()) {
+            emptyState.postValue(EmptyState.NO_EVENTS_AT_ALL);
+        } else if (filteredEvents == null || filteredEvents.isEmpty()) {
+            emptyState.postValue(EmptyState.NO_MATCHING_FILTERS);
+        } else {
+            emptyState.postValue(EmptyState.NONE);
         }
     }
 
@@ -103,25 +115,27 @@ public class ExploreEventsViewModel extends ViewModel {
 
     public void loadAllEvents() {
         eventRepository.getActiveEvents()
-                .addOnSuccessListener(fetchedEvents  -> {
+                .addOnSuccessListener(fetchedEvents -> {
                     this.allEvents = fetchedEvents;
-
                     events.setValue(allEvents);
-                    isEmpty.setValue(allEvents.isEmpty());
+
                     applyFilter();
                 })
                 .addOnFailureListener(e -> {
                     this.allEvents = new ArrayList<>();
                     events.setValue(new ArrayList<>());
                     filteredEvents.setValue(new ArrayList<>());
-                    isEmpty.setValue(true);
+
+                    updateEmptyState(allEvents, filteredEvents.getValue());
                 });
     }
+
 
     private void applyFilter() {
         EventFilter f = filter.getValue();
         List<Event> result = EventFilterEngine.filter(allEvents, f);
         filteredEvents.setValue(result);
+        updateEmptyState(allEvents, result);
     }
 
     public void clearFilter() {

@@ -157,8 +157,25 @@ public class ExploreEventsActivity extends BaseMapActivity {
             drawEventsOnMap(events);
         });
 
-        viewModel.getIsEmpty().observe(this, isEmpty ->
-                emptyText.setVisibility(isEmpty ? View.VISIBLE : View.GONE));
+        viewModel.getEmptyState().observe(this, state -> {
+            switch (state) {
+                case NO_EVENTS_AT_ALL:
+                    emptyText.setText("There are currently no events.");
+                    emptyText.setVisibility(View.VISIBLE);
+                    break;
+
+                case NO_MATCHING_FILTERS:
+                    emptyText.setText("No matching events found. Try changing your filters.");
+                    emptyText.setVisibility(View.VISIBLE);
+                    break;
+
+                case NONE:
+                    emptyText.setVisibility(View.GONE);
+                    break;
+            }
+        });
+
+
     }
 
 
