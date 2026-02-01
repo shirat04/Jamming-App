@@ -7,6 +7,8 @@
     <!-- Login -->
     <string name="login">Login</string>
     <string name="username">Username</string>
+    <string name="usernamemail">Username/Email</string>
+
     <string name="password">Password</string>
 
     <!-- Owner section -->
@@ -14,6 +16,7 @@
     <string name="hello_owner">Hello \"Owner Name\"</string>
     <string name="add_event">+ Create Event</string>
     <string name="my_events">My Events</string>
+    <string name="past_events">Past Events</string>
 
     <!-- Event titles -->
     <string name="jazz_open_mic_night">Jazz Open Mic Night</string>

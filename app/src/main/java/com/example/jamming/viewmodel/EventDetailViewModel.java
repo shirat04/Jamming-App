@@ -77,8 +77,14 @@ public class EventDetailViewModel extends ViewModel {
     }
 
     public void registerToEvent() {
+
         Event event = eventLiveData.getValue();
-        if (event != null && event.getDateTime() < System.currentTimeMillis()) {
+        if (event == null) {
+            errorMessage.postValue("שגיאה: אירוע לא נטען");
+            return;
+        }
+
+        if (event.getDateTime() < System.currentTimeMillis()) {
             errorMessage.postValue("This event has already ended");
             return;
         }
@@ -94,17 +100,13 @@ public class EventDetailViewModel extends ViewModel {
 
                     if (registeredEvents.contains(eventId)) {
                         showAlreadyRegisteredMessage.postValue(true);
-                        Event currentEvent = eventLiveData.getValue();
-                        if (currentEvent != null) {
-                            updateRegistrationState(currentEvent, true);
-                        }
+                        updateRegistrationState(event, true);
                         return;
                     }
 
-                    eventRepository.registerUserIfCapacityAvailable(
-                            eventId,
-                            uid,
-                            () -> {
+                    eventRepository.registerUserIfCapacityAvailable(eventId, uid)
+                            .addOnSuccessListener(v -> {
+
                                 registrationSuccess.postValue(true);
 
                                 eventRepository.getEventById(eventId)
@@ -115,9 +117,17 @@ public class EventDetailViewModel extends ViewModel {
                                                 updateRegistrationState(updated, true);
                                             }
                                         });
-                            },
-                            msg -> errorMessage.postValue(msg)
-                    );
+                            })
+                            .addOnFailureListener(e -> {
+
+                                if ("EVENT_FULL".equals(e.getMessage())) {
+                                    errorMessage.postValue("The event is full - registration is not possible.");
+                                } else if ("EVENT_NOT_FOUND".equals(e.getMessage())) {
+                                    errorMessage.postValue("Event not found");
+                                } else {
+                                    errorMessage.postValue("Registration error");
+                                }
+                            });
                 });
     }
 

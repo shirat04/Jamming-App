@@ -40,7 +40,7 @@
         android:layout_height="55dp"
         android:layout_marginTop="30dp"
         android:background="@android:drawable/edit_text"
-        android:hint="@string/username"
+        android:hint="@string/usernamemail"
         android:inputType="textEmailAddress"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"

@@ -7,51 +7,71 @@ import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
+/**
+ * Repository responsible for managing event-related data.
+ * Handles all interactions with the "events" collection in Firestore.
+ * This class follows the Repository pattern and abstracts data access
+ * from higher application layers (e.g., ViewModels).
+ */
 public class EventRepository {
-    public static class EventWithId {
-        public Event event;
-        public String id;
-
-        public EventWithId(Event event, String id) {
-            this.event = event;
-            this.id = id;
-        }
-    }
 
     private final FirebaseFirestore db;
 
+    /**
+     * Default constructor using the Firestore singleton instance.
+     */
     public EventRepository() {
         this.db = FirebaseFirestore.getInstance();
     }
 
+    /**
+     * Constructor for dependency injection (mainly used for testing).
+     *
+     * @param db Firestore instance
+     */
     public EventRepository(FirebaseFirestore db) {
         this.db = db;
     }
 
-    // Create new event in Firestore
+    /**
+     * Creates a new event document in Firestore.
+     * A unique document ID is generated and assigned to the event.
+     *
+     * @param event Event object to store
+     * @return Task representing the create operation
+     */
     public Task<Void> createEvent(Event event) {
 
         DocumentReference ref = db.collection("events").document();
 
+        // Assign generated Firestore ID to the event object
         event.setId(ref.getId());
 
         return ref.set(event);
     }
 
-    // Get an event by ID
+    /**
+     * Retrieves an event by its unique identifier.
+     *
+     * @param eventId Event ID
+     * @return Task containing the event document snapshot
+     */
     public Task<DocumentSnapshot> getEventById(String eventId) {
         return db.collection("events")
                 .document(eventId)
                 .get();
     }
+
+    /**
+     * Retrieves multiple events by their document IDs.
+     *
+     * @param ids List of event IDs
+     * @return Task containing a snapshot of matching events
+     */
     public Task<QuerySnapshot> getEventsByIds(List<String> ids) {
         return db.collection("events")
                 .whereIn(FieldPath.documentId(), ids)
@@ -59,27 +79,49 @@ public class EventRepository {
     }
 
 
-    // Get all events created by a specific owner
+    /**
+     * Retrieves all events created by a specific owner.
+     *
+     * @param ownerId Owner user ID
+     * @return Task containing a snapshot of matching events
+     */
     public Task<QuerySnapshot> getEventsByOwner(String ownerId) {
         return db.collection("events")
                 .whereEqualTo("ownerId", ownerId)
                 .get();
     }
 
-    // Update event fields (supports multiple updates)
+    /**
+     * Updates one or more fields of an existing event.
+     *
+     * @param eventId Event ID
+     * @param updates Map of field names and new values
+     * @return Task representing the update operation
+     */
     public Task<Void> updateEvent(String eventId, Map<String, Object> updates) {
         return db.collection("events")
                 .document(eventId)
                 .update(updates);
     }
 
-    // Delete an event completely
+    /**
+     * Deletes an event document from Firestore.
+     *
+     * @param eventId Event ID
+     * @return Task representing the delete operation
+     */
     public Task<Void> deleteEvent(String eventId) {
         return db.collection("events")
                 .document(eventId)
                 .delete();
     }
 
+    /**
+     * Retrieves all active events.
+     * Events whose date has already passed are automatically marked as inactive.
+     *
+     * @return Task containing a list of currently active events
+     */
     public Task<List<Event>> getActiveEvents() {
         return db.collection("events")
                 .whereEqualTo("active", true)
@@ -89,68 +131,78 @@ public class EventRepository {
                     long now = System.currentTimeMillis();
 
                     for (DocumentSnapshot doc : task.getResult()) {
-                        Event e = doc.toObject(Event.class);
-                        if (e == null) continue;
+                        Event event = doc.toObject(Event.class);
+                        if (event == null) continue;
 
-                        e.setId(doc.getId());
+                        event.setId(doc.getId());
 
-                        if (e.getDateTime() < now) {
+                        if (event.getDateTime() < now) {
                             db.collection("events")
-                                    .document(e.getId())
+                                    .document(event.getId())
                                     .update("active", false);
                             continue;
                         }
-                        list.add(e);
+                        list.add(event);
                     }
                     return list;
                 });
     }
 
 
-    // Decrement reserved seats count
+    /**
+     * Decrements the number of reserved seats for an event.
+     *
+     * @param eventId Event ID
+     * @return Task representing the update operation
+     */
     public Task<Void> decrementReserved(String eventId) {
         return db.collection("events")
                 .document(eventId)
                 .update("reserved", FieldValue.increment(-1));
     }
 
-    public void registerUserIfCapacityAvailable(
-            String eventId,
-            String uid,
-            Runnable onSuccess,
-            Consumer<String> onError
-    ) {
-        db.runTransaction(transaction -> {
+    /**
+     * Registers a user to an event only if capacity is available.
+     * This operation is performed atomically using a Firestore transaction.
+     *
+     * @param eventId Event ID
+     * @param uid User ID
+     * @return Task representing the transactional operation
+     */
+    public Task<Void> registerUserIfCapacityAvailable(String eventId, String uid) {
 
-                    DocumentReference eventRef =
-                            db.collection("events").document(eventId);
-                    DocumentReference userRef =
-                            db.collection("users").document(uid);
+        return db.runTransaction(transaction -> {
 
-                    DocumentSnapshot eventSnap = transaction.get(eventRef);
+            DocumentReference eventRef =
+                    db.collection("events").document(eventId);
+            DocumentReference userRef =
+                    db.collection("users").document(uid);
 
-                    long reserved = eventSnap.getLong("reserved");
-                    long max = eventSnap.getLong("maxCapacity");
+            DocumentSnapshot eventSnap = transaction.get(eventRef);
 
-                    if (reserved >= max) {
-                        throw new RuntimeException("EVENT_FULL");
-                    }
+            if (!eventSnap.exists()) {
+                throw new RuntimeException("EVENT_NOT_FOUND");
+            }
 
-                    transaction.update(eventRef,
-                            "reserved", FieldValue.increment(1));
+            Long reserved = eventSnap.getLong("reserved");
+            Long max = eventSnap.getLong("maxCapacity");
 
-                    transaction.update(userRef,
-                            "registeredEventIds", FieldValue.arrayUnion(eventId));
+            if (reserved == null || max == null) {
+                throw new RuntimeException("INVALID_EVENT_DATA");
+            }
 
-                    return null;
-                }).addOnSuccessListener(v -> onSuccess.run())
-                .addOnFailureListener(e -> {
-                    if ("EVENT_FULL".equals(e.getMessage())) {
-                        onError.accept("האירוע מלא – לא ניתן להירשם");
-                    } else {
-                        onError.accept("שגיאה בהרשמה");
-                    }
-                });
+            if (reserved >= max) {
+                throw new RuntimeException("EVENT_FULL");
+            }
+
+            transaction.update(eventRef,
+                    "reserved", FieldValue.increment(1));
+
+            transaction.update(userRef,
+                    "registeredEventIds", FieldValue.arrayUnion(eventId));
+
+            return null;
+        });
     }
 
 

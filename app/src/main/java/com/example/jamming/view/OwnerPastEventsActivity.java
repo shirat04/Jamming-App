@@ -1,5 +1,7 @@
 package com.example.jamming.view;
 
+import static com.example.jamming.utils.GenreUtils.genresToText;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -9,8 +11,8 @@ import android.widget.Toast;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.jamming.R;
+import com.example.jamming.model.Event;
 import com.example.jamming.navigation.OwnerMenuHandler;
-import com.example.jamming.repository.EventRepository;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.viewmodel.OwnerViewModel;
 
@@ -29,6 +31,7 @@ public class OwnerPastEventsActivity extends BaseActivity {
                 R.menu.owner_menu,
                 R.layout.activity_owner_past_events
         );
+        setTitleText(getString(R.string.past_events));
         showRightActions();
 
         pastEventsContainer = findViewById(R.id.pastEventsContainer);
@@ -59,8 +62,8 @@ public class OwnerPastEventsActivity extends BaseActivity {
 
             emptyPastEventsText.setVisibility(View.GONE);
 
-            for (EventRepository.EventWithId e : events) {
-                addPastEventCard(e);
+            for (Event event : events) {
+                addPastEventCard(event);
             }
         });
 
@@ -69,7 +72,7 @@ public class OwnerPastEventsActivity extends BaseActivity {
         );
     }
 
-    private void addPastEventCard(EventRepository.EventWithId event) {
+    private void addPastEventCard(Event event) {
         View card = getLayoutInflater()
                 .inflate(
                         R.layout.activity_item_event_owner_card,
@@ -78,35 +81,33 @@ public class OwnerPastEventsActivity extends BaseActivity {
                 );
 
         ((TextView) card.findViewById(R.id.myEventTitle))
-                .setText(event.event.getName());
+                .setText(event.getName());
 
         ((TextView) card.findViewById(R.id.myEventLocation))
-                .setText(event.event.getAddress());
+                .setText(event.getAddress());
 
-        long time = event.event.getDateTime();
+        long time = event.getDateTime();
+        String dateTimeText = DateUtils.formatOnlyDate(time) + " • " + DateUtils.formatOnlyTime(time);
         ((TextView) card.findViewById(R.id.myEventDate))
-                .setText(
-                        DateUtils.formatOnlyDate(time)
-                                + " • "
-                                + DateUtils.formatOnlyTime(time)
-                );
+                .setText(dateTimeText);
 
         ((TextView) card.findViewById(R.id.myEventGenre))
-                .setText(String.join(" , ", event.event.getMusicTypes()));
+                .setText(genresToText(event.getMusicTypes()));
 
+        String capacityText = getString(
+                R.string.participants_format,
+                event.getReserved(),
+                event.getMaxCapacity()
+        );
         ((TextView) card.findViewById(R.id.myEventCapacity))
-                .setText(
-                        event.event.getReserved()
-                                + " / "
-                                + event.event.getMaxCapacity()
-                );
+                .setText(capacityText);
 
         card.findViewById(R.id.btnMyEventDetails)
                 .setVisibility(View.GONE);
 
         card.findViewById(R.id.btnCancelMyEvent)
                 .setOnClickListener(v ->
-                        showDeleteEventDialog(event.id)
+                        showDeleteEventDialog(event.getId())
                 );
 
         pastEventsContainer.addView(card);

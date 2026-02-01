@@ -133,38 +133,6 @@ public class UserRepositoryTest {
     }
 
     // ------------------------
-    // updateSearchRadius
-    // ------------------------
-
-    @Test
-    public void updateSearchRadius_success() {
-        when(mockUserDoc.update("searchRadiusKm", 10))
-                .thenReturn(Tasks.forResult(null));
-
-        Task<Void> task = repo.updateSearchRadius("uid1", 10);
-
-        assertTrue(task.isSuccessful());
-        verify(mockUserDoc).update("searchRadiusKm", 10);
-    }
-
-    // ------------------------
-    // updateFavoriteMusicTypes
-    // ------------------------
-
-    @Test
-    public void updateFavoriteMusicTypes_success() {
-        List<String> types = List.of("Rock");
-
-        when(mockUserDoc.update("favoriteMusicTypes", types))
-                .thenReturn(Tasks.forResult(null));
-
-        Task<Void> task = repo.updateFavoriteMusicTypes("uid1", types);
-
-        assertTrue(task.isSuccessful());
-        verify(mockUserDoc).update("favoriteMusicTypes", types);
-    }
-
-    // ------------------------
     // updateNotificationsEnabled
     // ------------------------
 

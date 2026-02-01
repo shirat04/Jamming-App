@@ -23,8 +23,21 @@ public class LoginViewModel extends ViewModel {
             message.setValue("נא למלא את כל השדות");
             return;
         }
+        identifier = identifier.trim();
         isLoading.setValue(true);
 
+        // If identifier is an email -> login directly with FirebaseAuth
+        if (Patterns.EMAIL_ADDRESS.matcher(identifier).matches()) {
+            repo.login(identifier, password)
+                    .addOnSuccessListener(auth -> checkUserType(repo.getCurrentUid()))
+                    .addOnFailureListener(e -> {
+                        stopLoading();
+                        message.setValue("אימייל או סיסמה אינם נכונים");
+                    });
+            return;
+        }
+
+        // Otherwise, treat it as username
         repo.getUserByUsername(identifier)
                 .addOnSuccessListener(query -> {
                     if (query.isEmpty()) {

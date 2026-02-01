@@ -12,24 +12,46 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Repository responsible for managing user-related data.
+ * Handles all interactions with the "users" collection in Firestore.
+ * This class follows the Repository pattern and serves as an abstraction
+ * layer between the ViewModel and the data source.
+ */
 public class UserRepository {
 
     private final FirebaseFirestore db;
 
+    // Default constructor using the Firestore singleton instance.
     public UserRepository() {
         this.db = FirebaseFirestore.getInstance();
     }
 
+    /**
+     * Constructor for dependency injection (used mainly for testing).
+     * @param db Firestore instance
+     */
     public UserRepository(FirebaseFirestore db) {
         this.db = db;
     }
 
-    // Get user document by UID
-    public Task<DocumentSnapshot> getUserById(String uid) {
+    /**
+     * Retrieves a user document by its unique identifier (UID).
+     *
+     * @param uid User ID
+     * @return Task containing the user document snapshot
+     */    public Task<DocumentSnapshot> getUserById(String uid) {
         return db.collection("users")
                 .document(uid)
                 .get();
     }
+
+    /**
+     * Retrieves the full name of a user.
+     *
+     * @param uid User ID
+     * @return Task containing the user's full name, or null if not found
+     */
     public Task<String> getUserFullName(String uid) {
         return getUserById(uid).continueWith(task -> {
             if (!task.isSuccessful() || task.getResult() == null) {
@@ -42,19 +64,38 @@ public class UserRepository {
     }
 
 
-    // Update a single field of the user document
+    /**
+     * Updates a single field in the user's document.
+     *
+     * @param uid User ID
+     * @param fieldName Name of the field to update
+     * @param value New value for the field
+     * @return Task representing the update operation
+     */
     public Task<Void> updateUserField(String uid, String fieldName, Object value) {
         return db.collection("users")
                 .document(uid)
                 .update(fieldName, value);
     }
 
-    // Update multiple user fields at once
+    /**
+     * Updates multiple fields in the user's profile at once.
+     *
+     * @param uid User ID
+     * @param updates Map containing field names and their new values
+     * @return Task representing the update operation
+     */
     public Task<Void> updateUserProfile(String uid, Map<String, Object> updates) {
         return db.collection("users")
                 .document(uid)
                 .update(updates);
     }
+    /**
+     * Retrieves the last event filter used by the user.
+     *
+     * @param uid User ID
+     * @return Task containing the last used EventFilter, or null if not available
+     */
     public Task<EventFilter> getLastEventFilter(String uid) {
         return getUserById(uid).continueWith(task -> {
             if (!task.isSuccessful() || task.getResult() == null) {
@@ -65,26 +106,50 @@ public class UserRepository {
             return user != null ? user.getLastEventFilter() : null;
         });
     }
+    /**
+     * Saves the user's last used event filter.
+     *
+     * @param uid User ID
+     * @param filter Event filter to save
+     */
     public void saveLastEventFilter(String uid, EventFilter filter) {
         updateUserField(uid, "lastEventFilter", filter);
     }
 
 
-    // Add an event to the user's registered events list
-    public Task<Void> registerEventForUser(String uid, String eventId) {
+    /**
+     * Registers a user to an event by adding the event ID
+     * to the user's registered events list.
+     *
+     * @param uid User ID
+     * @param eventId Event ID to register
+     * @return Task representing the update operation
+     */    public Task<Void> registerEventForUser(String uid, String eventId) {
         return db.collection("users")
                 .document(uid)
                 .update("registeredEventIds", FieldValue.arrayUnion(eventId));
     }
 
-    // Remove an event from the user's registered events list
+    /**
+     * Unregisters a user from an event by removing the event ID
+     * from the user's registered events list.
+     *
+     * @param uid User ID
+     * @param eventId Event ID to unregister
+     * @return Task representing the update operation
+     */
     public Task<Void> unregisterEventForUser(String uid, String eventId) {
         return db.collection("users")
                 .document(uid)
                 .update("registeredEventIds", FieldValue.arrayRemove(eventId));
     }
 
-    // Get list of event IDs the user is registered to
+    /**
+     * Retrieves the list of event IDs the user is registered to.
+     *
+     * @param uid User ID
+     * @return Task containing a list of event IDs
+     */
     public Task<List<String>> getRegisteredEvents(String uid) {
         return db.collection("users")
                 .document(uid)
@@ -104,34 +169,38 @@ public class UserRepository {
                 });
     }
 
-    // Update profile image URL for user
+    /**
+     * Updates the user's profile image URL.
+     *
+     * @param uid User ID
+     * @param imageUrl URL of the new profile image
+     * @return Task representing the update operation
+     */
     public Task<Void> updateProfileImage(String uid, String imageUrl) {
         return db.collection("users")
                 .document(uid)
                 .update("profileImageUrl", imageUrl);
     }
 
-    // Update user search radius (for event discovery)
-    public Task<Void> updateSearchRadius(String uid, int radiusKm) {
-        return db.collection("users")
-                .document(uid)
-                .update("searchRadiusKm", radiusKm);
-    }
-
-    // Update user preferred music types
-    public Task<Void> updateFavoriteMusicTypes(String uid, List<String> musicTypes) {
-        return db.collection("users")
-                .document(uid)
-                .update("favoriteMusicTypes", musicTypes);
-    }
-
-    // Enable or disable user push notifications
+    /**
+     * Enables or disables push notifications for the user.
+     *
+     * @param uid User ID
+     * @param enabled Whether notifications are enabled
+     * @return Task representing the update operation
+     */
     public Task<Void> updateNotificationsEnabled(String uid, boolean enabled) {
         return db.collection("users")
                 .document(uid)
                 .update("notificationsEnabled", enabled);
     }
-    // Delete entire user document
+
+    /**
+     * Deletes the entire user profile document from Firestore.
+     *
+     * @param uid User ID
+     * @return Task representing the delete operation
+     */
     public Task<Void> deleteUserProfile(String uid) {
         return db.collection("users")
                 .document(uid)

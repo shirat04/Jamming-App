@@ -18,9 +18,8 @@ public class OwnerViewModel extends ViewModel {
     public MutableLiveData<String> ownerName = new MutableLiveData<>();
 
     public MutableLiveData<String> message = new MutableLiveData<>();
-    public MutableLiveData<List<EventRepository.EventWithId>> upcomingEvents = new MutableLiveData<>();
-    public MutableLiveData<List<EventRepository.EventWithId>> pastEvents = new MutableLiveData<>();
-
+    public MutableLiveData<List<Event>> upcomingEvents = new MutableLiveData<>();
+    public MutableLiveData<List<Event>> pastEvents = new MutableLiveData<>();
     public void loadOwnerName() {
         String uid = authRepo.getCurrentUid();
 
@@ -38,9 +37,6 @@ public class OwnerViewModel extends ViewModel {
                 );
     }
 
-    public void logout() {
-        authRepo.logout();
-    }
 
     public void loadOwnerEvents() {
         String uid = authRepo.getCurrentUid();
@@ -52,32 +48,31 @@ public class OwnerViewModel extends ViewModel {
 
         eventRepo.getEventsByOwner(uid)
                 .addOnSuccessListener(query -> {
-                    List<EventRepository.EventWithId> upcoming = new ArrayList<>();
-                    List<EventRepository.EventWithId> past = new ArrayList<>();
+
+                    List<Event> upcoming = new ArrayList<>();
+                    List<Event> past = new ArrayList<>();
 
                     long now = System.currentTimeMillis();
 
                     for (QueryDocumentSnapshot doc : query) {
-                        Event e = doc.toObject(Event.class);
-                        if (e == null) continue;
+                        Event event = doc.toObject(Event.class);
+                        if (event == null) continue;
 
-                        EventRepository.EventWithId wrapped =
-                                new EventRepository.EventWithId(e, doc.getId());
+                        // שורה קריטית: הכנסת ה־ID לאובייקט
+                        event.setId(doc.getId());
 
-                        if (e.getDateTime() < now) {
-                            past.add(wrapped);
+                        if (event.getDateTime() < now) {
+                            past.add(event);
                         } else {
-                            upcoming.add(wrapped);
+                            upcoming.add(event);
                         }
                     }
                     upcoming.sort((a, b) ->
-                            Long.compare(a.event.getDateTime(), b.event.getDateTime())
-                    );
+                            Long.compare(a.getDateTime(), b.getDateTime()));
 
                     past.sort((a, b) ->
-                            Long.compare(b.event.getDateTime(), a.event.getDateTime())
+                            Long.compare(b.getDateTime(), a.getDateTime())
                     );
-
 
                     upcomingEvents.setValue(upcoming);
                     pastEvents.setValue(past);

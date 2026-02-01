@@ -9,11 +9,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
+import com.example.jamming.model.Event;
 import com.example.jamming.navigation.OwnerMenuHandler;
-import com.example.jamming.repository.EventRepository;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.viewmodel.OwnerViewModel;
-import java.util.List;
+import static com.example.jamming.utils.GenreUtils.genresToText;
 
 public class OwnerActivity extends BaseActivity {
     private OwnerViewModel viewModel;
@@ -77,17 +77,57 @@ public class OwnerActivity extends BaseActivity {
                 emptyEventsText.setVisibility(View.VISIBLE);
             } else {
                 emptyEventsText.setVisibility(View.GONE);
-                for (EventRepository.EventWithId e : events) {
-                    addEventCard(e);
+                for (Event event : events) {
+                    addEventCard(event);
                 }
             }
         });
-
 
         viewModel.message.observe(this, msg ->
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
         );
     }
+
+
+    private void addEventCard(Event event) {
+        View card = getLayoutInflater()
+                .inflate(R.layout.activity_item_event_owner_card, eventsContainer, false);
+
+        TextView title = card.findViewById(R.id.myEventTitle);
+        TextView location = card.findViewById(R.id.myEventLocation);
+        TextView date = card.findViewById(R.id.myEventDate);
+        TextView genre = card.findViewById(R.id.myEventGenre);
+        TextView capacity = card.findViewById(R.id.myEventCapacity);
+        Button editBtn = card.findViewById(R.id.btnMyEventDetails);
+        Button cancelBtn = card.findViewById(R.id.btnCancelMyEvent);
+
+        title.setText(event.getName());
+        location.setText(event.getAddress());
+        long eventDateTime = event.getDateTime();
+
+        String dateTimeText = DateUtils.formatOnlyDate(eventDateTime) + " • " + DateUtils.formatOnlyTime(eventDateTime);
+        date.setText(dateTimeText);
+
+        genre.setText(genresToText(event.getMusicTypes()));
+        String capacityText = getString(
+                R.string.participants_format,
+                event.getReserved(),
+                event.getMaxCapacity()
+        );
+        capacity.setText(capacityText);
+
+        editBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(this, EditEventActivity.class);
+            intent.putExtra("EVENT_ID", event.getId());
+            startActivity(intent);
+        });
+
+        cancelBtn.setOnClickListener(v ->
+                showDeleteEventDialog(event.getId())
+        );
+        eventsContainer.addView(card);
+    }
+
 
     private void showDeleteEventDialog(String eventId) {
         new androidx.appcompat.app.AlertDialog.Builder(this)
@@ -102,58 +142,9 @@ public class OwnerActivity extends BaseActivity {
                 .show();
     }
 
-
-
     @Override
     protected boolean onMenuItemSelected(int itemId) {
         return menuHandler.handle(itemId);
-    }
-
-    private void addEventCard(EventRepository.EventWithId event) {
-        View card = getLayoutInflater()
-                .inflate(R.layout.activity_item_event_owner_card, eventsContainer, false);
-
-        TextView title = card.findViewById(R.id.myEventTitle);
-        TextView location = card.findViewById(R.id.myEventLocation);
-        TextView date = card.findViewById(R.id.myEventDate);
-        TextView genre = card.findViewById(R.id.myEventGenre);
-        TextView capacity = card.findViewById(R.id.myEventCapacity);
-        Button editBtn = card.findViewById(R.id.btnMyEventDetails);
-        Button cancelBtn = card.findViewById(R.id.btnCancelMyEvent);
-
-        title.setText(event.event.getName());
-        location.setText(event.event.getAddress());
-        long eventDateTime = event.event.getDateTime();
-        String dateTimeText = DateUtils.formatOnlyDate(eventDateTime) + " • " + DateUtils.formatOnlyTime(eventDateTime);
-        date.setText(dateTimeText);
-
-        genre.setText(genresToText(event.event.getMusicTypes()));
-        String text = getString(
-                R.string.participants_format,
-                event.event.getReserved(),
-                event.event.getMaxCapacity()
-        );
-
-        capacity.setText(text);
-
-        editBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(this, EditEventActivity.class);
-            intent.putExtra("EVENT_ID", event.id);
-            startActivity(intent);
-        });
-
-        cancelBtn.setOnClickListener(v ->
-                showDeleteEventDialog(event.id)
-        );
-
-
-        eventsContainer.addView(card);
-    }
-    private String genresToText(List<String> genres) {
-        if (genres == null || genres.isEmpty()) {
-            return "No genre specified";
-        }
-        return String.join(" , ", genres);
     }
 
 
