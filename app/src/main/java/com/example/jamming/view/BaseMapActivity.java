@@ -41,10 +41,10 @@ public abstract class BaseMapActivity extends BaseActivity
         onMapReadyCustom();
     }
 
-//הגדרות מפה
+
     protected void configureMapUi() {
         mMap.getUiSettings().setZoomControlsEnabled(true); //  + -
-        mMap.getUiSettings().setMapToolbarEnabled(false);  // בלי "Navigate"
+        mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setRotateGesturesEnabled(true);
         mMap.getUiSettings().setTiltGesturesEnabled(false);
@@ -108,9 +108,6 @@ public abstract class BaseMapActivity extends BaseActivity
         }
     }
 
-    /**
-     * כל Activity שמרחיבה את המחלקה הזו
-     * חייבת לממש את המתודה הזו
-     */
+
     protected abstract void onMapReadyCustom();
 }

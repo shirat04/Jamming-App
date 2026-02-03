@@ -54,7 +54,7 @@ public class MapPickerActivity extends BaseMapActivity {
         btnSearch.setOnClickListener(v -> {
             String query = etSearchLocation.getText().toString().trim();
             if (query.isEmpty()) {
-                etSearchLocation.setError("נא להזין מיקום לחיפוש");
+                etSearchLocation.setError("Please enter a location to search.");
                 etSearchLocation.requestFocus();
 
                 return;
@@ -92,7 +92,7 @@ public class MapPickerActivity extends BaseMapActivity {
             mMap.addMarker(
                     new MarkerOptions()
                             .position(latLng)
-                            .title("מיקום נבחר")
+                            .title("Selected location")
             );
 
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
@@ -109,7 +109,7 @@ public class MapPickerActivity extends BaseMapActivity {
                     selectedAddress = "";
                     Toast.makeText(
                             this,
-                            "לא ניתן לזהות כתובת. נסי לבחור נקודה מדויקת יותר",
+                            "Address cannot be identified. Please choose a more precise point.",
                             Toast.LENGTH_SHORT
                     ).show();
                     return;
@@ -121,7 +121,7 @@ public class MapPickerActivity extends BaseMapActivity {
                 selectedAddress = "";
                 Toast.makeText(
                         this,
-                        "שגיאה בזיהוי כתובת. נסי שוב",
+                        "Error recognizing address. Try again.",
                         Toast.LENGTH_SHORT
                 ).show();
             }
@@ -131,12 +131,12 @@ public class MapPickerActivity extends BaseMapActivity {
 
     private void confirmLocation() {
         if (Double.isNaN(selectedLat) || Double.isNaN(selectedLng)) {
-            Toast.makeText(this, "נא לבחור מיקום על המפה", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please select a location on the map", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (selectedAddress == null || selectedAddress.trim().isEmpty()) {
-            Toast.makeText(this, "נא לבחור מיקום עם כתובת מזוהה", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please select a location with an identified address.", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -157,7 +157,7 @@ public class MapPickerActivity extends BaseMapActivity {
             if (!AddressUtils.hasStreetAndCity(address)) {
                 Toast.makeText(
                         this,
-                        "הכתובת לא נמצאה במדויק. נא לבחור נקודה ידנית במפה",
+                        "The address was not found accurately. Please select a point manually on the map.",
                         Toast.LENGTH_LONG
                 ).show();
                 return;
@@ -177,7 +177,7 @@ public class MapPickerActivity extends BaseMapActivity {
             selectedAddress = AddressUtils.formatAddress(address);
 
         } catch (IOException e) {
-            Toast.makeText(this, "שגיאה בחיפוש", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Search error", Toast.LENGTH_SHORT).show();
         }
     }
 

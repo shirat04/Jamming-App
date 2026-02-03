@@ -98,41 +98,41 @@ public class CreateNewEventActivity extends BaseActivity {
 
             switch (field) {
                 case TITLE:
-                    nameInput.setError("נא להזין שם אירוע");
+                    nameInput.setError("Please enter an event name");
                     nameInput.requestFocus();
                     break;
 
                 case LOCATION:
-                    locationInput.setError("נא לבחור מיקום");
+                    locationInput.setError("Please select a location");
                     locationInput.requestFocus();
                     break;
 
                 case DATE:
-                    dateInput.setError("נא לבחור תאריך");
+                    dateInput.setError("Please select a date");
                     dateInput.requestFocus();
                     break;
 
                 case TIME:
-                    timeInput.setError("נא לבחור שעה");
+                    timeInput.setError("Please select a time");
                     timeInput.requestFocus();
                     break;
 
                 case GENRE:
-                    genreText.setError("נא לבחור ז'אנר");
+                    genreText.setError("Please select at least one genre");
                     genreText.requestFocus();
                     break;
 
                 case CAPACITY:
-                    capacityInput.setError("קיבולת לא תקינה");
+                    capacityInput.setError("Invalid capacity value");
                     capacityInput.requestFocus();
                     break;
+
                 case DESCRIPTION:
-                    descriptionInput.setError("נא להזין תיאור לאירוע");
+                    descriptionInput.setError("Please enter an event description");
                     descriptionInput.requestFocus();
                     break;
-
-
             }
+
         });
 
         viewModel.getGenresText().observe(this, text -> {
@@ -166,7 +166,7 @@ public class CreateNewEventActivity extends BaseActivity {
 
         viewModel.getSuccess().observe(this, success -> {
             if (Boolean.TRUE.equals(success)) {
-                Toast.makeText(this, "האירוע נוצר בהצלחה!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "The event was created successfully!", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });

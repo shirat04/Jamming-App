@@ -112,40 +112,41 @@ public class EditEventActivity extends BaseActivity {
             }
             switch (field) {
                 case TITLE:
-                    etTitle.setError("נא להזין שם אירוע");
+                    etTitle.setError("Please enter an event title");
                     etTitle.requestFocus();
                     break;
 
                 case DESCRIPTION:
-                    etDescription.setError("נא להזין תיאור");
+                    etDescription.setError("Please enter a description");
                     etDescription.requestFocus();
                     break;
 
                 case LOCATION:
-                    etLocation.setError("נא לבחור מיקום");
+                    etLocation.setError("Please select a location");
                     etLocation.requestFocus();
                     break;
 
                 case DATE:
-                    etDate.setError("נא לבחור תאריך");
+                    etDate.setError("Please select a date");
                     etDate.requestFocus();
                     break;
 
                 case TIME:
-                    etTime.setError("נא לבחור שעה");
+                    etTime.setError("Please select a time");
                     etTime.requestFocus();
                     break;
 
                 case CAPACITY:
-                    etCapacity.setError("קיבולת לא תקינה");
+                    etCapacity.setError("Invalid capacity value");
                     etCapacity.requestFocus();
                     break;
 
                 case GENRE:
-                    genreText.setError("נא לבחור ז'אנר");
+                    genreText.setError("Please select at least one genre");
                     genreText.requestFocus();
                     break;
             }
+
         });
 
         viewModel.getErrorMessage().observe(this, msg -> {

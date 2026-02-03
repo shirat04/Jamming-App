@@ -286,7 +286,7 @@ public class FilterDialogs {
         });
 
         new AlertDialog.Builder(ctx)
-                .setTitle("סינון לפי מרחק")
+                .setTitle("Filter by distance")
                 .setView(v)
                 .setPositiveButton("OK", (d, w) -> {
                     int radius = Math.round(slider.getValue());

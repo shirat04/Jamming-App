@@ -1,4 +1,4 @@
-package com.example.jamming.view;// קובץ: EventDetailActivity.java
+package com.example.jamming.view;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -48,7 +48,7 @@ public class EventDetailActivity extends BaseActivity  {
 
         String eventId = getIntent().getStringExtra("EVENT_ID");
         if (eventId == null || eventId.isEmpty()) {
-            Toast.makeText(this, "שגיאה: לא נשלח ID אירוע ב-Intent.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Something went wrong. Event ID is missing.", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
