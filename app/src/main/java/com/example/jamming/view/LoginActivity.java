@@ -13,12 +13,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.viewmodel.LoginViewModel;
+import com.example.jamming.model.UserType;
 
 public class LoginActivity extends AppCompatActivity {
 
 
     private EditText usernameInput, passwordInput;
-    private LoginViewModel loginViewModel;
+    private LoginViewModel viewModel;
     ProgressBar progressBar;
 
     private Button loginBtn,registerBtn;
@@ -30,6 +31,16 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        initViews();
+        viewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+
+        setupClearErrorOnInput();
+
+        setupListeners();
+
+        observeViewModel();
+    }
+    private void initViews() {
         usernameInput = findViewById(R.id.usernameInput);
         passwordInput = findViewById(R.id.passwordInput);
         loginBtn = findViewById(R.id.loginButton);
@@ -37,44 +48,27 @@ public class LoginActivity extends AppCompatActivity {
         errorText = findViewById(R.id.errorTextView);
         forgotPassword = findViewById(R.id.forgotPasswordText);
         progressBar = findViewById(R.id.loginProgressBar);
-        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+    }
 
-        TextWatcher clearMessageWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                loginViewModel.clearMessage();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        };
-
-        usernameInput.addTextChangedListener(clearMessageWatcher);
-        passwordInput.addTextChangedListener(clearMessageWatcher);
-
+    private void setupListeners() {
         loginBtn.setOnClickListener(v -> {
             String identifier = usernameInput.getText().toString().trim();
             String pass = passwordInput.getText().toString().trim();
-            loginViewModel.login(identifier, pass);
+            viewModel.login(identifier, pass);
         });
 
         forgotPassword.setOnClickListener(v -> {
             String identifier = usernameInput.getText().toString().trim();
-            loginViewModel.resetPassword(identifier);
+            viewModel.resetPassword(identifier);
         });
 
         registerBtn.setOnClickListener(v ->
                 startActivity(new Intent(this, RegisterActivity.class))
         );
-
-        observeViewModel();
     }
 
-    private void observeViewModel() {
-        loginViewModel.getMessage().observe(this, msg -> {
+        private void observeViewModel() {
+        viewModel.getMessage().observe(this, msg -> {
             if (msg != null) {
                 errorText.setText(msg);
                 errorText.setVisibility(View.VISIBLE);
@@ -83,26 +77,18 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        loginViewModel.getIsLoading().observe(this, isLoading -> {
-            if (isLoading) {
-                progressBar.setVisibility(View.VISIBLE);
-                loginBtn.setEnabled(false);
-            } else {
-                progressBar.setVisibility(View.GONE);
-                loginBtn.setEnabled(true);
-            }
-        });
-
-        loginViewModel.getIsLoading().observe(this, isLoading -> {
+        viewModel.getIsLoading().observe(this, isLoading -> {
+            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
             loginBtn.setEnabled(!isLoading);
             loginBtn.setAlpha(isLoading ? 0.6f : 1f);
         });
 
 
-        loginViewModel.getUserType().observe(this, type -> {
+
+        viewModel.getUserType().observe(this, type -> {
             if (type == null) return;
 
-            if ("owner".equals(type)) {
+            if (type == UserType.OWNER) {
                 startActivity(new Intent(this, OwnerActivity.class));
             } else {
                 startActivity(new Intent(this, ExploreEventsActivity.class));
@@ -110,5 +96,24 @@ public class LoginActivity extends AppCompatActivity {
 
             finish();
         });
+
+    }
+
+    private void setupClearErrorOnInput() {
+        TextWatcher clearMessageWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                viewModel.clearMessage();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
+        usernameInput.addTextChangedListener(clearMessageWatcher);
+        passwordInput.addTextChangedListener(clearMessageWatcher);
+
     }
 }
