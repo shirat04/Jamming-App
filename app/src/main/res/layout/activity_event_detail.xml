@@ -204,6 +204,17 @@
                 tools:ignore="VisualLintButtonSize"
                 android:backgroundTint="@color/button_register_selector"/>
 
+            <TextView
+                android:id="@+id/soldOutLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SOLD OUT"
+                android:textColor="@android:color/holo_red_dark"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone" />
+
             <Button
                 android:id="@+id/CancelRegistrationBtn"
                 android:layout_width="match_parent"

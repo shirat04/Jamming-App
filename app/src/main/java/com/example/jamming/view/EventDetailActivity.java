@@ -22,7 +22,7 @@ import java.util.List;
 public class EventDetailActivity extends BaseActivity  {
     private EventDetailViewModel viewModel;
 
-    private TextView titleEvent, dateTextView,  locationTextView, eventDescription, capacityEvent, generEevet;
+    private TextView titleEvent, dateTextView,  locationTextView, eventDescription, capacityEvent, generEevet, soldOutLabel;
 
     private Button registerBtn, cancelRegistrationBtn;
     private LinearLayout contentLayout;
@@ -70,6 +70,7 @@ public class EventDetailActivity extends BaseActivity  {
         capacityEvent = findViewById(R.id.capacityEvent);
         generEevet = findViewById(R.id.genreTextView);
         registerBtn = findViewById(R.id.registerBtn);
+        soldOutLabel = findViewById(R.id.soldOutLabel);
         cancelRegistrationBtn = findViewById(R.id.CancelRegistrationBtn);
         eventImage = findViewById(R.id.eventImage);
         contentLayout = findViewById(R.id.contentLayout);
@@ -82,7 +83,14 @@ public class EventDetailActivity extends BaseActivity  {
             if (event == null) return;
 
             displayEventData(event);
-            contentLayout.setVisibility(View.VISIBLE);
+        });
+
+        viewModel.getIsLoading().observe(this, loading -> {
+            if (loading != null && loading) {
+                contentLayout.setVisibility(View.GONE);
+            } else {
+                contentLayout.setVisibility(View.VISIBLE);
+            }
         });
 
         viewModel.getErrorMessage().observe(this, msg -> {
@@ -116,14 +124,18 @@ public class EventDetailActivity extends BaseActivity  {
 
             registerBtn.setEnabled(state.canRegister);
             cancelRegistrationBtn.setEnabled(state.canCancel);
-            registerBtn.setText(state.registerButtonText);
+            registerBtn.setText(state.mainText);
+            cancelRegistrationBtn.setVisibility(state.canCancel ? View.VISIBLE : View.GONE);
 
-            cancelRegistrationBtn.setVisibility(View.VISIBLE);
 
-            if (!state.canRegister && !state.canCancel) {
-                cancelRegistrationBtn.setVisibility(View.GONE);
+            if (state.secondaryText != null) {
+                soldOutLabel.setText(state.secondaryText);
+                soldOutLabel.setVisibility(View.VISIBLE);
+            } else {
+                soldOutLabel.setVisibility(View.GONE);
             }
         });
+
 
 
     }

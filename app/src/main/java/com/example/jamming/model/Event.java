@@ -82,7 +82,9 @@ public class Event {
     public void setLatitude(double latitude) { this.latitude = latitude; }
     public void setLongitude(double longitude) { this.longitude = longitude; }
 
-
+    public void setReserved(int reserved) {
+        this.reserved = reserved;
+    }
     public int getAvailableSpots() {
         return maxCapacity - reserved;
     }
