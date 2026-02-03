@@ -28,6 +28,7 @@ public class MyEventUserActivity extends BaseActivity {
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,14 +72,23 @@ public class MyEventUserActivity extends BaseActivity {
             }
         });
 
-
-        viewModel.getEmptyMessage().observe(this, msg -> {
-            if (msg != null) {
-                emptyMessageText.setText(msg);
-                emptyMessageText.setVisibility(View.VISIBLE);
-                container.setVisibility(View.GONE);
+        viewModel.getState().observe(this, state -> {
+            switch (state) {
+                case NOT_LOGGED_IN:
+                    emptyMessageText.setText("User not logged in");
+                    break;
+                case NO_REGISTERED_EVENTS:
+                    emptyMessageText.setText("You haven't registered for events yet.");
+                    break;
+                case LOAD_ERROR:
+                    Toast.makeText(this, "Failed to load events", Toast.LENGTH_SHORT).show();
+                    break;
+                case NONE:
+                    emptyMessageText.setVisibility(View.GONE);
+                    break;
             }
         });
+
 
 
         viewModel.getCancelSuccess().observe(this, success -> {
@@ -88,11 +98,7 @@ public class MyEventUserActivity extends BaseActivity {
             }
         });
 
-        viewModel.getErrorMessage().observe(this, msg -> {
-            if (msg != null) {
-                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-            }
-        });
+
     }
 
     private void showCancelRegistrationDialog(String eventId) {
@@ -121,7 +127,7 @@ public class MyEventUserActivity extends BaseActivity {
 
     private void addEventCard(MyEventUserViewModel.EventWithId wrapper) {
         Event event = wrapper.event;
-        boolean isPast = wrapper.isPast;
+        boolean isPast = event.getDateTime() < System.currentTimeMillis();
 
         View card = getLayoutInflater()
                 .inflate(R.layout.activity_item_event_user_card, container, false);
