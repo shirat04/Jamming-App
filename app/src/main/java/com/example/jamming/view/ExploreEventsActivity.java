@@ -50,7 +50,7 @@ public class ExploreEventsActivity extends BaseMapActivity {
         setupListeners();
         viewModel.initFilter();
         viewModel.loadAllEvents();
-        viewModel.loadUserGreeting();
+        viewModel.loadUserName();
 
     }
 
@@ -82,6 +82,10 @@ public class ExploreEventsActivity extends BaseMapActivity {
         mapFragment.getMapAsync(this);
     }
     private void setupListeners() {
+        viewModel.getUserName().observe(this, name -> {
+            if (name == null || name.isEmpty()) return;
+            setTitleText(getString(R.string.hello_user, name));
+        });
 
         btnAllEvent.setOnClickListener(v -> viewModel.clearFilter());
 
@@ -142,14 +146,10 @@ public class ExploreEventsActivity extends BaseMapActivity {
         });
     }
 
-    @Override
-    protected boolean onMenuItemSelected(int itemId) {
-        return menuHandler.handle(itemId);
-    }
 
     // Observers
     private void observeViewModel() {
-        viewModel.getUserGreeting().observe(this, this::setTitleText);
+        viewModel.getUserName().observe(this, this::setTitleText);
 
         viewModel.getFilteredEvents().observe(this, events -> {
             pendingEvents = events;
@@ -178,6 +178,10 @@ public class ExploreEventsActivity extends BaseMapActivity {
 
     }
 
+    @Override
+    protected boolean onMenuItemSelected(int itemId) {
+        return menuHandler.handle(itemId);
+    }
 
     @Override
     protected void onMapReadyCustom() {
