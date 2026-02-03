@@ -1,25 +1,85 @@
 package com.example.jamming.viewmodel;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import com.example.jamming.model.Event;
 import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.repository.UserRepository;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ViewModel responsible for managing the owner's main screen.
+ *
+ * Handles loading the owner's name, fetching and categorizing events
+ * (upcoming vs past), and deleting events.
+ *
+ * Follows the MVVM pattern:
+ * - No direct UI references
+ * - Exposes state via LiveData
+ * - Delegates data access to repositories
+ */
 public class OwnerViewModel extends ViewModel {
-    private final AuthRepository authRepo = new AuthRepository();
-    private final EventRepository eventRepo = new EventRepository();
-    private final UserRepository userRepo = new UserRepository();
-    public MutableLiveData<String> ownerName = new MutableLiveData<>();
 
-    public MutableLiveData<String> message = new MutableLiveData<>();
-    public MutableLiveData<List<Event>> upcomingEvents = new MutableLiveData<>();
-    public MutableLiveData<List<Event>> pastEvents = new MutableLiveData<>();
+    /** Repository for authentication-related operations */
+    private final AuthRepository authRepo;
+
+    /** Repository for event-related data */
+    private final EventRepository eventRepo;
+
+    /** Repository for user-related data */
+    private final UserRepository userRepo;
+
+    /**
+     * Default constructor used in production.
+     * Initializes the ViewModel with real repository instances.
+     */
+    public OwnerViewModel() {
+        this(new AuthRepository(), new EventRepository(), new UserRepository());
+    }
+
+    /**
+     * Constructor for dependency injection (mainly for testing).
+     *
+     * @param authRepo  authentication repository
+     * @param eventRepo event repository
+     * @param userRepo  user repository
+     */
+    public OwnerViewModel(AuthRepository authRepo, EventRepository eventRepo, UserRepository userRepo) {
+        this.authRepo = authRepo;
+        this.eventRepo = eventRepo;
+        this.userRepo = userRepo;
+    }
+
+    /** Owner's display name */
+    private final MutableLiveData<String> ownerName = new MutableLiveData<>();
+
+    /** General message for UI feedback (errors, confirmations) */
+    private final MutableLiveData<String> message = new MutableLiveData<>();
+
+    /** List of upcoming events created by the owner */
+    private final MutableLiveData<List<Event>> upcomingEvents = new MutableLiveData<>();
+
+    /** List of past events created by the owner */
+    private final MutableLiveData<List<Event>> pastEvents = new MutableLiveData<>();
+
+
+    /** Read-only accessors for the View */
+    public LiveData<String> getOwnerName() { return ownerName; }
+    public LiveData<String> getMessage() { return message; }
+    public LiveData<List<Event>> getUpcomingEvents() { return upcomingEvents; }
+    public LiveData<List<Event>> getPastEvents() { return pastEvents; }
+
+
+    /**
+     * Loads the owner's display name.
+     *
+     * If the user is not logged in or the name cannot be retrieved,
+     * a default value ("Owner") is used.
+     */
     public void loadOwnerName() {
         String uid = authRepo.getCurrentUid();
 
@@ -37,7 +97,15 @@ public class OwnerViewModel extends ViewModel {
                 );
     }
 
-
+    /**
+     * Loads all events created by the current owner.
+     *
+     * Events are split into:
+     * - Upcoming events (future date)
+     * - Past events (already occurred)
+     *
+     * Each list is sorted by date for display purposes.
+     */
     public void loadOwnerEvents() {
         String uid = authRepo.getCurrentUid();
 
@@ -46,42 +114,45 @@ public class OwnerViewModel extends ViewModel {
             return;
         }
 
-        eventRepo.getEventsByOwner(uid)
-                .addOnSuccessListener(query -> {
+        eventRepo.getOwnerEventsMapped(uid)
+                .addOnSuccessListener(events  -> {
 
                     List<Event> upcoming = new ArrayList<>();
                     List<Event> past = new ArrayList<>();
 
                     long now = System.currentTimeMillis();
 
-                    for (QueryDocumentSnapshot doc : query) {
-                        Event event = doc.toObject(Event.class);
-                        if (event == null) continue;
-
-                        // שורה קריטית: הכנסת ה־ID לאובייקט
-                        event.setId(doc.getId());
-
+                    for (Event event : events) {
                         if (event.getDateTime() < now) {
                             past.add(event);
                         } else {
                             upcoming.add(event);
                         }
                     }
+
+                    // Sort upcoming events from nearest to farthest
                     upcoming.sort((a, b) ->
                             Long.compare(a.getDateTime(), b.getDateTime()));
 
+                    // Sort past events from most recent to oldest
                     past.sort((a, b) ->
-                            Long.compare(b.getDateTime(), a.getDateTime())
-                    );
+                            Long.compare(b.getDateTime(), a.getDateTime()));
 
                     upcomingEvents.setValue(upcoming);
                     pastEvents.setValue(past);
                 })
-                .addOnFailureListener(e ->
-                        message.setValue("Failed to load events")
-                );
+                .addOnFailureListener(e -> {
+                    message.setValue("Failed to load events");
+                });
     }
 
+    /**
+     * Deletes an event owned by the current user.
+     *
+     * After successful deletion, the event list is reloaded.
+     *
+     * @param eventId Event ID to delete
+     */
     public void deleteEvent(String eventId) {
         eventRepo.deleteEvent(eventId)
                 .addOnSuccessListener(v -> {

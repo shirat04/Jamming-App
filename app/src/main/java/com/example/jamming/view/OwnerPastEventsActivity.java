@@ -52,7 +52,7 @@ public class OwnerPastEventsActivity extends BaseActivity {
     }
 
     private void observeViewModel() {
-        viewModel.pastEvents.observe(this, events -> {
+        viewModel.getPastEvents().observe(this, events -> {
             pastEventsContainer.removeAllViews();
 
             if (events == null || events.isEmpty()) {
@@ -67,7 +67,7 @@ public class OwnerPastEventsActivity extends BaseActivity {
             }
         });
 
-        viewModel.message.observe(this, msg ->
+        viewModel.getMessage().observe(this, msg ->
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
         );
     }

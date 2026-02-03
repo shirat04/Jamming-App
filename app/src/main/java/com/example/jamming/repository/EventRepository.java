@@ -148,6 +148,31 @@ public class EventRepository {
                 });
     }
 
+    /**
+     * Retrieves all events created by a specific owner.
+     *
+     * Each event is mapped from Firestore into an {@link Event} object,
+     * including its document ID.
+     *
+     * @param ownerId Owner user ID
+     * @return Task containing a list of the owner's events
+     */
+    public Task<List<Event>> getOwnerEventsMapped(String ownerId) {
+        return db.collection("events")
+                .whereEqualTo("ownerId", ownerId)
+                .get()
+                .continueWith(task -> {
+                    List<Event> events = new ArrayList<>();
+                    for (DocumentSnapshot doc : task.getResult()) {
+                        Event event = doc.toObject(Event.class);
+                        if (event == null) continue;
+                        event.setId(doc.getId());
+                        events.add(event);
+                    }
+                    return events;
+                });
+    }
+
 
     /**
      * Decrements the number of reserved seats for an event.

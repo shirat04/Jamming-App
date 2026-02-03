@@ -66,11 +66,12 @@ public class OwnerActivity extends BaseActivity {
     }
 
     private void observeViewModel() {
-        viewModel.ownerName.observe(this, name ->
+        viewModel.getOwnerName().observe(this, name ->
                 setTitleText(getString(R.string.hello_user, name))
         );
 
-        viewModel.upcomingEvents.observe(this, events -> {
+
+        viewModel.getUpcomingEvents().observe(this, events -> {
             eventsContainer.removeAllViews();
 
             if (events == null || events.isEmpty()) {
@@ -83,7 +84,7 @@ public class OwnerActivity extends BaseActivity {
             }
         });
 
-        viewModel.message.observe(this, msg ->
+        viewModel.getMessage().observe(this, msg ->
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
         );
     }
