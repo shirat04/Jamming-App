@@ -8,17 +8,32 @@ import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.repository.UserRepository;
 
-
+/**
+ * ViewModel for the Event Details screen.
+ *
+ * Responsible for:
+ * - Loading event data
+ * - Handling registration and cancellation logic
+ * - Exposing UI state via LiveData according to MVVM architecture
+ */
 public class EventDetailViewModel extends ViewModel {
 
+    // Repositories used for data access and business logic
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final AuthRepository authRepository;
 
+    /**
+     * Default constructor used in production.
+     * Initializes repositories with their default implementations.
+     */
     public EventDetailViewModel() {
         this(new EventRepository(), new UserRepository(), new AuthRepository());
     }
 
+    /**
+     * Constructor used mainly for testing (dependency injection).
+     */
     public EventDetailViewModel(
             EventRepository eventRepository,
             UserRepository userRepository,
@@ -29,26 +44,44 @@ public class EventDetailViewModel extends ViewModel {
         this.authRepository = authRepository;
     }
 
+    /**
+     * One-time UI events used for showing messages such as Toasts.
+     */
+    public enum UiEvent {
+        REGISTER_SUCCESS,
+        CANCEL_SUCCESS,
+        ALREADY_REGISTERED
+    }
+
+    // Holds the current event data
     private final MutableLiveData<Event> eventLiveData = new MutableLiveData<>();
+
+    // Holds the current registration-related UI state
     private final MutableLiveData<RegistrationUiState> registrationUiState = new MutableLiveData<>();
+
+    // Holds error messages to be displayed in the UI
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> registrationSuccess = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> cancelSuccess = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> showAlreadyRegisteredMessage = new MutableLiveData<>();
+
+    // Indicates whether data is currently loading
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(true);
 
+    // One-time UI events (success / already registered)
+    private final MutableLiveData<UiEvent> uiEvent = new MutableLiveData<>();
+    public LiveData<UiEvent> getUiEvent() { return uiEvent; }
     public LiveData<Boolean> getIsLoading() {return isLoading;}
-
     public LiveData<Event> getEventLiveData() { return eventLiveData; }
     public LiveData<RegistrationUiState> getRegistrationUiState() { return registrationUiState; }
     public LiveData<String> getErrorMessage() { return errorMessage; }
-    public LiveData<Boolean> getRegistrationSuccess() { return registrationSuccess; }
-    public LiveData<Boolean> getCancelSuccess() { return cancelSuccess; }
-    public LiveData<Boolean> getShowAlreadyRegisteredMessage() { return showAlreadyRegisteredMessage; }
 
+    // Currently loaded event ID (used to avoid unnecessary reloads)
     private String eventId;
 
 
+    /**
+     * Loads event details and updates UI state accordingly.
+     *
+     * @param eventId ID of the event to load
+     */
     public void loadEvent(String eventId) {
         if (eventId == null || eventId.equals(this.eventId)) {
             return;
@@ -79,6 +112,7 @@ public class EventDetailViewModel extends ViewModel {
                         return;
                     }
 
+                    // Check if the user is already registered to this event
                     userRepository.getRegisteredEvents(uid)
                             .addOnSuccessListener(events -> {
                                 boolean registered = events.contains(eventId);
@@ -99,6 +133,10 @@ public class EventDetailViewModel extends ViewModel {
 
     }
 
+
+    /**
+     * Attempts to register the current user to the event.
+     */
     public void registerToEvent() {
         Event event = eventLiveData.getValue();
         if (event == null) {
@@ -117,19 +155,22 @@ public class EventDetailViewModel extends ViewModel {
             return;
         }
 
+        // Check if user is already registered
         userRepository.getRegisteredEvents(uid)
                 .addOnSuccessListener(events -> {
 
                     if (events.contains(eventId)) {
-                        showAlreadyRegisteredMessage.postValue(true);
+                        uiEvent.postValue(UiEvent.ALREADY_REGISTERED);
                         updateRegistrationState(event, true);
                         return;
                     }
 
+                    // Try to register user if capacity allows
                     eventRepository.registerUserIfCapacityAvailable(eventId, uid)
                             .addOnSuccessListener(v -> {
-                                registrationSuccess.postValue(true);
+                                uiEvent.postValue(UiEvent.REGISTER_SUCCESS);
 
+                                // Reload event to update capacity and UI
                                 eventRepository.getEventById(eventId)
                                         .addOnSuccessListener(doc -> {
                                             Event refreshed = doc.toObject(Event.class);
@@ -152,6 +193,10 @@ public class EventDetailViewModel extends ViewModel {
 
     }
 
+
+    /**
+     * Cancels the current user's registration to the event.
+     */
     public void cancelRegistration() {
         Event event = eventLiveData.getValue();
         if (event == null) return;
@@ -170,9 +215,12 @@ public class EventDetailViewModel extends ViewModel {
         userRepository.unregisterEventForUser(uid, eventId)
                 .addOnSuccessListener(unused -> {
 
+                    // Decrease reserved count after successful cancellation
                     eventRepository.decrementReserved(eventId)
                             .addOnSuccessListener(v -> {
+                                uiEvent.postValue(UiEvent.CANCEL_SUCCESS);
 
+                                // Reload event data
                                 eventRepository.getEventById(eventId)
                                         .addOnSuccessListener(doc -> {
                                             Event refreshed = doc.toObject(Event.class);
@@ -192,6 +240,9 @@ public class EventDetailViewModel extends ViewModel {
                 );
     }
 
+    /**
+     * Updates the registration-related UI state based on event status and user registration.
+     */
     private void updateRegistrationState(Event event, boolean isRegistered) {
         boolean isPast = isEventExpired(event);
         boolean isFull = event.getReserved() >= event.getMaxCapacity();
@@ -242,22 +293,16 @@ public class EventDetailViewModel extends ViewModel {
         );
     }
 
+    /**
+     * Checks whether the event date has already passed.
+     */
     private boolean isEventExpired(Event event) {
         return event.getDateTime() < System.currentTimeMillis();
     }
 
-    public void resetRegistrationSuccess() {
-        registrationSuccess.postValue(false);
-    }
-
-    public void resetCancelSuccess() {
-        cancelSuccess.postValue(false);
-    }
-
-    public void resetAlreadyRegisteredMessage() {
-        showAlreadyRegisteredMessage.postValue(false);
-    }
-
+    /**
+     * Represents the UI state related to event registration.
+     */
     public static class RegistrationUiState {
         public final boolean canRegister;
         public final boolean canCancel;

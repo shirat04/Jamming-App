@@ -99,25 +99,23 @@ public class EventDetailActivity extends BaseActivity  {
             }
         });
 
-        viewModel.getShowAlreadyRegisteredMessage().observe(this, show -> {
-            if (show != null && show) {
-                Toast.makeText(this, "You're already registered for this event.", Toast.LENGTH_SHORT).show();
-                viewModel.resetAlreadyRegisteredMessage();
-            }
-        });
-        viewModel.getCancelSuccess().observe(this, success -> {
-            if (success != null && success) {
-                Toast.makeText(this, "Your registration was canceled.", Toast.LENGTH_SHORT).show();
-                viewModel.resetCancelSuccess();
+        viewModel.getUiEvent().observe(this, event -> {
+            if (event == null) return;
+
+            switch (event) {
+                case REGISTER_SUCCESS:
+                    Toast.makeText(this, "You're registered! 🎉", Toast.LENGTH_SHORT).show();
+                    break;
+                case CANCEL_SUCCESS:
+                    Toast.makeText(this, "Registration canceled", Toast.LENGTH_SHORT).show();
+                    break;
+                case ALREADY_REGISTERED:
+                    Toast.makeText(this, "You're already registered", Toast.LENGTH_SHORT).show();
+                    break;
             }
         });
 
-        viewModel.getRegistrationSuccess().observe(this, success -> {
-            if (success != null && success) {
-                Toast.makeText(this, "You're registered! 🎉", Toast.LENGTH_SHORT).show();
-                viewModel.resetRegistrationSuccess();
-            }
-        });
+
 
         viewModel.getRegistrationUiState().observe(this, state -> {
             if (state == null) return;
