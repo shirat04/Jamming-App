@@ -105,6 +105,17 @@
 
         </RadioGroup>
 
+        <ProgressBar
+            android:id="@+id/registerProgressBar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:visibility="gone"
+            android:layout_gravity="center_horizontal"
+            app:layout_constraintTop_toBottomOf="@id/registerTitle"
+            app:layout_constraintBottom_toTopOf="@id/registerForm"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <Button
             android:id="@+id/btnRegister"
             android:layout_width="match_parent"
@@ -115,16 +126,16 @@
 
         <TextView
             android:id="@+id/errorText"
-            android:layout_width="366dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:textAlignment="center"
             android:textColor="#7f0532"
-            android:textSize="18sp"
-            android:visibility="gone"
+            android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:visibility="gone"
+            android:maxLines="4"
+            android:ellipsize="end"/>
 
         <Button
             android:id="@+id/btnAlreadyHaveAccount"
