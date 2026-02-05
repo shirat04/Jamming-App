@@ -8,7 +8,69 @@
     android:background="#F2F4F7"
     tools:context=".view.OwnerProfileActivity">
 
+    <!-- Main Progress Bar (for loading) -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Upload Progress Overlay -->
+    <FrameLayout
+        android:id="@+id/uploadProgressOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:visibility="gone"
+        android:elevation="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="24dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Uploading image..."
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp"/>
+
+            <ProgressBar
+                android:id="@+id/uploadProgressBar"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:progress="0"/>
+
+            <TextView
+                android:id="@+id/uploadProgressText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0%"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp"/>
+
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- PAGE SCROLL CONTENT -->
     <ScrollView
+        android:id="@+id/profileScroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="20dp"
@@ -23,29 +85,51 @@
             android:orientation="vertical"
             android:gravity="center_horizontal">
 
-            <!--OWNER INFO CARD -->
+            <!-- OWNER INFO CARD -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:background="@android:color/white"
-                android:padding="12dp"
+                android:padding="16dp"
                 android:elevation="4dp"
                 android:layout_marginBottom="16dp"
                 android:gravity="center_vertical">
 
-                <ImageView
-                    android:id="@+id/profileImage"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:src="@android:drawable/sym_def_app_icon"
-                    android:layout_marginEnd="12dp"
-                    android:contentDescription="Profile image"/>
+                <!-- Profile Image Container with Camera Icon -->
+                <FrameLayout
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginEnd="16dp">
+
+                    <ImageView
+                        android:id="@+id/profileImage"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:src="@drawable/default_profile_image"
+                        android:scaleType="centerCrop"
+                        android:contentDescription="Profile image"
+                        android:background="@drawable/circle_background"
+                        android:clipToOutline="true"/>
+
+                    <!-- Camera Icon Overlay -->
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="bottom|end"
+                        android:src="@android:drawable/ic_menu_camera"
+                        android:background="@drawable/circle_background_small"
+                        android:padding="4dp"
+                        android:elevation="2dp"
+                        android:contentDescription="Change profile picture"/>
+
+                </FrameLayout>
 
                 <LinearLayout
                     android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
 
                     <TextView
                         android:id="@+id/profileName"
@@ -61,9 +145,30 @@
                         android:layout_height="wrap_content"
                         android:text="owner@email.com"
                         android:textSize="14sp"
-                        android:textColor="#777777"/>
+                        android:textColor="#777777"
+                        android:layout_marginTop="4dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tap photo to change"
+                        android:textSize="12sp"
+                        android:textColor="#999999"
+                        android:layout_marginTop="4dp"/>
+
                 </LinearLayout>
             </LinearLayout>
+
+            <!-- SETTINGS SECTION TITLE -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Account Settings"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#666666"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="4dp"/>
 
             <!-- Edit Profile -->
             <LinearLayout
@@ -73,22 +178,34 @@
                 android:background="@android:color/white"
                 android:gravity="center_vertical"
                 android:padding="12dp"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="2dp"
                 android:clickable="true"
-                android:focusable="true">
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="Edit profile"
+                    android:src="@android:drawable/ic_menu_edit"
+                    android:tint="#666666"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:text="Edit profile"
+                    android:textSize="16sp"/>
 
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@android:drawable/ic_menu_edit"
-                    android:contentDescription="Edit profile"/>
+                    android:src="@android:drawable/ic_media_play"
+                    android:rotation="0"
+                    android:tint="#CCCCCC"
+                    android:contentDescription="Navigate"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="Edit profile"
-                    android:textSize="16sp"/>
             </LinearLayout>
 
             <!-- Change Password -->
@@ -99,22 +216,37 @@
                 android:background="@android:color/white"
                 android:gravity="center_vertical"
                 android:padding="12dp"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_lock_lock"
+                    android:tint="#666666"
+                    android:contentDescription="Change password"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:text="Change Password"
+                    android:textSize="16sp"/>
 
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@android:drawable/ic_lock_lock"/>
+                    android:src="@android:drawable/ic_media_play"
+                    android:rotation="0"
+                    android:tint="#CCCCCC"
+                    android:contentDescription="Navigate"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="Change Password"
-                    android:textSize="16sp"/>
             </LinearLayout>
 
-            <!--  Notifications -->
+            <!-- Notifications + Switch -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
@@ -124,45 +256,66 @@
                 android:layout_marginBottom="24dp">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="Notifications"
                     android:src="@android:drawable/ic_dialog_info"
-                    android:contentDescription="Notifications"/>
+                    android:tint="#666666"/>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
                     android:text="Notifications"
                     android:textSize="16sp"/>
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/switchNotifications"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
+                    android:checked="true"/>
+
             </LinearLayout>
+
+            <!-- ACTIONS SECTION TITLE -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Actions"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#666666"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="4dp"/>
 
             <!-- Logout -->
             <Button
                 android:id="@+id/btnLogout"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="50dp"
                 android:text="Log out"
                 android:textAllCaps="false"
+                android:textSize="16sp"
                 android:layout_marginBottom="12dp"
-                android:backgroundTint="@color/divider"
+                android:backgroundTint="#757575"
                 android:textColor="@android:color/white"/>
 
-            <!--  Delete Account -->
+            <!-- Delete Account -->
             <Button
                 android:id="@+id/btnDeleteAccount"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="50dp"
                 android:text="Delete my account"
                 android:textAllCaps="false"
+                android:textSize="16sp"
                 android:backgroundTint="#D32F2F"
                 android:textColor="@android:color/white"/>
+
+            <!-- Spacer at bottom -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="32dp"/>
 
         </LinearLayout>
     </ScrollView>
