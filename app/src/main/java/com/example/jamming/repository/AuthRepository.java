@@ -1,6 +1,7 @@
 package com.example.jamming.repository;
 
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -132,6 +133,21 @@ public class AuthRepository {
      */
     public Task<Void> sendPasswordResetEmail(String email) {
         return auth.sendPasswordResetEmail(email);
+    }
+
+    /**
+     * Deletes the currently authenticated user's Firebase Auth account.
+     * Note: This requires the user to have recently authenticated.
+     * If the user hasn't authenticated recently, this will fail with
+     * FirebaseAuthRecentLoginRequiredException.
+     *
+     * @return Task representing the delete operation
+     */
+    public Task<Void> deleteCurrentUser() {
+        if (auth.getCurrentUser() != null) {
+            return auth.getCurrentUser().delete();
+        }
+        return Tasks.forException(new Exception("No user logged in"));
     }
 
 }
