@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.widget.TextView;
+
+import androidx.core.view.GravityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
@@ -18,6 +20,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,6 +33,9 @@ public class ExploreEventsActivity extends BaseMapActivity {
     private boolean isMapReady = false;
     private List<Event> pendingEvents = new ArrayList<>();
     private UserMenuHandler menuHandler;
+    private long lastBackPressTime = 0;
+    private static final long BACK_PRESS_INTERVAL = 2000;
+
 
 
 
@@ -40,7 +46,6 @@ public class ExploreEventsActivity extends BaseMapActivity {
                 R.menu.user_menu,
                 R.layout.activity_explore_events
         );
-        showRightActions();
 
         initViews();
         initMap();
@@ -221,5 +226,21 @@ public class ExploreEventsActivity extends BaseMapActivity {
     private void drawEventsOnMap(List<Event> events) {
         if (mMap == null) return;
         MapUiHelper.drawEvents(mMap, events, this::enableMyLocationSafe);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawers();
+            return;
+        }
+
+        long now = System.currentTimeMillis();
+        if (now - lastBackPressTime < BACK_PRESS_INTERVAL) {
+            super.onBackPressed();
+        } else {
+            lastBackPressTime = now;
+            Toast.makeText(this, "Click again to exit.", Toast.LENGTH_SHORT).show();
+        }
     }
 }

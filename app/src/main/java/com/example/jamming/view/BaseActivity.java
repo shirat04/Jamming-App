@@ -19,24 +19,21 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected TextView titleText;
     protected ImageButton btnMenu;
     protected LinearLayout rightActions;
+    protected FrameLayout contentFrame;
 
 
 
 
     protected void setupBase(int menuRes, int contentLayout) {
         setContentView(R.layout.activity_base_menu);
+        initViews();
 
-        drawerLayout = findViewById(R.id.drawerLayout);
-        navigationView = findViewById(R.id.navigationView);
-        titleText = findViewById(R.id.titleText);
-        btnMenu = findViewById(R.id.btnMenu);
-        rightActions = findViewById(R.id.rightActions);
 
         btnMenu.setOnClickListener(v ->
                 drawerLayout.openDrawer(GravityCompat.START)
         );
 
-        FrameLayout contentFrame = findViewById(R.id.contentFrame);
+
         getLayoutInflater().inflate(contentLayout, contentFrame, true);
 
         navigationView.getMenu().clear();
@@ -48,8 +45,17 @@ public abstract class BaseActivity extends AppCompatActivity {
             return handled;
         });
 
-
 }
+    private void initViews() {
+        drawerLayout = findViewById(R.id.drawerLayout);
+        navigationView = findViewById(R.id.navigationView);
+        titleText = findViewById(R.id.titleText);
+        btnMenu = findViewById(R.id.btnMenu);
+        rightActions = findViewById(R.id.rightActions);
+        contentFrame = findViewById(R.id.contentFrame);
+    }
+
+
     protected void setTitleText(String text) {
         if (titleText != null) {
             titleText.setText(text);
@@ -58,6 +64,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected boolean onMenuItemSelected(int itemId) {
         return false;
     }
+
     protected void hideRightActions() {
         if (rightActions != null) {
             rightActions.removeAllViews();

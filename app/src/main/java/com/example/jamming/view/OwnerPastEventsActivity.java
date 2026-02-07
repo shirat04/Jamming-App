@@ -32,7 +32,6 @@ public class OwnerPastEventsActivity extends BaseActivity {
                 R.layout.activity_owner_past_events
         );
         setTitleText(getString(R.string.past_events));
-        showRightActions();
 
         pastEventsContainer = findViewById(R.id.pastEventsContainer);
         emptyPastEventsText = findViewById(R.id.emptyPastEventsText);

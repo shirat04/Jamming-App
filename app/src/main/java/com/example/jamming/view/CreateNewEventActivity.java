@@ -280,6 +280,7 @@ public class CreateNewEventActivity extends BaseActivity {
         this.viewModel = testViewModel;
         observeViewModel();
     }
+
     public CreateNewEventViewModel getViewModel() { return viewModel; }
 
 }

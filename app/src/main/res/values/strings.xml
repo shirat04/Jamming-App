@@ -176,6 +176,24 @@
         <item>Classical</item>
         <item>Open Mic</item>
     </string-array>
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_change">Change</string>
+    <string name="action_clear">Clear</string>
+
+    <string name="dialog_select_genres">Select genres</string>
+    <string name="dialog_current_time_filter">Current time filter</string>
+    <string name="dialog_current_date_filter">Current date filter</string>
+    <string name="dialog_select_start_time">Select start time</string>
+    <string name="dialog_select_end_time">Select end time</string>
+    <string name="dialog_select_start_date">Select start date</string>
+    <string name="dialog_select_end_date">Select end date</string>
+    <string name="dialog_seat_filtering">Seat filtering</string>
+    <string name="dialog_filter_by_distance">Filter by distance</string>
+
+    <string name="error_no_location">No location is currently available. Make sure location permissions are enabled.</string>
+
+    <string name="label_distance_km">Distance: %d km</string>
 
     <string name="participants_format">Participants: %1$d / %2$d</string>
 

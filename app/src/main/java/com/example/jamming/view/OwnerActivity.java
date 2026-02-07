@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.core.view.GravityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
@@ -19,6 +20,9 @@ public class OwnerActivity extends BaseActivity {
     private OwnerViewModel viewModel;
     private TextView emptyEventsText;
     private OwnerMenuHandler menuHandler;
+    private Button createEventBtn;
+    private long lastBackPressTime = 0;
+    private static final long BACK_PRESS_INTERVAL = 2000;
 
     private LinearLayout eventsContainer;
 
@@ -29,18 +33,13 @@ public class OwnerActivity extends BaseActivity {
                 R.menu.owner_menu,
                 R.layout.activity_owner
         );
-        showRightActions();
-
-
-        Button createEventBtn = findViewById(R.id.createEventButton);
-        eventsContainer = findViewById(R.id.eventsContainer);
-        emptyEventsText = findViewById(R.id.emptyEventsText);
 
 
         viewModel = new ViewModelProvider(this).get(OwnerViewModel.class);
         menuHandler = new OwnerMenuHandler(this);
-
+        initViews();
         observeViewModel();
+        setupListeners();
 
         viewModel.loadOwnerName();
         navigationView.setNavigationItemSelectedListener(item -> {
@@ -49,6 +48,14 @@ public class OwnerActivity extends BaseActivity {
             return handled;
         });
 
+    }
+    private void initViews() {
+        createEventBtn = findViewById(R.id.createEventButton);
+        eventsContainer = findViewById(R.id.eventsContainer);
+        emptyEventsText = findViewById(R.id.emptyEventsText);
+    }
+
+    private void setupListeners() {
         findViewById(R.id.btnPastEvents).setOnClickListener(v ->
                 startActivity(new Intent(this, OwnerPastEventsActivity.class))
         );
@@ -56,7 +63,6 @@ public class OwnerActivity extends BaseActivity {
         createEventBtn.setOnClickListener(v ->
                 startActivity(new Intent(this, CreateNewEventActivity.class))
         );
-
     }
 
     @Override
@@ -148,5 +154,19 @@ public class OwnerActivity extends BaseActivity {
         return menuHandler.handle(itemId);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawers();
+            return;
+        }
 
+        long now = System.currentTimeMillis();
+        if (now - lastBackPressTime < BACK_PRESS_INTERVAL) {
+            super.onBackPressed();
+        } else {
+            lastBackPressTime = now;
+            Toast.makeText(this, "Click again to exit.", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

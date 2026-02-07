@@ -77,15 +77,6 @@
                 android:layout_marginBottom="12dp"/>
 
             <!-- Change Password -->
-            <Button
-                android:id="@+id/btnChangePassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Change Password"
-                android:backgroundTint="#E0E0E0"
-                android:textColor="@android:color/black"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="12dp"/>
 
             <!-- Save -->
             <Button
