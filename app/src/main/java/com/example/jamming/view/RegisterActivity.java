@@ -2,8 +2,6 @@ package com.example.jamming.view;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,38 +9,65 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import com.example.jamming.model.UserType;
-
+import com.example.jamming.utils.FormTextWatcher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-
 import com.example.jamming.R;
 import com.example.jamming.viewmodel.RegisterViewModel;
 
+/**
+ * Activity responsible for rendering the registration screen and handling user interactions.
+ *
+ * This class follows the MVVM pattern:
+ * - It contains no business logic or validation rules.
+ * - It delegates all registration logic to {@link RegisterViewModel}.
+ * - It observes LiveData from the ViewModel to update the UI and perform navigation.
+ */
 public class RegisterActivity extends AppCompatActivity {
+    // Input fields
     private EditText fullName, password, confirmPassword, email, userName;
+
+    // UI controls
     private RadioButton owner;
     private TextView errorText;
     private ProgressBar progressBar;
-    private  Button register,backLogin;
+    private Button register,backLogin;
+
+    // ViewModel handling the registration logic
     private RegisterViewModel viewModel;
 
-
+    /**
+     * Initializes the Activity, binds the UI elements, sets up listeners,
+     * and starts observing the ViewModel state.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        // Bind all views from the layout
         initViews();
+
+        // Obtain the ViewModel instance scoped to this Activity
         viewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
+        // Set up UI event listeners (buttons, etc.)
         setupListeners();
 
+        // Clear error messages when the user edits any input field
         setupClearErrorOnInput(fullName, userName, email, password, confirmPassword);
-        owner.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            viewModel.clearError();
-        });
 
+        // Clear error message when the user changes the selected user type
+        owner.setOnCheckedChangeListener((buttonView, isChecked) -> viewModel.clearError());
+
+        // Observe ViewModel state and react to changes
         observeViewModel();
     }
+
+    /**
+     * Finds and assigns all required view references from the layout.
+     * This method centralizes view binding and keeps onCreate() clean and readable.
+     */
     private void initViews() {
         fullName = findViewById(R.id.etName);
         password = findViewById(R.id.etPassword);
@@ -52,41 +77,58 @@ public class RegisterActivity extends AppCompatActivity {
         userName = findViewById(R.id.usName);
         errorText = findViewById(R.id.errorText);
         progressBar = findViewById(R.id.registerProgressBar);
-
         register = findViewById(R.id.btnRegister);
         backLogin = findViewById(R.id.btnAlreadyHaveAccount);
     }
+
+    /**
+     * Sets up click listeners for the main UI actions:
+     * - Navigating back to the login screen
+     * - Submitting the registration form
+     */
     private void setupListeners() {
+        // Navigate back to the login screen
         backLogin.setOnClickListener(v ->
                 startActivity(new Intent(this, LoginActivity.class))
         );
-
+        // Trigger the registration flow via the ViewModel
         register.setOnClickListener(v -> handleRegister());
     }
 
+    /**
+     * Collects raw input values from the UI and delegates the processing
+     * to the ViewModel. The ViewModel is responsible for normalization,
+     * validation, and executing the registration logic.
+     */
     private void handleRegister() {
-
-        String fName = fullName.getText().toString().trim();
-        String emailTxt = email.getText().toString().trim();
-        String pass = password.getText().toString().trim();
-        String confPass = confirmPassword.getText().toString().trim();
-        String uName = userName.getText().toString().trim();
-        UserType type = owner.isChecked() ? UserType.OWNER : UserType.USER;
-
-        viewModel.register(fName, emailTxt, pass, confPass, uName, type);
+        viewModel.registerFromForm(
+                fullName.getText().toString(),
+                email.getText().toString(),
+                password.getText().toString(),
+                confirmPassword.getText().toString(),
+                userName.getText().toString(),
+                owner.isChecked()
+        );
     }
 
+    /**
+     * Observes LiveData exposed by the ViewModel and updates the UI accordingly:
+     * - Shows or hides the loading indicator
+     * - Displays validation or server errors
+     * - Navigates to the appropriate screen after successful registration
+     */
     private void observeViewModel() {
-
+        // Observe loading state to update progress indicator and UI interactivity
         viewModel.getIsLoading().observe(this, isLoading -> {
+            if (isLoading == null) return;
+
             progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
             register.setEnabled(!isLoading);
             backLogin.setEnabled(!isLoading);
             register.setAlpha(isLoading ? 0.6f : 1f);
         });
 
-
-
+        // Observe error messages and display them to the user
         viewModel.getErrorResId().observe(this, errResId -> {
             if (errResId != null) {
                 errorText.setText(getString(errResId));
@@ -96,7 +138,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-
+        // Observe successful registration result and navigate to the next screen
         viewModel.getUserType().observe(this, type -> {
             if (type == null) return;
             if (type == UserType.OWNER) {
@@ -104,23 +146,25 @@ public class RegisterActivity extends AppCompatActivity {
             } else {
                 startActivity(new Intent(this, ExploreEventsActivity.class));
             }
-
+            viewModel.clearNavigation();
             finish();
         });
     }
 
+    /**
+     * Attaches a shared TextWatcher to the given input fields.
+     * Whenever the user edits any field, the current error message is cleared
+     * to provide immediate feedback and avoid showing outdated errors.
+     *
+     * @param fields variable number of EditText fields to observe
+     */
     private void setupClearErrorOnInput(EditText... fields) {
-        TextWatcher watcher = new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                viewModel.clearError();
-            }
-            @Override public void afterTextChanged(Editable s) {}
-        };
-
         for (EditText field : fields) {
-            field.addTextChangedListener(watcher);
+            field.addTextChangedListener(
+                    FormTextWatcher.after(text -> viewModel.clearError())
+            );
         }
     }
+
 
 }

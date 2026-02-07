@@ -135,7 +135,13 @@ public class RegisterViewModel extends ViewModel {
                     repo.createUser(email, pass)
                             .addOnSuccessListener(auth -> {
                                 String uid = repo.getCurrentUid();
+                                if (uid == null) {
+                                    isLoading.setValue(false);
+                                    errorResId.setValue(R.string.error_registration_failed);
+                                    return;
+                                }
                                 saveUserProfile(uid, fullName, email, userName, type);
+
                             })
                             .addOnFailureListener(e -> {
                                 isLoading.setValue(false);
@@ -182,6 +188,36 @@ public class RegisterViewModel extends ViewModel {
     }
 
     /**
+     * Prepares user input from the UI and delegates the registration process.
+     *
+     * @param fullName raw full name input
+     * @param email raw email input
+     * @param pass raw password input
+     * @param confPass raw password confirmation input
+     * @param userName raw username input
+     * @param isOwnerChecked true if the "owner" option is selected
+     */
+    public void registerFromForm(String fullName,
+                                 String email,
+                                 String pass,
+                                 String confPass,
+                                 String userName,
+                                 boolean isOwnerChecked) {
+
+        UserType type = isOwnerChecked ? UserType.OWNER : UserType.USER;
+
+        register(
+                fullName == null ? null : fullName.trim(),
+                email == null ? null : email.trim(),
+                pass == null ? null : pass.trim(),
+                confPass == null ? null : confPass.trim(),
+                userName == null ? null : userName.trim(),
+                type
+        );
+    }
+
+
+    /**
      * Clears the current error message.
      * Called when the user starts editing input fields.
      */
@@ -189,5 +225,14 @@ public class RegisterViewModel extends ViewModel {
         errorResId.setValue(null);
     }
 
+    /**
+     * Clears the navigation state after the View has already reacted to it.
+     *
+     * This prevents re-triggering navigation when the observer is re-attached
+     * (e.g., after configuration changes like screen rotation).
+     */
+    public void clearNavigation() {
+        userType.setValue(null);
+    }
 
 }
