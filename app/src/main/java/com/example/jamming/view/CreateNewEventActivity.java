@@ -10,37 +10,49 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import com.example.jamming.R;
 import androidx.lifecycle.ViewModelProvider;
-
 import com.example.jamming.model.MusicGenre;
 import com.example.jamming.navigation.OwnerMenuHandler;
 import com.example.jamming.viewmodel.CreateNewEventViewModel;
-
 import java.util.Calendar;
 
-
+/**
+ * Activity responsible for creating a new event.
+ * Handles user input, shows date/time/genre pickers, validates input via ViewModel,
+ * and publishes the event when all fields are valid.
+ *
+ * Follows MVVM: UI logic here, validation and business logic in CreateNewEventViewModel.
+ */
 public class CreateNewEventActivity extends BaseActivity {
 
+    // UI elements
     private EditText nameInput, capacityInput, descriptionInput, locationInput;
-    private TextView dateInput, timeInput, genreText, cancelBtn;
-    private Button publishBtn;
+    private TextView dateInput, timeInput, genreText;
+    private Button publishBtn, cancelBtn;
     private ImageButton mapButton;
+
+    // Calendar instance used for initializing date and time pickers
     private Calendar calendar;
+
+    // Handles navigation drawer menu actions for owner screens
     private OwnerMenuHandler menuHandler;
 
 
-
+    // ViewModel
     private CreateNewEventViewModel viewModel;
 
+    /**
+     * Launcher for opening the MapPickerActivity and receiving the selected location.
+     * When a location is returned successfully, the result is forwarded to the ViewModel.
+     */
     private final ActivityResultLauncher<Intent> mapPickerLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
                     result -> {
-                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null && viewModel != null) {
                             viewModel.onLocationSelected(
                                     result.getData().getDoubleExtra("lat", 0),
                                     result.getData().getDoubleExtra("lng", 0),
@@ -49,27 +61,38 @@ public class CreateNewEventActivity extends BaseActivity {
                         }
                     });
 
+    /**
+     * Called when the Activity is created.
+     * Initializes the base layout, ViewModel, helpers, UI references,
+     * observers and event listeners.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Setup the base layout with owner menu and this screen's content
         setupBase(
                 R.menu.owner_menu,
                 R.layout.activity_create_new_event
         );
+        // Set the screen title and hide right action buttons
         setTitleText(getString(R.string.create_new_event));
         hideRightActions();
 
+        // Initialize ViewModel and helpers
         viewModel = new ViewModelProvider(this).get(CreateNewEventViewModel.class);
         calendar = viewModel.getDateTime();
         menuHandler = new OwnerMenuHandler(this);
 
+        // Initialize UI and bind logic
         initViews();
         observeViewModel();
         setupListeners();
     }
 
+    /**
+     * Finds and caches all required view references from the layout.
+     */
     private void initViews() {
-
         nameInput = findViewById(R.id.eventNameInput);
         capacityInput = findViewById(R.id.eventCapacityInput);
         descriptionInput = findViewById(R.id.eventDescriptionInput);
@@ -82,9 +105,17 @@ public class CreateNewEventActivity extends BaseActivity {
         mapButton = findViewById(R.id.mapButton);
     }
 
+    /**
+     * Observes ViewModel LiveData and updates the UI accordingly:
+     * - Displays validation errors on relevant fields
+     * - Updates date, time, location and genres text
+     * - Shows toast messages
+     * - Closes the screen on successful event creation
+     */
     private void observeViewModel() {
         viewModel.getErrorField().observe(this, field -> {
 
+            // Clear all previous errors
             if (field == null) {
                 nameInput.setError(null);
                 locationInput.setError(null);
@@ -96,84 +127,93 @@ public class CreateNewEventActivity extends BaseActivity {
                 return;
             }
 
+            // Show validation error according to the failing field
             switch (field) {
                 case TITLE:
-                    nameInput.setError("Please enter an event name");
+                    nameInput.setError(getString(R.string.error_event_title));
                     nameInput.requestFocus();
                     break;
 
                 case LOCATION:
-                    locationInput.setError("Please select a location");
+                    locationInput.setError(getString(R.string.error_event_location));
                     locationInput.requestFocus();
                     break;
 
                 case DATE:
-                    dateInput.setError("Please select a date");
+                    dateInput.setError(getString(R.string.error_event_date));
                     dateInput.requestFocus();
                     break;
 
                 case TIME:
-                    timeInput.setError("Please select a time");
+                    timeInput.setError(getString(R.string.error_event_time));
                     timeInput.requestFocus();
                     break;
 
                 case GENRE:
-                    genreText.setError("Please select at least one genre");
+                    genreText.setError(getString(R.string.error_event_genre));
                     genreText.requestFocus();
                     break;
 
                 case CAPACITY:
-                    capacityInput.setError("Invalid capacity value");
+                    capacityInput.setError(getString(R.string.error_event_capacity));
                     capacityInput.requestFocus();
                     break;
 
                 case DESCRIPTION:
-                    descriptionInput.setError("Please enter an event description");
+                    descriptionInput.setError(getString(R.string.error_event_description));
                     descriptionInput.requestFocus();
                     break;
             }
-
         });
 
+        // Update selected genres text
         viewModel.getGenresText().observe(this, text -> {
             genreText.setText(text);
             if (text != null && !text.trim().isEmpty()) {
                 genreText.setError(null);
             }
         });
+
+        // Update date text
         viewModel.getDateText().observe(this, text -> {
             dateInput.setText(text);
             dateInput.setError(null);
         });
 
+        // Update time text
         viewModel.getTimeText().observe(this, text -> {
             timeInput.setText(text);
             timeInput.setError(null);
         });
 
+        // Update location text
         viewModel.getLocationText().observe(this, text -> {
             locationInput.setText(text);
             locationInput.setError(null);
         });
 
-
-
+        // Show toast messages from ViewModel
         viewModel.getToastMessage().observe(this, msg -> {
             if (msg != null) {
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
             }
         });
 
+        // Finish screen on successful creation
         viewModel.getSuccess().observe(this, success -> {
             if (Boolean.TRUE.equals(success)) {
-                Toast.makeText(this, "The event was created successfully!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.event_created_success), Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
     }
 
+    /**
+     * Sets up all UI event listeners and delegates actions to the ViewModel.
+     */
     private void setupListeners() {
 
+        // Open map picker for selecting a location
         mapButton.setOnClickListener(v ->
                 mapPickerLauncher.launch(
                         new Intent(this, MapPickerActivity.class)));
@@ -182,6 +222,7 @@ public class CreateNewEventActivity extends BaseActivity {
                 mapPickerLauncher.launch(
                         new Intent(this, MapPickerActivity.class)));
 
+        // Show date picker dialog
         dateInput.setOnClickListener(v ->
                 new DatePickerDialog(
                         this,
@@ -192,7 +233,7 @@ public class CreateNewEventActivity extends BaseActivity {
                 ).show()
         );
 
-
+        // Show time picker dialog
         timeInput.setOnClickListener(v ->
                 new TimePickerDialog(
                         this,
@@ -203,13 +244,13 @@ public class CreateNewEventActivity extends BaseActivity {
                 ).show()
         );
 
-
+        // Open genre selection dialog
         genreText.setOnClickListener(v -> openGenreDialog());
 
+        // Clear errors when user edits fields
         nameInput.addTextChangedListener(new SimpleTextWatcher(() ->
                 nameInput.setError(null)
         ));
-
         capacityInput.addTextChangedListener(new SimpleTextWatcher(() ->
                 capacityInput.setError(null)
         ));
@@ -219,9 +260,7 @@ public class CreateNewEventActivity extends BaseActivity {
                 )
         );
 
-        genreText.setOnClickListener(v -> openGenreDialog());
-
-
+        // Publish event
         publishBtn.setOnClickListener(v ->
                 viewModel.publish(
                         nameInput.getText().toString(),
@@ -229,10 +268,15 @@ public class CreateNewEventActivity extends BaseActivity {
                         descriptionInput.getText().toString()
                 ));
 
+        // Cancel creation
         cancelBtn.setOnClickListener(v -> finish());
     }
-    private void openGenreDialog() {
 
+    /**
+     * Opens a multi-choice dialog that allows selecting one or more music genres.
+     * The selected values are stored and managed by the ViewModel.
+     */
+    private void openGenreDialog() {
         MusicGenre[] allGenres = MusicGenre.values();
         String[] labels = new String[allGenres.length];
         for (int i = 0; i < allGenres.length; i++) {
@@ -242,7 +286,7 @@ public class CreateNewEventActivity extends BaseActivity {
         boolean[] checked = viewModel.getCheckedGenres(allGenres);
 
         new AlertDialog.Builder(this)
-                .setTitle("Select music genres")
+                .setTitle(getString(R.string.select_music_genres))
                 .setMultiChoiceItems(
                         labels,
                         checked,
@@ -252,11 +296,15 @@ public class CreateNewEventActivity extends BaseActivity {
                                         isChecked
                                 )
                 )
-                .setPositiveButton("OK", null)
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(getString(R.string.ok), null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
 
+    /**
+     * Simple TextWatcher that executes a callback whenever the text changes.
+     * Used here to clear validation errors while the user edits input.
+     */
     private static class SimpleTextWatcher implements android.text.TextWatcher {
 
         private final Runnable onChange;
@@ -266,21 +314,29 @@ public class CreateNewEventActivity extends BaseActivity {
         }
 
         @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
-        @Override public void onTextChanged(CharSequence s, int st, int b, int c) {
-            onChange.run();
-        }
+        @Override public void onTextChanged(CharSequence s, int st, int b, int c) { onChange.run(); }
         @Override public void afterTextChanged(android.text.Editable s) {}
     }
+
+    /**
+     * Handles selection from the navigation menu.
+     */
     @Override
     protected boolean onMenuItemSelected(int itemId) {
         return menuHandler.handle(itemId);
     }
 
+    /**
+     * Replaces the ViewModel instance for testing purposes.
+     */
     public void setTestingViewModel(CreateNewEventViewModel testViewModel) {
         this.viewModel = testViewModel;
         observeViewModel();
     }
 
+    /**
+     * Returns the current ViewModel instance (mainly for testing).
+     */
     public CreateNewEventViewModel getViewModel() { return viewModel; }
 
 }

@@ -157,14 +157,18 @@
                 android:textColor="@android:color/white"
                 android:textSize="18sp" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/cancelText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/cancel"
                 android:textStyle="bold"
                 android:textColor="#0B375E"
-                android:textSize="18sp"/>
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:background="@drawable/rounded_button_outline"/>
+
+
 
         </LinearLayout>
 

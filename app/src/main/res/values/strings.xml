@@ -202,6 +202,19 @@
 
     <string name="hello_user">Hello %1$s</string>
     <string name="event_details">Event Details</string>
+    <string name="error_event_title">Please enter an event name</string>
+    <string name="error_event_location">Please select a location</string>
+    <string name="error_event_date">Please select a date</string>
+    <string name="error_event_time">Please select a time</string>
+    <string name="error_event_genre">Please select at least one genre</string>
+    <string name="error_event_capacity">Invalid capacity value</string>
+    <string name="error_event_description">Please enter an event description</string>
+
+    <string name="event_created_success">The event was created successfully!</string>
+
+    <string name="select_music_genres">Select music genres</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 
 
 </resources>
