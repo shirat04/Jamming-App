@@ -3,7 +3,6 @@ package com.example.jamming.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.model.MusicGenre;

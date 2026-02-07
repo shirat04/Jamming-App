@@ -226,5 +226,15 @@
 
     <string name="event_updated_success">The event was successfully updated.</string>
     <string name="error_updating_event_he">Error updating event</string>
+    <!-- Register errors -->
+    <string name="error_fill_all_fields">Please fill in all fields.</string>
+    <string name="error_username_taken">Username is taken. Try another one.</string>
+    <string name="error_invalid_email">Please enter a valid email address.</string>
+    <string name="error_password_too_short">The password must be at least six characters long.</string>
+    <string name="error_passwords_do_not_match">The passwords do not match.</string>
+    <string name="error_registration_failed">Registration failed. Please try again.</string>
+    <string name="error_event_time_already_passed_create">Cannot create an event for a time that has already passed.</string>
+    <string name="error_user_generic">User error</string>
+    <string name="error_creating_event">Failed to create event. Please try again.</string>
 
 </resources>

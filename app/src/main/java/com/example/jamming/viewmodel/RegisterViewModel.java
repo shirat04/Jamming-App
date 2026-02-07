@@ -3,7 +3,7 @@ package com.example.jamming.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
+import com.example.jamming.R;
 import com.example.jamming.model.UserType;
 import com.example.jamming.repository.AuthRepository;
 import java.util.HashMap;
@@ -46,7 +46,7 @@ public class RegisterViewModel extends ViewModel {
     }
 
     /** Error message exposed to the UI */
-    private final MutableLiveData<String> error = new MutableLiveData<>();
+    private final MutableLiveData<Integer> errorResId = new MutableLiveData<>();
 
     /**
      * Selected user type emitted on successful registration.
@@ -63,7 +63,7 @@ public class RegisterViewModel extends ViewModel {
     /** Read-only accessors for UI observers */
     public LiveData<Boolean> getIsLoading() {return isLoading;}
 
-    public LiveData<String> getError() { return error; }
+    public LiveData<Integer> getErrorResId() { return errorResId; }
     public LiveData<UserType> getUserType() { return userType; }
 
 
@@ -91,7 +91,7 @@ public class RegisterViewModel extends ViewModel {
      */
     public void register(String fullName, String email, String pass,String confPass, String userName, UserType type) {
         // Reset previous error and start loading
-        error.setValue(null);
+        errorResId.setValue(null);
         isLoading.setValue(true);
 
         // Basic required-fields validation
@@ -101,7 +101,7 @@ public class RegisterViewModel extends ViewModel {
                 userName == null || userName.trim().isEmpty() ||
                 type == null) {
             isLoading.setValue(false);
-            error.setValue("Please fill in all fields.");
+            errorResId.setValue(R.string.error_fill_all_fields);
             return;
         }
         // Check if username is already taken
@@ -109,26 +109,26 @@ public class RegisterViewModel extends ViewModel {
                 .addOnSuccessListener(query -> {
                     if (!query.isEmpty()) {
                         isLoading.setValue(false);
-                        error.setValue("Username is taken. Try another one.");
+                        errorResId.setValue(R.string.error_username_taken);
                         return;
                     }
 
         // Email format validation
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             isLoading.setValue(false);
-            error.setValue("Please enter a valid email address.");
+            errorResId.setValue(R.string.error_invalid_email);
             return;
         }
         if(pass.length()<6){
             isLoading.setValue(false);
-            error.setValue("The password must be at least six characters long.");
+            errorResId.setValue(R.string.error_password_too_short);
             return;
         }
 
         // Password validation
         if (!pass.equals(confPass)) {
             isLoading.setValue(false);
-            error.setValue("The passwords do not match.");
+            errorResId.setValue(R.string.error_passwords_do_not_match);
             return;
         }
                     // Create authentication user
@@ -139,11 +139,11 @@ public class RegisterViewModel extends ViewModel {
                             })
                             .addOnFailureListener(e -> {
                                 isLoading.setValue(false);
-                                error.setValue(e.getMessage());
+                                errorResId.setValue(R.string.error_registration_failed);
                             });                })
                 .addOnFailureListener(e -> {
                     isLoading.setValue(false);
-                    error.setValue(e.getMessage());
+                    errorResId.setValue(R.string.error_registration_failed);
                 });
     }
 
@@ -176,7 +176,7 @@ public class RegisterViewModel extends ViewModel {
                 })
                 .addOnFailureListener(e -> {
                     isLoading.setValue(false);
-                    error.setValue(e.getMessage());
+                    errorResId.setValue(R.string.error_registration_failed);
                 });
 
     }
@@ -186,7 +186,7 @@ public class RegisterViewModel extends ViewModel {
      * Called when the user starts editing input fields.
      */
     public void clearError() {
-        error.setValue(null);
+        errorResId.setValue(null);
     }
 
 

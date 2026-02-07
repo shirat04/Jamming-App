@@ -194,11 +194,12 @@ public class CreateNewEventActivity extends BaseActivity {
         });
 
         // Show toast messages from ViewModel
-        viewModel.getToastMessage().observe(this, msg -> {
-            if (msg != null) {
-                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        viewModel.getMessageResId().observe(this, resId -> {
+            if (resId != null) {
+                Toast.makeText(this, getString(resId), Toast.LENGTH_SHORT).show();
             }
         });
+
 
         // Finish screen on successful creation
         viewModel.getSuccess().observe(this, success -> {

@@ -87,14 +87,15 @@ public class RegisterActivity extends AppCompatActivity {
 
 
 
-        viewModel.getError().observe(this, err -> {
-            if (err != null) {
-                errorText.setText(err);
+        viewModel.getErrorResId().observe(this, errResId -> {
+            if (errResId != null) {
+                errorText.setText(getString(errResId));
                 errorText.setVisibility(View.VISIBLE);
             } else {
                 errorText.setVisibility(View.GONE);
             }
         });
+
 
         viewModel.getUserType().observe(this, type -> {
             if (type == null) return;

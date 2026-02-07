@@ -10,7 +10,7 @@ import com.example.jamming.repository.EventRepository;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.model.EventField;
 import com.example.jamming.utils.GenreUtils;
-
+import com.example.jamming.R;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -61,7 +61,7 @@ public class CreateNewEventViewModel extends ViewModel {
     private final MutableLiveData<String> timeText = new MutableLiveData<>();
     private final MutableLiveData<String> locationText = new MutableLiveData<>();
     private final MutableLiveData<String> genresText = new MutableLiveData<>("");
-    private final MutableLiveData<String> toastMessage = new MutableLiveData<>();
+    private final MutableLiveData<Integer> messageResId = new MutableLiveData<>();
     private final MutableLiveData<Boolean> success = new MutableLiveData<>();
     private final MutableLiveData<EventField> errorField = new MutableLiveData<>();
 
@@ -71,7 +71,7 @@ public class CreateNewEventViewModel extends ViewModel {
     public LiveData<String> getTimeText() { return timeText; }
     public LiveData<String> getLocationText() { return locationText; }
     public LiveData<String> getGenresText() {return genresText;}
-    public LiveData<String> getToastMessage() { return toastMessage; }
+    public LiveData<Integer> getMessageResId() {return messageResId;}
     public LiveData<Boolean> getSuccess() { return success; }
     public Calendar getDateTime() {return dateTime;}
 
@@ -172,7 +172,7 @@ public class CreateNewEventViewModel extends ViewModel {
         // Prevent creation of events in the past
         if (selectedTime <= now) {
             errorField.setValue(EventField.TIME);
-            toastMessage.setValue("Cannot create an event for a time that has already passed.");
+            messageResId.setValue(R.string.error_event_time_already_passed_create);
             return;
         }
 
@@ -198,7 +198,7 @@ public class CreateNewEventViewModel extends ViewModel {
 
         String ownerId = authRepo.getCurrentUid();
         if (ownerId == null) {
-            toastMessage.setValue("User error");
+            messageResId.setValue(R.string.error_user_generic);
             return;
         }
 
@@ -216,8 +216,8 @@ public class CreateNewEventViewModel extends ViewModel {
 
         eventRepository.createEvent(event)
                 .addOnSuccessListener(a -> success.setValue(true))
-                .addOnFailureListener(e ->
-                        toastMessage.setValue(e.getMessage()));
+                .addOnFailureListener(e -> messageResId.setValue(R.string.error_creating_event));
+
     }
 
 
