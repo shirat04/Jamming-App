@@ -16,6 +16,7 @@ import com.example.jamming.R;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.model.MusicGenre;
 import com.example.jamming.navigation.OwnerMenuHandler;
+import com.example.jamming.utils.FormTextWatcher;
 import com.example.jamming.viewmodel.CreateNewEventViewModel;
 import java.util.Calendar;
 
@@ -247,18 +248,11 @@ public class CreateNewEventActivity extends BaseActivity {
         // Open genre selection dialog
         genreText.setOnClickListener(v -> openGenreDialog());
 
-        // Clear errors when user edits fields
-        nameInput.addTextChangedListener(new SimpleTextWatcher(() ->
-                nameInput.setError(null)
-        ));
-        capacityInput.addTextChangedListener(new SimpleTextWatcher(() ->
-                capacityInput.setError(null)
-        ));
-        descriptionInput.addTextChangedListener(
-                new SimpleTextWatcher(() ->
-                        descriptionInput.setError(null)
-                )
-        );
+        // Clear validation errors when the user edits the fields
+        nameInput.addTextChangedListener(FormTextWatcher.after(s -> nameInput.setError(null)));
+        capacityInput.addTextChangedListener(FormTextWatcher.after(s -> capacityInput.setError(null)));
+        descriptionInput.addTextChangedListener(FormTextWatcher.after(s -> descriptionInput.setError(null)));
+
 
         // Publish event
         publishBtn.setOnClickListener(v ->
@@ -301,22 +295,6 @@ public class CreateNewEventActivity extends BaseActivity {
                 .show();
     }
 
-    /**
-     * Simple TextWatcher that executes a callback whenever the text changes.
-     * Used here to clear validation errors while the user edits input.
-     */
-    private static class SimpleTextWatcher implements android.text.TextWatcher {
-
-        private final Runnable onChange;
-
-        SimpleTextWatcher(Runnable onChange) {
-            this.onChange = onChange;
-        }
-
-        @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
-        @Override public void onTextChanged(CharSequence s, int st, int b, int c) { onChange.run(); }
-        @Override public void afterTextChanged(android.text.Editable s) {}
-    }
 
     /**
      * Handles selection from the navigation menu.

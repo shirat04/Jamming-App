@@ -209,6 +209,8 @@
     <string name="error_event_genre">Please select at least one genre</string>
     <string name="error_event_capacity">Invalid capacity value</string>
     <string name="error_event_description">Please enter an event description</string>
+    <string name="error_missing_event_id">Missing event ID</string>
+    <string name="error_edit_past_event">Past events cannot be edited</string>
 
     <string name="event_created_success">The event was created successfully!</string>
 

@@ -5,8 +5,6 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -18,22 +16,32 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.model.MusicGenre;
 import com.example.jamming.navigation.OwnerMenuHandler;
+import com.example.jamming.utils.FormTextWatcher;
 import com.example.jamming.viewmodel.EditEventViewModel;
 import com.google.android.material.snackbar.Snackbar;
 import java.util.Calendar;
 
+/**
+ * Activity responsible for editing an existing event.
+ * Handles UI input, delegates validation and business logic to EditEventViewModel,
+ * and updates the screen using LiveData observers (MVVM architecture).
+ */
 public class EditEventActivity extends BaseActivity {
 
+    // UI fields for event editing
     private EditText etTitle, etDescription, etLocation, etDate, etTime, etCapacity;
     private TextView genreText, cancelText;
     private Button btnSave;
     private ImageButton btnMap;
 
+    // ViewModel and helpers
     private EditEventViewModel viewModel;
     private Calendar calendar;
     private OwnerMenuHandler menuHandler;
 
-
+    /**
+     * Launcher used to open the map picker activity and receive the selected location.
+     */
     private final ActivityResultLauncher<Intent> mapPickerLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
@@ -43,11 +51,16 @@ public class EditEventActivity extends BaseActivity {
                             double lng = result.getData().getDoubleExtra("lng", 0);
                             String address = result.getData().getStringExtra("address");
 
-                            viewModel.onLocationSelected(lat, lng, address);
+                                viewModel.onLocationSelected(lat, lng, address);
+
                         }
                     }
             );
 
+    /**
+     * Initializes the activity, loads the event ID, sets up the ViewModel,
+     * and binds UI components, observers, and listeners.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,18 +71,31 @@ public class EditEventActivity extends BaseActivity {
         setTitleText(getString(R.string.edit_event));
         hideRightActions();
 
+        // Initialize ViewModel and menu handler
         viewModel = new ViewModelProvider(this).get(EditEventViewModel.class);
-        String eventId = getIntent().getStringExtra("EVENT_ID");
-        viewModel.init(eventId);
-        calendar = viewModel.getDateTime();
         menuHandler = new OwnerMenuHandler(this);
 
+        // Validate that an event ID was provided
+        String eventId = getIntent().getStringExtra("EVENT_ID");
+        if (eventId == null || eventId.isEmpty()) {
+            Toast.makeText(this, getString(R.string.error_missing_event_id), Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
 
+        // Load event data into the ViewModel
+        viewModel.init(eventId);
+        calendar = viewModel.getDateTime();
+
+        // Initialize UI and bind logic
         initViews();
         observeViewModel();
         setupListeners();
     }
 
+    /**
+     * Finds and caches all required view references from the layout.
+     */
     private void initViews() {
         etTitle = findViewById(R.id.etEventTitle);
         etDescription = findViewById(R.id.etEventDescription);
@@ -83,7 +109,14 @@ public class EditEventActivity extends BaseActivity {
         btnMap = findViewById(R.id.btnOpenMap);
     }
 
+    /**
+     * Observes LiveData from the ViewModel and updates the UI accordingly:
+     * - Fills input fields
+     * - Shows validation errors
+     * - Displays messages and closes the screen on success
+     */
     private void observeViewModel() {
+        // Observe event fields from the ViewModel and keep the input fields in sync with the current event data
         viewModel.getTitle().observe(this, text -> setIfDifferent(etTitle, text));
         viewModel.getDescription().observe(this, text -> setIfDifferent(etDescription, text));
         viewModel.getLocationText().observe(this, text -> setIfDifferent(etLocation, text));
@@ -99,62 +132,55 @@ public class EditEventActivity extends BaseActivity {
             }
         });
 
+        // Observe validation errors and highlight the corresponding input field
         viewModel.getErrorField().observe(this, field -> {
             if (field == null) {
-                genreText.setError(null);
-                etTitle.setError(null);
-                etDescription.setError(null);
-                etLocation.setError(null);
-                etDate.setError(null);
-                etTime.setError(null);
-                etCapacity.setError(null);
+                clearErrors();
                 return;
             }
+
+            // Show validation error on the relevant field
             switch (field) {
                 case TITLE:
-                    etTitle.setError("Please enter an event title");
+                    etTitle.setError(getString(R.string.error_event_title));
                     etTitle.requestFocus();
                     break;
-
                 case DESCRIPTION:
-                    etDescription.setError("Please enter a description");
+                    etDescription.setError(getString(R.string.error_event_description));
                     etDescription.requestFocus();
                     break;
-
                 case LOCATION:
-                    etLocation.setError("Please select a location");
+                    etLocation.setError(getString(R.string.error_event_location));
                     etLocation.requestFocus();
                     break;
-
                 case DATE:
-                    etDate.setError("Please select a date");
+                    etDate.setError(getString(R.string.error_event_date));
                     etDate.requestFocus();
                     break;
-
                 case TIME:
-                    etTime.setError("Please select a time");
+                    etTime.setError(getString(R.string.error_event_time));
                     etTime.requestFocus();
                     break;
-
                 case CAPACITY:
-                    etCapacity.setError("Invalid capacity value");
+                    etCapacity.setError(getString(R.string.error_event_capacity));
                     etCapacity.requestFocus();
                     break;
-
                 case GENRE:
-                    genreText.setError("Please select at least one genre");
+                    genreText.setError(getString(R.string.error_event_genre));
                     genreText.requestFocus();
                     break;
             }
 
         });
 
+        // Observe general error messages from the ViewModel and show them as a Snackbar
         viewModel.getErrorMessage().observe(this, msg -> {
             if (msg != null && !msg.trim().isEmpty()) {
                 Snackbar.make(findViewById(android.R.id.content), msg, Snackbar.LENGTH_LONG).show();
             }
         });
 
+        // Observe success messages (e.g., after saving changes) and close the screen
         viewModel.getSuccessMessage().observe(this, msg -> {
             if (msg != null) {
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
@@ -162,45 +188,61 @@ public class EditEventActivity extends BaseActivity {
             }
         });
 
+        // Observe whether editing is allowed (e.g., prevent editing past events)
         viewModel.getEditingAllowed().observe(this, allowed -> {
             if (allowed != null && !allowed) {
-                Toast.makeText(this, "Past events cannot be edited", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.error_edit_past_event), Toast.LENGTH_LONG).show();
                 finish();
             }
         });
-
-
     }
 
+    /**
+     * Clears all validation errors from input fields.
+     */
+    private void clearErrors() {
+        genreText.setError(null);
+        etTitle.setError(null);
+        etDescription.setError(null);
+        etLocation.setError(null);
+        etDate.setError(null);
+        etTime.setError(null);
+        etCapacity.setError(null);
+    }
+
+    /**
+     * Sets up all UI event listeners and delegates actions to the ViewModel.
+     */
     private void setupListeners() {
-        etTitle.addTextChangedListener(new SimpleTextWatcher(s -> {
-            viewModel.onTitleChanged(s);
-        }));
+        // Clear field errors when the user edits text
+        etTitle.addTextChangedListener(FormTextWatcher.after(s -> etTitle.setError(null)));
+        etDescription.addTextChangedListener(FormTextWatcher.after(s -> etDescription.setError(null)));
+        etCapacity.addTextChangedListener(FormTextWatcher.after(s -> etCapacity.setError(null)));
 
-        etDescription.addTextChangedListener(new SimpleTextWatcher(s -> {
-            viewModel.onDescriptionChanged(s);
-        }));
-
-        etCapacity.addTextChangedListener(new SimpleTextWatcher(s -> {
-            viewModel.onCapacityChanged(s);
-        }));
-
+        // Open date and time pickers
         etDate.setOnClickListener(v -> showDatePicker());
         etTime.setOnClickListener(v -> showTimePicker());
 
+        // Open map picker for selecting a location
         btnMap.setOnClickListener(v ->
                 mapPickerLauncher.launch(new Intent(this, MapPickerActivity.class))
         );
         etLocation.setOnClickListener(v ->
                 mapPickerLauncher.launch(new Intent(this, MapPickerActivity.class))
         );
+        // Open genre selection dialog
+        genreText.setOnClickListener(v -> openGenreDialog());
 
+        // Save or cancel actions
         btnSave.setOnClickListener(v -> viewModel.saveChanges());
         cancelText.setOnClickListener(v -> finish());
 
-        genreText.setOnClickListener(v -> openGenreDialog());
     }
 
+
+    /**
+     * Opens a multi-choice dialog for selecting music genres.
+     */
     private void openGenreDialog() {
         MusicGenre[] allGenres = MusicGenre.values();
         String[] displayNames = new String[allGenres.length];
@@ -210,22 +252,27 @@ public class EditEventActivity extends BaseActivity {
         boolean[] checked = viewModel.getCheckedGenres(allGenres);
 
         new AlertDialog.Builder(this)
-                .setTitle("Select music genres")
+                .setTitle(getString(R.string.select_music_genres))
                 .setMultiChoiceItems(
                         displayNames,
                         checked,
                         (dialog, which, isChecked) ->
                                 viewModel.toggleGenre(allGenres[which], isChecked)
                 )
-                .setPositiveButton("OK", null)
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(getString(R.string.ok), null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
 
+    /**
+     * Shows a date picker dialog and updates the ViewModel with the selected date.
+     */
     private void showDatePicker() {
         new DatePickerDialog(this,
                 (view, y, m, d) -> {
                     viewModel.setDate(y, m, d);
+                    etDate.setError(null);
+
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -233,6 +280,9 @@ public class EditEventActivity extends BaseActivity {
         ).show();
     }
 
+    /**
+     * Shows a time picker dialog and updates the ViewModel with the selected time.
+     */
     private void showTimePicker() {
         new TimePickerDialog(this,
                 (view, h, m) -> {
@@ -245,6 +295,10 @@ public class EditEventActivity extends BaseActivity {
         ).show();
     }
 
+    /**
+     * Updates an EditText only if the new value is different,
+     * to avoid unnecessary text resets and cursor jumps.
+     */
     private void setIfDifferent(EditText et, String value) {
         String v = value == null ? "" : value;
         if (!v.equals(et.getText().toString())) {
@@ -252,18 +306,9 @@ public class EditEventActivity extends BaseActivity {
         }
     }
 
-    private static class SimpleTextWatcher implements TextWatcher {
-        interface OnChanged { void run(String s); }
-        private final OnChanged onChanged;
-
-        SimpleTextWatcher(OnChanged onChanged) { this.onChanged = onChanged; }
-
-        @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
-        @Override public void onTextChanged(CharSequence s, int st, int b, int c) {
-            onChanged.run(s == null ? "" : s.toString());
-        }
-        @Override public void afterTextChanged(Editable s) {}
-    }
+    /**
+     * Handles navigation drawer menu item selections.
+     */
     @Override
     protected boolean onMenuItemSelected(int itemId) {
         return menuHandler.handle(itemId);
