@@ -3,6 +3,8 @@ package com.example.jamming.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.EventRepository;
@@ -58,7 +60,7 @@ public class OwnerViewModel extends ViewModel {
     private final MutableLiveData<String> ownerName = new MutableLiveData<>();
 
     /** General message for UI feedback (errors, confirmations) */
-    private final MutableLiveData<String> message = new MutableLiveData<>();
+    private final MutableLiveData<Integer> message = new MutableLiveData<>();
 
     /** List of upcoming events created by the owner */
     private final MutableLiveData<List<Event>> upcomingEvents = new MutableLiveData<>();
@@ -69,7 +71,7 @@ public class OwnerViewModel extends ViewModel {
 
     /** Read-only accessors for the View */
     public LiveData<String> getOwnerName() { return ownerName; }
-    public LiveData<String> getMessage() { return message; }
+    public LiveData<Integer> getMessage() { return message; }
     public LiveData<List<Event>> getUpcomingEvents() { return upcomingEvents; }
     public LiveData<List<Event>> getPastEvents() { return pastEvents; }
 
@@ -110,7 +112,7 @@ public class OwnerViewModel extends ViewModel {
         String uid = authRepo.getCurrentUid();
 
         if (uid == null) {
-            message.setValue("User not logged in");
+            message.setValue(R.string.error_user_not_logged_in);
             return;
         }
 
@@ -142,7 +144,7 @@ public class OwnerViewModel extends ViewModel {
                     pastEvents.setValue(past);
                 })
                 .addOnFailureListener(e -> {
-                    message.setValue("Failed to load events");
+                    message.setValue(R.string.error_failed_to_load_events);
                 });
     }
 
@@ -156,11 +158,11 @@ public class OwnerViewModel extends ViewModel {
     public void deleteEvent(String eventId) {
         eventRepo.deleteEvent(eventId)
                 .addOnSuccessListener(v -> {
-                    message.setValue("Event deleted");
+                    message.setValue(R.string.event_deleted_success);
                     loadOwnerEvents();
                 })
                 .addOnFailureListener(e ->
-                        message.setValue("Error deleting event")
+                        message.setValue(R.string.error_deleting_event)
                 );
     }
 

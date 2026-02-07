@@ -267,5 +267,9 @@
     <string name="error_password_reset_failed">Failed to send password reset email.</string>
     <string name="error_username_not_exists">Username does not exist.</string>
     <string name="error_failed_to_retrieve_user_info">Failed to retrieve user information.</string>
+    <string name="owner_default_name">Owner</string>
+    <string name="error_failed_to_load_events">Failed to load events</string>
+    <string name="event_deleted_success">Event deleted</string>
+    <string name="error_deleting_event">Error deleting event</string>
 
 </resources>
