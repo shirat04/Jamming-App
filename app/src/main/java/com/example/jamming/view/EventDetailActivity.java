@@ -93,7 +93,7 @@ public class EventDetailActivity extends BaseActivity  {
             }
         });
 
-        viewModel.getErrorMessage().observe(this, msg -> {
+        viewModel.getErrorMessageResId().observe(this, msg -> {
             if (msg != null) {
                 Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
             }

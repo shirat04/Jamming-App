@@ -218,7 +218,6 @@
     <string name="cancel">Cancel</string>
 
     <!-- Edit Event - Errors & Messages -->
-    <string name="error_failed_to_load_event">Failed to load event</string>
     <string name="error_loading_event_he">Error loading event</string>
     <string name="error_missing_event_id_vm">Missing event ID</string>
     <string name="error_editing_not_allowed">Editing this event is no longer allowed.</string>
@@ -232,9 +231,27 @@
     <string name="error_invalid_email">Please enter a valid email address.</string>
     <string name="error_password_too_short">The password must be at least six characters long.</string>
     <string name="error_passwords_do_not_match">The passwords do not match.</string>
-    <string name="error_registration_failed">Registration failed. Please try again.</string>
     <string name="error_event_time_already_passed_create">Cannot create an event for a time that has already passed.</string>
     <string name="error_user_generic">User error</string>
     <string name="error_creating_event">Failed to create event. Please try again.</string>
+    <!-- Event Details - Errors & Status -->
+
+    <string name="error_event_not_found">Event not found</string>
+    <string name="error_event_invalid_data">Event data is invalid</string>
+    <string name="error_user_not_logged_in">User not logged in</string>
+    <string name="error_failed_to_load_event">Failed to load event</string>
+
+    <string name="error_event_already_ended">This event has already ended</string>
+    <string name="error_event_full">The event is full</string>
+    <string name="error_registration_failed">Registration failed</string>
+    <string name="error_update_event_capacity_failed">Failed to update event capacity</string>
+    <string name="error_cancel_registration_failed">Failed to cancel registration</string>
+
+    <!-- Registration UI texts -->
+
+    <string name="status_event_ended">The event has ended</string>
+    <string name="status_registered">You are registered</string>
+    <string name="status_sold_out">SOLD OUT</string>
+    <string name="action_register_for_event">Register for event</string>
 
 </resources>

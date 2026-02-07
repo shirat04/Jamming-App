@@ -3,6 +3,8 @@ package com.example.jamming.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.EventRepository;
@@ -60,7 +62,7 @@ public class EventDetailViewModel extends ViewModel {
     private final MutableLiveData<RegistrationUiState> registrationUiState = new MutableLiveData<>();
 
     // Holds error messages to be displayed in the UI
-    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final MutableLiveData<Integer> errorMessageResId = new MutableLiveData<>();
 
     // Indicates whether data is currently loading
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(true);
@@ -71,7 +73,7 @@ public class EventDetailViewModel extends ViewModel {
     public LiveData<Boolean> getIsLoading() {return isLoading;}
     public LiveData<Event> getEventLiveData() { return eventLiveData; }
     public LiveData<RegistrationUiState> getRegistrationUiState() { return registrationUiState; }
-    public LiveData<String> getErrorMessage() { return errorMessage; }
+    public LiveData<Integer> getErrorMessageResId() { return errorMessageResId; }
 
     // Currently loaded event ID (used to avoid unnecessary reloads)
     private String eventId;
@@ -93,13 +95,13 @@ public class EventDetailViewModel extends ViewModel {
         eventRepository.getEventById(eventId)
                 .addOnSuccessListener(doc -> {
                     if (!doc.exists()) {
-                        errorMessage.postValue("Event not found");
+                        errorMessageResId.postValue(R.string.error_event_not_found);
                         return;
                     }
 
                     Event event = doc.toObject(Event.class);
                     if (event == null) {
-                        errorMessage.postValue("Event data is invalid");
+                        errorMessageResId.postValue(R.string.error_event_invalid_data);
                         return;
                     }
 
@@ -107,7 +109,7 @@ public class EventDetailViewModel extends ViewModel {
 
                     String uid = authRepository.getCurrentUid();
                     if (uid == null) {
-                        errorMessage.postValue("User not logged in");
+                        errorMessageResId.postValue(R.string.error_user_not_logged_in);
                         registrationUiState.postValue(null);
                         return;
                     }
@@ -126,7 +128,7 @@ public class EventDetailViewModel extends ViewModel {
 
                 })
                 .addOnFailureListener(e -> {
-                    errorMessage.postValue("Failed to load event");
+                    errorMessageResId.postValue(R.string.error_failed_to_load_event);
                     isLoading.postValue(false);
                 });
 
@@ -140,18 +142,18 @@ public class EventDetailViewModel extends ViewModel {
     public void registerToEvent() {
         Event event = eventLiveData.getValue();
         if (event == null) {
-            errorMessage.postValue("Event not found");
+            errorMessageResId.postValue(R.string.error_event_not_found);
             return;
         }
 
         if (isEventExpired(event)) {
-            errorMessage.postValue("This event has already ended");
+            errorMessageResId.postValue(R.string.error_event_already_ended);
             return;
         }
 
         String uid = authRepository.getCurrentUid();
         if (uid == null) {
-            errorMessage.postValue("User not logged in");
+            errorMessageResId.postValue(R.string.error_user_not_logged_in);
             return;
         }
 
@@ -182,10 +184,9 @@ public class EventDetailViewModel extends ViewModel {
                             })
                             .addOnFailureListener(e -> {
                                 if ("EVENT_FULL".equals(e.getMessage())) {
-                                    errorMessage.postValue("The event is full");
+                                    errorMessageResId.postValue(R.string.error_event_full);
                                 } else {
-                                    errorMessage.postValue("Registration failed");
-                                }
+                                    errorMessageResId.postValue(R.string.error_registration_failed);                                }
                             });
 
                 });
@@ -202,13 +203,13 @@ public class EventDetailViewModel extends ViewModel {
         if (event == null) return;
 
         if (isEventExpired(event)) {
-            errorMessage.postValue("This event has already ended");
+            errorMessageResId.postValue(R.string.error_event_already_ended);
             return;
         }
 
         String uid = authRepository.getCurrentUid();
         if (uid == null) {
-            errorMessage.postValue("User not logged in");
+            errorMessageResId.postValue(R.string.error_user_not_logged_in);
             return;
         }
 
@@ -232,11 +233,11 @@ public class EventDetailViewModel extends ViewModel {
 
                             })
                             .addOnFailureListener(e ->
-                                    errorMessage.postValue("Failed to update event capacity")
+                                    errorMessageResId.postValue(R.string.error_update_event_capacity_failed)
                             );
                 })
                 .addOnFailureListener(e ->
-                        errorMessage.postValue("Failed to cancel registration")
+                        errorMessageResId.postValue(R.string.error_cancel_registration_failed)
                 );
     }
 
@@ -252,7 +253,7 @@ public class EventDetailViewModel extends ViewModel {
                     new RegistrationUiState(
                             false,
                             false,
-                            "The event has ended",
+                            R.string.status_event_ended,
                             null
                     )
             );
@@ -264,8 +265,8 @@ public class EventDetailViewModel extends ViewModel {
                     new RegistrationUiState(
                             false,
                             true,
-                            "You're registered",
-                            isFull ? "SOLD OUT" : null
+                            R.string.status_registered,
+                            isFull ? R.string.status_sold_out : null
                     )
             );
             return;
@@ -276,7 +277,7 @@ public class EventDetailViewModel extends ViewModel {
                     new RegistrationUiState(
                             false,
                             false,
-                            "SOLD OUT",
+                            R.string.status_sold_out,
                             null
                     )
             );
@@ -287,7 +288,7 @@ public class EventDetailViewModel extends ViewModel {
                 new RegistrationUiState(
                         true,
                         false,
-                        "Register for event",
+                        R.string.action_register_for_event,
                         null
                 )
         );
@@ -306,14 +307,14 @@ public class EventDetailViewModel extends ViewModel {
     public static class RegistrationUiState {
         public final boolean canRegister;
         public final boolean canCancel;
-        public final String mainText;     // Registered / Register / Ended
-        public final String secondaryText; // SOLD OUT / null
+        public final int mainText;     // Registered / Register / Ended
+        public final Integer secondaryText; // SOLD OUT / null
 
         public RegistrationUiState(
                 boolean canRegister,
                 boolean canCancel,
-                String mainText,
-                String secondaryText
+                int mainText,
+                Integer secondaryText
         ) {
             this.canRegister = canRegister;
             this.canCancel = canCancel;
