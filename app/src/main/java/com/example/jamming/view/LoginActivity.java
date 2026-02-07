@@ -68,7 +68,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
         private void observeViewModel() {
-        viewModel.getMessage().observe(this, msg -> {
+        viewModel.getMessageResId().observe(this, msg -> {
             if (msg != null) {
                 errorText.setText(msg);
                 errorText.setVisibility(View.VISIBLE);

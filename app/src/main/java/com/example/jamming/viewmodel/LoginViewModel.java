@@ -4,6 +4,8 @@ import android.util.Patterns;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.example.jamming.R;
 import com.example.jamming.model.UserType;
 import com.example.jamming.repository.AuthRepository;
 
@@ -40,7 +42,7 @@ public class LoginViewModel extends ViewModel {
     }
 
     /** Message exposed to the UI (errors and informational messages) */
-    private final MutableLiveData<String> message = new MutableLiveData<>();
+    private final MutableLiveData<Integer> messageResId = new MutableLiveData<>();
 
     /** User type emitted on successful login */
     private final MutableLiveData<UserType> userType = new MutableLiveData<>();
@@ -49,7 +51,7 @@ public class LoginViewModel extends ViewModel {
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
 
     /** Read-only accessors for the View */
-    public LiveData<String> getMessage() { return message; }
+    public LiveData<Integer> getMessageResId() { return messageResId; }
     public LiveData<UserType> getUserType() { return userType; }
     public LiveData<Boolean> getIsLoading() {return isLoading;}
 
@@ -73,7 +75,7 @@ public class LoginViewModel extends ViewModel {
         // Basic input validation
         if (identifier == null || identifier.trim().isEmpty()
                 || password == null || password.trim().isEmpty()) {
-            message.setValue("Please fill in all fields");
+            messageResId.setValue(R.string.error_fill_all_fields);
             return;
         }
         identifier = identifier.trim();
@@ -85,7 +87,7 @@ public class LoginViewModel extends ViewModel {
                     .addOnSuccessListener(auth -> checkUserType(repo.getCurrentUid()))
                     .addOnFailureListener(e -> {
                         stopLoading();
-                        message.setValue("Incorrect email or password");
+                        messageResId.setValue(R.string.error_incorrect_email_or_password);
                     });
             return;
         }
@@ -95,7 +97,7 @@ public class LoginViewModel extends ViewModel {
                 .addOnSuccessListener(query -> {
                     if (query.isEmpty()) {
                         stopLoading();
-                        message.setValue("Incorrect email or password");
+                        messageResId.setValue(R.string.error_incorrect_email_or_password);
                         return;
                     }
 
@@ -103,7 +105,7 @@ public class LoginViewModel extends ViewModel {
                     String email = query.getDocuments().get(0).getString("email");
                     if (email == null || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                         stopLoading();
-                        message.setValue("Invalid user email address");
+                        messageResId.setValue(R.string.error_invalid_user_email);
                         return;
                     }
 
@@ -114,12 +116,12 @@ public class LoginViewModel extends ViewModel {
                             })
                             .addOnFailureListener(e -> {
                                 stopLoading();
-                                message.setValue("Incorrect username or password");
+                                messageResId.setValue(R.string.error_incorrect_username_or_password);
                             });
                 })
                 .addOnFailureListener(e -> {
                     stopLoading();
-                    message.setValue("Login failed. Please try again");
+                    messageResId.setValue(R.string.error_login_failed_try_again);
                 });
     }
 
@@ -131,31 +133,31 @@ public class LoginViewModel extends ViewModel {
     private void checkUserType(String uid) {
         if (uid == null) {
             stopLoading();
-            message.setValue("Authentication error");
+            messageResId.setValue(R.string.error_authentication);
             return;
         }
         repo.getUserUId(uid)
                 .addOnSuccessListener(doc -> {
                     if (!doc.exists()) {
-                        message.setValue("User data not found");
+                        messageResId.setValue(R.string.error_user_data_not_found);
                         return;
                     }
 
                     String typeStr = doc.getString("userType");
                     if (typeStr == null) {
-                        message.setValue("Invalid user type");
+                        messageResId.setValue(R.string.error_invalid_user_type);
                         return;
                     }
 
                     try {
                         userType.setValue(UserType.valueOf(typeStr));
                     } catch (IllegalArgumentException e) {
-                        message.setValue("Invalid user type");
+                        messageResId.setValue(R.string.error_invalid_user_type);
                     }
                 })
                 .addOnFailureListener(e -> {
                     stopLoading();
-                    message.setValue("Failed to load user data");
+                    messageResId.setValue(R.string.error_failed_to_load_user_data);
                 });
     }
 
@@ -169,7 +171,7 @@ public class LoginViewModel extends ViewModel {
     public void resetPassword(String identifier) {
 
         if (identifier == null || identifier.trim().isEmpty()) {
-            message.setValue("Please enter a username or email address.");
+            messageResId.setValue(R.string.error_enter_username_or_email);
             return;
         }
 
@@ -179,9 +181,9 @@ public class LoginViewModel extends ViewModel {
         if (android.util.Patterns.EMAIL_ADDRESS.matcher(identifier).matches()) {
             repo.sendPasswordResetEmail(identifier)
                     .addOnSuccessListener(v ->
-                            message.setValue("A password reset email has been sent."))
+                            messageResId.setValue(R.string.msg_password_reset_sent))
                     .addOnFailureListener(e ->
-                            message.setValue("Failed to send password reset email."));
+                            messageResId.setValue(R.string.error_password_reset_failed));
             return;
         }
 
@@ -189,7 +191,7 @@ public class LoginViewModel extends ViewModel {
         repo.getUserByUsername(identifier)
                 .addOnSuccessListener(query -> {
                     if (query.isEmpty()) {
-                        message.setValue("Username does not exist.");
+                        messageResId.setValue(R.string.error_username_not_exists);
                         return;
                     }
 
@@ -199,18 +201,18 @@ public class LoginViewModel extends ViewModel {
 
                     if (email == null ||
                             !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                        message.setValue("Invalid user email address.");
+                        messageResId.setValue(R.string.error_invalid_user_email);
                         return;
                     }
 
                     repo.sendPasswordResetEmail(email)
                             .addOnSuccessListener(v ->
-                                    message.setValue("A password reset email has been sent."))
+                                    messageResId.setValue(R.string.msg_password_reset_sent))
                             .addOnFailureListener(e ->
-                                    message.setValue("Failed to send password reset email."));
+                                    messageResId.setValue(R.string.error_password_reset_failed));
                 })
                 .addOnFailureListener(e ->
-                        message.setValue("Failed to retrieve user information."));
+                        messageResId.setValue(R.string.error_failed_to_retrieve_user_info));
     }
 
     /**
@@ -218,7 +220,8 @@ public class LoginViewModel extends ViewModel {
      * Used by the View when user starts editing input fields.
      */
     public void clearMessage() {
-        message.setValue(null);
+        messageResId.setValue(null);
+
     }
 
 

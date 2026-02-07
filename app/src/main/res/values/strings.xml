@@ -226,7 +226,6 @@
     <string name="event_updated_success">The event was successfully updated.</string>
     <string name="error_updating_event_he">Error updating event</string>
     <!-- Register errors -->
-    <string name="error_fill_all_fields">Please fill in all fields.</string>
     <string name="error_username_taken">Username is taken. Try another one.</string>
     <string name="error_invalid_email">Please enter a valid email address.</string>
     <string name="error_password_too_short">The password must be at least six characters long.</string>
@@ -253,5 +252,20 @@
     <string name="status_registered">You are registered</string>
     <string name="status_sold_out">SOLD OUT</string>
     <string name="action_register_for_event">Register for event</string>
+    <!-- Login errors & messages -->
+    <string name="error_fill_all_fields">Please fill in all fields</string>
+    <string name="error_incorrect_email_or_password">Incorrect email or password</string>
+    <string name="error_incorrect_username_or_password">Incorrect username or password</string>
+    <string name="error_invalid_user_email">Invalid user email address</string>
+    <string name="error_login_failed_try_again">Login failed. Please try again</string>
+    <string name="error_authentication">Authentication error</string>
+    <string name="error_user_data_not_found">User data not found</string>
+    <string name="error_invalid_user_type">Invalid user type</string>
+    <string name="error_failed_to_load_user_data">Failed to load user data</string>
+    <string name="error_enter_username_or_email">Please enter a username or email address</string>
+    <string name="msg_password_reset_sent">A password reset email has been sent.</string>
+    <string name="error_password_reset_failed">Failed to send password reset email.</string>
+    <string name="error_username_not_exists">Username does not exist.</string>
+    <string name="error_failed_to_retrieve_user_info">Failed to retrieve user information.</string>
 
 </resources>
