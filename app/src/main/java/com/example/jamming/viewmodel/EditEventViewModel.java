@@ -3,6 +3,8 @@ package com.example.jamming.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.model.MusicGenre;
 import com.example.jamming.repository.EventRepository;
@@ -70,12 +72,12 @@ public class EditEventViewModel extends ViewModel {
 
     /** Validation and result feedback */
     private final MutableLiveData<EventField> errorField = new MutableLiveData<>();
-    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private final MutableLiveData<String> successMessage = new MutableLiveData<>();
+    private final MutableLiveData<Integer> errorMessageRes = new MutableLiveData<>();
+    private final MutableLiveData<Integer> successMessageRes = new MutableLiveData<>();
 
     /* ===== LiveData getters exposed to the View ===== */
     public LiveData<Boolean> getEditingAllowed() {return editingAllowed;}
-    public LiveData<String> getSuccessMessage() { return successMessage; }
+    public LiveData<Integer> getSuccessMessageRes() { return successMessageRes; }
     public LiveData<String> getTitle() { return title; }
     public LiveData<String> getDescription() { return description; }
     public LiveData<String> getLocationText() { return locationText; }
@@ -85,12 +87,7 @@ public class EditEventViewModel extends ViewModel {
     public LiveData<String> getGenresText() { return genresText; }
     public Calendar getDateTime() {return dateTime;}
     public LiveData<EventField> getErrorField() { return errorField; }
-    public LiveData<String> getErrorMessage() { return errorMessage; }
-
-    /* ===== Setters triggered by UI input ===== */
-    public void onTitleChanged(String v) { title.setValue(v == null ? "" : v); }
-    public void onDescriptionChanged(String v) { description.setValue(v == null ? "" : v); }
-    public void onCapacityChanged(String v) { capacityText.setValue(v == null ? "" : v); }
+    public LiveData<Integer> getErrorMessageRes() { return errorMessageRes; }
 
     /* ===== Event loading ===== */
     /**
@@ -101,13 +98,13 @@ public class EditEventViewModel extends ViewModel {
         eventRepository.getEventById(eventId)
                 .addOnSuccessListener(doc -> {
                     if (doc == null || !doc.exists()) {
-                        errorMessage.setValue("Failed to load event");
+                        errorMessageRes.setValue(R.string.error_failed_to_load_event);
                         return;
                     }
 
                     Event event = doc.toObject(Event.class);
                     if (event == null) {
-                        errorMessage.setValue("Failed to load event");
+                        errorMessageRes.setValue(R.string.error_failed_to_load_event);
                         return;
                     }
                     // Determine whether editing is still allowed
@@ -142,7 +139,8 @@ public class EditEventViewModel extends ViewModel {
                     timeText.setValue(DateUtils.formatOnlyTime(event.getDateTime()));
 
                 })
-                .addOnFailureListener(e -> errorMessage.setValue("שגיאה בטעינת האירוע"));
+                .addOnFailureListener(e ->
+                        errorMessageRes.setValue(R.string.error_loading_event_he));
     }
 
     /**
@@ -233,11 +231,11 @@ public class EditEventViewModel extends ViewModel {
     public void saveChanges() {
         errorField.setValue(null);
         if (eventId == null) {
-            errorMessage.setValue("Missing event ID");
+            errorMessageRes.setValue(R.string.error_missing_event_id);
             return;
         }
         if (!Boolean.TRUE.equals(editingAllowed.getValue())) {
-            errorMessage.setValue("Editing this event is no longer allowed.");
+            errorMessageRes.setValue(R.string.error_edit_past_event);
             return;
         }
 
@@ -263,7 +261,7 @@ public class EditEventViewModel extends ViewModel {
 
         if (selectedTime <= now) {
             errorField.setValue(EventField.TIME);
-            errorMessage.setValue("An event cannot be updated for a time that has already passed.");
+            errorMessageRes.setValue(R.string.error_event_time_already_passed);
             return;
         }
 
@@ -291,8 +289,9 @@ public class EditEventViewModel extends ViewModel {
         updates.put("musicTypes", genreStrings);
 
         eventRepository.updateEvent(eventId, updates)
-                .addOnSuccessListener(a -> successMessage.setValue("האירוע עודכן בהצלחה"))
-                .addOnFailureListener(e -> errorMessage.setValue("שגיאה בעדכון האירוע"));
+                .addOnSuccessListener(a ->
+                        successMessageRes.setValue(R.string.event_updated_success))
+                .addOnFailureListener(e ->
+                        errorMessageRes.setValue(R.string.error_updating_event_he));
     }
-    
 }

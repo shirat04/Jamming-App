@@ -91,7 +91,6 @@
     <string name="max_capacity">Max Capacity</string>
     <string name="event_description">Event Description</string>
     <string name="publish_event">Publish Event</string>
-    <string name="cancel">Cancel</string>
     <string name="music_genre">Music genre</string>
     <string name="cafe_bloute_9_pm">Cafe Bloute - 9 PM</string>
     <string name="_123_main_st">📍 123 Main St</string>
@@ -218,5 +217,14 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 
+    <!-- Edit Event - Errors & Messages -->
+    <string name="error_failed_to_load_event">Failed to load event</string>
+    <string name="error_loading_event_he">Error loading event</string>
+    <string name="error_missing_event_id_vm">Missing event ID</string>
+    <string name="error_editing_not_allowed">Editing this event is no longer allowed.</string>
+    <string name="error_event_time_already_passed">An event cannot be updated for a time that has already passed.</string>
+
+    <string name="event_updated_success">The event was successfully updated.</string>
+    <string name="error_updating_event_he">Error updating event</string>
 
 </resources>

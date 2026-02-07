@@ -173,20 +173,25 @@ public class EditEventActivity extends BaseActivity {
 
         });
 
-        // Observe general error messages from the ViewModel and show them as a Snackbar
-        viewModel.getErrorMessage().observe(this, msg -> {
-            if (msg != null && !msg.trim().isEmpty()) {
-                Snackbar.make(findViewById(android.R.id.content), msg, Snackbar.LENGTH_LONG).show();
+        // Observe general error messages (string resource IDs) and show them as a Snackbar
+        viewModel.getErrorMessageRes().observe(this, resId -> {
+            if (resId != null) {
+                Snackbar.make(
+                        findViewById(android.R.id.content),
+                        getString(resId),
+                        Snackbar.LENGTH_LONG
+                ).show();
             }
         });
 
-        // Observe success messages (e.g., after saving changes) and close the screen
-        viewModel.getSuccessMessage().observe(this, msg -> {
-            if (msg != null) {
-                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        // Observe success messages (string resource IDs) and close the screen
+        viewModel.getSuccessMessageRes().observe(this, resId -> {
+            if (resId != null) {
+                Toast.makeText(this, getString(resId), Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
+
 
         // Observe whether editing is allowed (e.g., prevent editing past events)
         viewModel.getEditingAllowed().observe(this, allowed -> {
