@@ -196,6 +196,9 @@
     <string name="label_distance_km">Distance: %d km</string>
 
     <string name="participants_format">Participants: %1$d / %2$d</string>
+    <string name="empty_no_events">There are currently no events.</string>
+    <string name="empty_no_matching_filters">No matching events found. Try changing your filters.</string>
+    <string name="back_press_exit">Click again to exit.</string>
 
     <string name="hello_user">Hello %1$s</string>
     <string name="event_details">Event Details</string>
