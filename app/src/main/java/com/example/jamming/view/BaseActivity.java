@@ -72,10 +72,4 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    protected void showRightActions() {
-        if (rightActions != null) {
-            rightActions.setVisibility(View.VISIBLE);
-        }
-    }
-
 }
