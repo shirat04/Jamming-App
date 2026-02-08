@@ -14,11 +14,18 @@ import com.example.jamming.model.MusicGenre;
 import com.example.jamming.navigation.UserMenuHandler;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.viewmodel.MyEventUserViewModel;
-
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Activity that displays the list of events the current user is registered to.
+ *
+ * This screen follows the MVVM pattern:
+ * - The Activity is responsible only for UI rendering and user interactions.
+ * - The ViewModel provides the data and exposes UI state via LiveData.
+ * - All business logic (loading events, canceling registration, removing events) is delegated
+ *   to the ViewModel.
+ */
 public class MyEventUserActivity extends BaseActivity {
 
     private MyEventUserViewModel viewModel;
@@ -27,34 +34,44 @@ public class MyEventUserActivity extends BaseActivity {
     private UserMenuHandler menuHandler;
 
 
-
-
+    /**
+     * Initializes the screen, sets up the base layout, binds UI elements,
+     * creates the ViewModel instance, and registers observers.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupBase(R.menu.user_menu, R.layout.activity_my_event_user);
         hideRightActions();
 
+        // Bind UI elements
         container = findViewById(R.id.myEventsContainer);
         emptyMessageText = findViewById(R.id.emptyMessageText);
         setTitleText(getString(R.string.my_events));
 
+        // Initialize ViewModel and menu handler
         viewModel = new ViewModelProvider(this).get(MyEventUserViewModel.class);
         menuHandler = new UserMenuHandler(this);
 
         observeViewModel();
-
-        viewModel.loadMyEvents();
     }
 
+    /**
+     * Reloads the user's events whenever the screen becomes visible again.
+     * This ensures the list stays up-to-date after returning from other screens.
+     */
     @Override
     protected void onResume() {
         super.onResume();
         viewModel.loadMyEvents();
     }
 
+    /**
+     * Observes all relevant LiveData objects from the ViewModel and updates the UI
+     * according to the current data and screen state.
+     */
     private void observeViewModel() {
-
+        // Observe the list of events the user is registered to
         viewModel.getMyEvents().observe(this, events -> {
             container.removeAllViews();
 
@@ -72,16 +89,17 @@ public class MyEventUserActivity extends BaseActivity {
             }
         });
 
+        // Observe general UI state such as errors or empty states
         viewModel.getState().observe(this, state -> {
             switch (state) {
                 case NOT_LOGGED_IN:
-                    emptyMessageText.setText("User not logged in");
+                    emptyMessageText.setText(getString(R.string.error_user_not_logged_in));
                     break;
                 case NO_REGISTERED_EVENTS:
-                    emptyMessageText.setText("You haven't registered for events yet.");
+                    emptyMessageText.setText(getString(R.string.no_registered_events));
                     break;
                 case LOAD_ERROR:
-                    Toast.makeText(this, "Failed to load events", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.error_failed_to_load_events), Toast.LENGTH_SHORT).show();
                     break;
                 case NONE:
                     emptyMessageText.setVisibility(View.GONE);
@@ -89,42 +107,51 @@ public class MyEventUserActivity extends BaseActivity {
             }
         });
 
-
-
+        // Observe one-time success flag for canceling registration
         viewModel.getCancelSuccess().observe(this, success -> {
             if (success != null && success) {
-                Toast.makeText(this, "Registration canceled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.msg_cancel_success), Toast.LENGTH_SHORT).show();
                 viewModel.resetCancelSuccess();
             }
         });
-
-
     }
 
+    /**
+     * Displays a confirmation dialog before canceling the user's registration
+     * to an upcoming event.
+     */
     private void showCancelRegistrationDialog(String eventId) {
         new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Cancel Registration")
-                .setMessage("Are you sure you want to cancel your registration for this event?")
-                .setPositiveButton("Yes, cancel", (dialog, which) -> {
+                .setTitle(getString(R.string.dialog_cancel_registration_title))
+                .setMessage(getString(R.string.dialog_cancel_registration_message))
+                .setPositiveButton(getString(R.string.dialog_yes_cancel), (dialog, which) -> {
                     viewModel.cancelRegistration(eventId);
                 })
-                .setNegativeButton("No", (dialog, which) -> {
+                .setNegativeButton(getString(R.string.dialog_no), (dialog, which) -> {
                     dialog.dismiss();
                 })
                 .show();
     }
 
+    /**
+     * Displays a confirmation dialog for removing a past event from the user's list.
+     * This is used only for events that have already ended.
+     */
     private void showRemoveEventDialog(String eventId) {
         new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Remove event")
-                .setMessage("This event has already ended.\nDo you want to remove it from your list?")
-                .setPositiveButton("Yes, remove", (dialog, which) -> {
+                .setTitle(getString(R.string.dialog_remove_event_title))
+                .setMessage(getString(R.string.dialog_remove_event_message))
+                .setPositiveButton(getString(R.string.dialog_yes_remove), (dialog, which) -> {
                     viewModel.removeEventFromMyList(eventId);
                 })
-                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
+    /**
+     * Creates a visual card for a single event, binds all event data to the UI,
+     * and configures the available actions according to the event's state.
+     */
     private void addEventCard(MyEventUserViewModel.EventWithId wrapper) {
         Event event = wrapper.event;
         boolean isPast = event.getDateTime() < System.currentTimeMillis();
@@ -138,21 +165,22 @@ public class MyEventUserActivity extends BaseActivity {
         TextView genre = card.findViewById(R.id.myEventGenre);
         TextView capacity = card.findViewById(R.id.myEventCapacity);
         TextView statusLabel = card.findViewById(R.id.eventStatusLabel);
-
-
         Button cancelBtn = card.findViewById(R.id.btnCancelMyEvent);
         Button detailsBtn = card.findViewById(R.id.btnMyEventDetails);
 
+        // Bind basic event information
         title.setText(event.getName());
         location.setText(event.getAddress());
 
-        List<MusicGenre> genres = event.getMusicGenresEnum();
+        // Visually mark past events
         if (isPast) {
+            statusLabel.setText(getString(R.string.status_event_ended));
             statusLabel.setVisibility(View.VISIBLE);
             card.setAlpha(0.75f);
         }
 
-
+        // Render the list of genres or show a fallback text
+        List<MusicGenre> genres = event.getMusicGenresEnum();
         if (genres != null && !genres.isEmpty()) {
             List<String> names = new ArrayList<>();
             for (MusicGenre musicGenre : genres) {
@@ -160,29 +188,37 @@ public class MyEventUserActivity extends BaseActivity {
             }
             genre.setText(String.join(" , ", names));
         } else {
-            genre.setText("No genre");
+            genre.setText(getString(R.string.no_genre));
         }
-        String capacityText = " Participants: " + event.getReserved() + " / " + event.getMaxCapacity();
+
+        // Format and display the capacity information
+        String capacityText = getString(
+                R.string.participants_format,
+                event.getReserved(),
+                event.getMaxCapacity()
+        );
         capacity.setText(capacityText);
 
+        // Format and display date and time
         String dateTimeText = DateUtils.formatOnlyDate(event.getDateTime()) +
                 " • " + DateUtils.formatOnlyTime(event.getDateTime());
         date.setText(dateTimeText);
 
-
+        // Configure the main action button according to the event state
         if (isPast) {
-            cancelBtn.setText("Remove");
+            cancelBtn.setText(getString(R.string.action_remove));
             cancelBtn.setOnClickListener(v ->
                     showRemoveEventDialog(wrapper.id)
             );
 
         } else {
-            cancelBtn.setText("Cancel registration");
+            cancelBtn.setText(getString(R.string.action_cancel_registration));
             cancelBtn.setOnClickListener(v ->
                     showCancelRegistrationDialog(wrapper.id)
             );
         }
 
+        // Navigate to the event details screen
         detailsBtn.setOnClickListener(v -> {
             Intent i = new Intent(this, EventDetailActivity.class);
             i.putExtra("EVENT_ID", wrapper.id);
@@ -192,10 +228,12 @@ public class MyEventUserActivity extends BaseActivity {
         container.addView(card);
     }
 
+    /**
+     * Handles selection of items from the navigation drawer menu.
+     */
     @Override
     protected boolean onMenuItemSelected(int itemId) {
         return menuHandler.handle(itemId);
     }
-
 
 }

@@ -194,7 +194,7 @@
 
     <string name="label_distance_km">Distance: %d km</string>
 
-    <string name="participants_format">Participants: %1$d / %2$d</string>
+
     <string name="empty_no_events">There are currently no events.</string>
     <string name="empty_no_matching_filters">No matching events found. Try changing your filters.</string>
     <string name="back_press_exit">Click again to exit.</string>
@@ -289,5 +289,17 @@
     <string name="error_address_not_accurate">The address was not found accurately. Please select a point manually on the map.</string>
     <string name="error_search_failed">Search error</string>
     <string name="title_selected_location">Selected location</string>
+    <string name="no_registered_events">You have not registered for events yet.</string>
+    <string name="msg_registration_canceled">Registration canceled</string>
+
+
+    <string name="dialog_remove_event_title">Remove event</string>
+    <string name="dialog_remove_event_message">This event has already ended.\nDo you want to remove it from your list?</string>
+    <string name="dialog_yes_remove">Yes, remove</string>
+
+    <string name="no_genre">No genre</string>
+    <string name="participants_format">Participants: %1$d / %2$d</string>
+    <string name="action_remove">Remove</string>
+    <string name="action_cancel_registration">Cancel registration</string>
 
 </resources>
