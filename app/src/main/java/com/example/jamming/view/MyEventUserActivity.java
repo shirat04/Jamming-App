@@ -28,9 +28,16 @@ import java.util.List;
  */
 public class MyEventUserActivity extends BaseActivity {
 
+    // ViewModel that provides the user's events data and handles related actions
     private MyEventUserViewModel viewModel;
+
+    // Container that holds the dynamically created event cards
     private LinearLayout container;
+
+    // Text shown when there are no events or when an empty/error state is displayed
     private TextView emptyMessageText;
+
+    // Helper responsible for handling navigation drawer menu actions
     private UserMenuHandler menuHandler;
 
 
