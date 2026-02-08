@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.widget.TextView;
-
+import androidx.activity.OnBackPressedCallback;
 import androidx.core.view.GravityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
@@ -91,6 +91,7 @@ public class ExploreEventsActivity extends BaseMapActivity {
         // Load initial data
         viewModel.loadAllEvents();
         viewModel.loadUserName();
+        setupBackPressedHandler();
 
     }
 
@@ -317,23 +318,34 @@ public class ExploreEventsActivity extends BaseMapActivity {
     }
 
     /**
-     * Handles back presses:
-     * - Closes the navigation drawer if it is open
-     * - Otherwise requires a double press within a time window to exit the app
+     * Registers a custom back-press handler using the OnBackPressedDispatcher.
+     *
+     * If the navigation drawer is open, the back button closes it.
+     * Otherwise, the user must press back twice within a short time interval
+     * in order to exit the activity ("double back to exit" behavior).
      */
-    @Override
-    public void onBackPressed() {
-        if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawers();
-            return;
-        }
+    private void setupBackPressedHandler() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawers();
+                    return;
+                }
 
-        long now = System.currentTimeMillis();
-        if (now - lastBackPressTime < BACK_PRESS_INTERVAL) {
-            super.onBackPressed();
-        } else {
-            lastBackPressTime = now;
-            Toast.makeText(this, getString(R.string.back_press_exit), Toast.LENGTH_SHORT).show();
-        }
+                long now = System.currentTimeMillis();
+                if (now - lastBackPressTime < BACK_PRESS_INTERVAL) {
+                    finish();
+                } else {
+                    lastBackPressTime = now;
+                    Toast.makeText(
+                            ExploreEventsActivity.this,
+                            getString(R.string.back_press_exit),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            }
+        });
     }
+
 }

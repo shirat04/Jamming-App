@@ -305,5 +305,6 @@
     <string name="dialog_delete_event_message">This event has already passed.\nAre you sure you want to delete it?</string>
     <string name="dialog_yes_delete">Yes, delete</string>
     <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_delete_event_message_confirm">Are you sure you want to delete this event?</string>
 
 </resources>
