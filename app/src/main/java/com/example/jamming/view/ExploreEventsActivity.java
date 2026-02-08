@@ -165,11 +165,19 @@ public class ExploreEventsActivity extends BaseMapActivity {
                     eventFilter.getMaxAvailableSpots(),
                     eventFilter.getMinCapacity(),
                     eventFilter.getMaxCapacity(),
-                    (minA, maxA, minC, maxC) ->
-                            viewModel.updateFilter(filter -> {
-                                filter.setAvailableSpotsRange(minA, maxA);
-                                filter.setCapacityRange(minC, maxC);}));
+                    (minA, maxA, minC, maxC) -> {
+                        if (!viewModel.isValidCapacityRange(minA, maxA, minC, maxC)) {
+                            Toast.makeText(this, R.string.invalid_capacity_range, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        viewModel.updateFilter(filter -> {
+                            filter.setAvailableSpotsRange(minA, maxA);
+                            filter.setCapacityRange(minC, maxC);
+                        });
+                    }
+            );
         });
+
 
         // Music genre filter
         filterMusic.setOnClickListener(v -> {
@@ -187,20 +195,36 @@ public class ExploreEventsActivity extends BaseMapActivity {
             EventFilter eventFilter = viewModel.getFilter().getValue();
             if (eventFilter == null) return;
 
-            FilterDialogs.showTimeRange(getSupportFragmentManager(), this, eventFilter.getStartMinute(), eventFilter.getEndMinute(),
+            FilterDialogs.showTimeRange(
+                    this,
+                    eventFilter.getStartMinute(),
+                    eventFilter.getEndMinute(),
                     (start, end) ->
-                            viewModel.updateFilter(filter -> filter.setTimeRange(start, end)));
+                            viewModel.updateFilter(filter -> filter.setTimeRange(start, end))
+            );
         });
+
+
 
         // Date range filter
         filterDate.setOnClickListener(v -> {
             EventFilter eventFilter = viewModel.getFilter().getValue();
             if (eventFilter == null) return;
 
-            FilterDialogs.showDateRange(getSupportFragmentManager(), this, eventFilter.getStartDateMillis(), eventFilter.getEndDateMillis(),
-                    (start, end) ->
-                            viewModel.updateFilter(filter -> filter.setDateRange(start, end)));
+            FilterDialogs.showDateRange(
+                    this,
+                    eventFilter.getStartDateMillis(),
+                    eventFilter.getEndDateMillis(),
+                    (start, end) -> {
+                        if (!viewModel.isValidDateRange(start, end)) {
+                            Toast.makeText(this, R.string.end_after_start, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        viewModel.updateFilter(filter -> filter.setDateRange(start, end));
+                    }
+            );
         });
+
 
         // Distance filter (requires last known location)
         filterDistance.setOnClickListener(v -> {
