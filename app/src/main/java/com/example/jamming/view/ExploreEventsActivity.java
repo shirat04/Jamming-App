@@ -11,7 +11,7 @@ import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.model.EventFilter;
 import com.example.jamming.model.MusicGenre;
-import com.example.jamming.navigation.UserMenuHandler;
+import com.example.jamming.view.navigation.UserMenuHandler;
 import com.example.jamming.utils.MapUiHelper;
 import com.example.jamming.view.dialog.FilterDialogs;
 import com.example.jamming.viewmodel.ExploreEventsViewModel;

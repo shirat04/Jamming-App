@@ -1,7 +1,6 @@
 package com.example.jamming.view;
 
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -11,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.model.MusicGenre;
-import com.example.jamming.navigation.UserMenuHandler;
+import com.example.jamming.view.navigation.UserMenuHandler;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.viewmodel.EventDetailViewModel;
 import java.util.ArrayList;

@@ -11,7 +11,7 @@ import androidx.core.view.GravityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
-import com.example.jamming.navigation.OwnerMenuHandler;
+import com.example.jamming.view.navigation.OwnerMenuHandler;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.utils.GenreUtils;
 import androidx.activity.OnBackPressedCallback;

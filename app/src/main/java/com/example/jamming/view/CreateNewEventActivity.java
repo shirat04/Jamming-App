@@ -15,7 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import com.example.jamming.R;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.model.MusicGenre;
-import com.example.jamming.navigation.OwnerMenuHandler;
+import com.example.jamming.view.navigation.OwnerMenuHandler;
 import com.example.jamming.utils.FormTextWatcher;
 import com.example.jamming.viewmodel.CreateNewEventViewModel;
 import java.util.Calendar;

@@ -2,7 +2,7 @@ package com.example.jamming.view;
 
 import android.os.Bundle;
 import com.example.jamming.R;
-import com.example.jamming.navigation.UserMenuHandler;
+import com.example.jamming.view.navigation.UserMenuHandler;
 
 public class UpdateUserProfileActivity extends BaseActivity {
 

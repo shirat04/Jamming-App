@@ -8,7 +8,7 @@ import android.widget.Toast;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
-import com.example.jamming.navigation.OwnerMenuHandler;
+import com.example.jamming.view.navigation.OwnerMenuHandler;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.utils.GenreUtils;
 import com.example.jamming.viewmodel.OwnerViewModel;
