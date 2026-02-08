@@ -271,5 +271,15 @@
     <string name="error_failed_to_load_events">Failed to load events</string>
     <string name="event_deleted_success">Event deleted</string>
     <string name="error_deleting_event">Error deleting event</string>
+    <string name="msg_register_success">You are registered!</string>
+    <string name="msg_cancel_success">Registration canceled</string>
+    <string name="msg_already_registered">You are already registered</string>
+
+    <string name="dialog_cancel_registration_title">Cancel Registration</string>
+    <string name="dialog_cancel_registration_message">Are you sure you want to cancel your registration for the event?</string>
+    <string name="dialog_yes_cancel">Yes, cancel</string>
+    <string name="dialog_no">No</string>
+
+    <string name="no_genre_specified">No genre specified</string>
 
 </resources>

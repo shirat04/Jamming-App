@@ -323,6 +323,23 @@ public class EventDetailViewModel extends ViewModel {
         }
     }
 
+    /**
+     * Clears the current one-time UI event.
+     * This is typically called by the View after the event was handled
+     * (e.g., after showing a Toast), to prevent the same event from being
+     * re-consumed on configuration changes or re-observation.
+     */
+    public void clearUiEvent() {
+        uiEvent.setValue(null);
+    }
 
+    /**
+     * Clears the current error message.
+     * This is used after the View has displayed the error (e.g., in a Toast),
+     * to avoid showing the same error again when the observer is triggered.
+     */
+    public void clearErrorMessage() {
+        errorMessageResId.setValue(null);
+    }
 
 }
