@@ -1,5 +1,6 @@
 package com.example.jamming.utils;
 
+import com.example.jamming.R;
 import com.example.jamming.model.MusicGenre;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class GenreUtils {
      */
     public static String genresToText(List<String> genres) {
         if (genres == null || genres.isEmpty()) {
-            return "No genre specified";
+            return null;
         }
         return String.join(" , ", genres);
     }
@@ -33,7 +34,7 @@ public class GenreUtils {
      */
     public static String genresToTextFromEnums(List<MusicGenre> genres) {
         if (genres == null || genres.isEmpty()) {
-            return "No genre specified";
+            return null;
         }
 
         List<String> names = new ArrayList<>();

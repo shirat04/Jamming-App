@@ -301,5 +301,9 @@
     <string name="participants_format">Participants: %1$d / %2$d</string>
     <string name="action_remove">Remove</string>
     <string name="action_cancel_registration">Cancel registration</string>
+    <string name="dialog_delete_event_title">Delete Event</string>
+    <string name="dialog_delete_event_message">This event has already passed.\nAre you sure you want to delete it?</string>
+    <string name="dialog_yes_delete">Yes, delete</string>
+    <string name="dialog_cancel">Cancel</string>
 
 </resources>
