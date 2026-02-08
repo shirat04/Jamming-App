@@ -281,5 +281,13 @@
     <string name="dialog_no">No</string>
 
     <string name="no_genre_specified">No genre specified</string>
+    <string name="error_enter_location_search">Please enter a location to search.</string>
+    <string name="error_address_not_identified">Address cannot be identified. Please choose a more precise point.</string>
+    <string name="error_address_recognition_failed">Error recognizing address. Try again.</string>
+    <string name="error_select_location_on_map">Please select a location on the map</string>
+    <string name="error_select_location_with_address">Please select a location with an identified address.</string>
+    <string name="error_address_not_accurate">The address was not found accurately. Please select a point manually on the map.</string>
+    <string name="error_search_failed">Search error</string>
+    <string name="title_selected_location">Selected location</string>
 
 </resources>
