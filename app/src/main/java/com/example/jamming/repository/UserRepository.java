@@ -7,6 +7,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +64,18 @@ public class UserRepository {
         });
     }
 
+    /**
+     * Retrieves a user profile by username.
+     *
+     * @param username Username to search for
+     * @return Task containing the query result
+     */
+    public Task<QuerySnapshot> getUserByUsername(String username) {
+        return db.collection("users")
+                .whereEqualTo("username", username)
+                .limit(1)
+                .get();
+    }
 
     /**
      * Updates a single field in the user's document.

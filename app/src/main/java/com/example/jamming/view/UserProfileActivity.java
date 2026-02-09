@@ -214,6 +214,11 @@ public class UserProfileActivity extends BaseActivity {
             }
         });
 
+        rowEditProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(this, UpdateUserProfileActivity.class);
+            startActivity(intent);
+        });
+
         // Logout
         btnLogout.setOnClickListener(v -> showLogoutConfirmationDialog());
 

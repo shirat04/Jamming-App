@@ -214,6 +214,11 @@ public class OwnerProfileActivity extends BaseActivity {
             }
         });
 
+        rowEditProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(this, UpdateOwnerProfileActivity.class);
+            startActivity(intent);
+        });
+
         // Logout
         btnLogout.setOnClickListener(v -> showLogoutConfirmationDialog());
 
