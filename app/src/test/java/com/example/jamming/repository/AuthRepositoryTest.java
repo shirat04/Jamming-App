@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.AuthResult;
@@ -17,13 +16,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,34 +70,34 @@ public class AuthRepositoryTest {
 
     @Test
     public void login_callsFirebaseAuth() {
-        when(mockAuth.signInWithEmailAndPassword("a@b.com", "1234"))
+        when(mockAuth.signInWithEmailAndPassword("a@gmail.com", "1234"))
                 .thenReturn(Tasks.forResult((AuthResult) null));
 
-        Task<AuthResult> task = repo.login("a@b.com", "1234");
+        Task<AuthResult> task = repo.login("a@gmail.com", "1234");
 
-        verify(mockAuth).signInWithEmailAndPassword("a@b.com", "1234");
+        verify(mockAuth).signInWithEmailAndPassword("a@gmail.com", "1234");
         assertTrue(task.isSuccessful());
     }
 
     @Test
     public void createUser_callsFirebaseAuth() {
-        when(mockAuth.createUserWithEmailAndPassword("a@b.com", "1234"))
+        when(mockAuth.createUserWithEmailAndPassword("a@gmail.com", "1234"))
                 .thenReturn(Tasks.forResult((AuthResult) null));
 
-        Task<AuthResult> task = repo.createUser("a@b.com", "1234");
+        Task<AuthResult> task = repo.createUser("a@gmail.com", "1234");
 
-        verify(mockAuth).createUserWithEmailAndPassword("a@b.com", "1234");
+        verify(mockAuth).createUserWithEmailAndPassword("a@gmail.com", "1234");
         assertTrue(task.isSuccessful());
     }
 
     @Test
     public void sendPasswordResetEmail_callsFirebaseAuth() {
-        when(mockAuth.sendPasswordResetEmail("a@b.com"))
+        when(mockAuth.sendPasswordResetEmail("a@gmail.com"))
                 .thenReturn(Tasks.forResult(null));
 
-        Task<Void> task = repo.sendPasswordResetEmail("a@b.com");
+        Task<Void> task = repo.sendPasswordResetEmail("a@gmail.com");
 
-        verify(mockAuth).sendPasswordResetEmail("a@b.com");
+        verify(mockAuth).sendPasswordResetEmail("a@gmail.com");
         assertTrue(task.isSuccessful());
     }
 
