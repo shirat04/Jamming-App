@@ -293,4 +293,31 @@ public class EditEventViewModel extends ViewModel {
                 .addOnFailureListener(e ->
                         errorMessageRes.setValue(R.string.error_updating_event_he));
     }
+
+    /**
+     * Updates the event title in the ViewModel.
+     *
+     * @param title New event title.
+     */
+    public void setTitle(String title) {
+        this.title.setValue(title);
+    }
+
+    /**
+     * Updates the event description in the ViewModel.
+     *
+     * @param description New event description.
+     */
+    public void setDescription(String description) {
+        this.description.setValue(description);
+    }
+
+    /**
+     * Updates the capacity text in the ViewModel.
+     *
+     * @param capacityText New capacity value as text.
+     */
+    public void setCapacityText(String capacityText) {
+        this.capacityText.setValue(capacityText);
+    }
 }

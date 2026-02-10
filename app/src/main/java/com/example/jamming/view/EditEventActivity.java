@@ -238,6 +238,21 @@ public class EditEventActivity extends BaseActivity {
         // Open genre selection dialog
         genreText.setOnClickListener(v -> openGenreDialog());
 
+        // Update title in ViewModel when user edits the field
+        etTitle.addTextChangedListener(FormTextWatcher.after(s ->
+                viewModel.setTitle(s.toString())
+        ));
+
+        // Update description in ViewModel when user edits the field
+        etDescription.addTextChangedListener(FormTextWatcher.after(s ->
+                viewModel.setDescription(s.toString())
+        ));
+
+        // Update capacity in ViewModel when user edits the field
+        etCapacity.addTextChangedListener(FormTextWatcher.after(s ->
+                viewModel.setCapacityText(s.toString())
+        ));
+
         // Save or cancel actions
         btnSave.setOnClickListener(v -> viewModel.saveChanges());
         cancelText.setOnClickListener(v -> finish());
