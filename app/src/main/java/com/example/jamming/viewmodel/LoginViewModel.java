@@ -6,8 +6,15 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.jamming.R;
+import com.example.jamming.model.Event;
 import com.example.jamming.model.UserType;
 import com.example.jamming.repository.AuthRepository;
+import com.example.jamming.repository.UserRepository;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.GoogleAuthProvider;
+import java.util.HashMap;
+import com.example.jamming.utils.UiEvent;
+
 
 /**
  * ViewModel responsible for handling the login flow.
@@ -23,23 +30,23 @@ public class LoginViewModel extends ViewModel {
 
     /** Repository responsible for authentication and user data access */
     private final AuthRepository repo;
+    private final UserRepository userRepo;
 
-    /**
-     * Default constructor used in production.
-     * Initializes the ViewModel with the real AuthRepository.
-     */
+
+
     public LoginViewModel() {
-        this(new AuthRepository());
+        this(new AuthRepository(), new UserRepository());
     }
 
-    /**
-     * Constructor for dependency injection (mainly used for testing).
-     *
-     * @param repo AuthRepository instance
-     */
-    public LoginViewModel(AuthRepository repo) {
-        this.repo = repo;
+    public LoginViewModel(UserRepository userRepo) {
+        this(new AuthRepository(), userRepo);
     }
+
+    public LoginViewModel(AuthRepository repo, UserRepository userRepo) {
+        this.repo = repo;
+        this.userRepo = userRepo;
+    }
+
 
     /** Message exposed to the UI (errors and informational messages) */
     private final MutableLiveData<Integer> messageResId = new MutableLiveData<>();
@@ -55,8 +62,18 @@ public class LoginViewModel extends ViewModel {
     public LiveData<UserType> getUserType() { return userType; }
     public LiveData<Boolean> getIsLoading() {return isLoading;}
 
+    private MutableLiveData<UiEvent<Void>> launchGoogle = new MutableLiveData<>();
+
+
+
+
+
     /** Stops the loading state */
     public void stopLoading() {isLoading.setValue(false);}
+    public LiveData<UiEvent<Void>> getLaunchGoogle() {
+        return launchGoogle;
+    }
+
 
     /**
      * Performs user login using either email or username.
@@ -136,22 +153,31 @@ public class LoginViewModel extends ViewModel {
             messageResId.setValue(R.string.error_authentication);
             return;
         }
+
         repo.getUserUId(uid)
                 .addOnSuccessListener(doc -> {
+
                     if (!doc.exists()) {
+                        stopLoading();
                         messageResId.setValue(R.string.error_user_data_not_found);
                         return;
                     }
 
                     String typeStr = doc.getString("userType");
                     if (typeStr == null) {
+                        stopLoading();
                         messageResId.setValue(R.string.error_invalid_user_type);
                         return;
                     }
 
                     try {
-                        userType.setValue(UserType.valueOf(typeStr));
+                        UserType type = UserType.valueOf(typeStr);
+
+                        stopLoading();
+                        userType.setValue(type);
+
                     } catch (IllegalArgumentException e) {
+                        stopLoading();
                         messageResId.setValue(R.string.error_invalid_user_type);
                     }
                 })
@@ -160,6 +186,7 @@ public class LoginViewModel extends ViewModel {
                     messageResId.setValue(R.string.error_failed_to_load_user_data);
                 });
     }
+
 
     /**
      * Sends a password reset email.
@@ -223,6 +250,56 @@ public class LoginViewModel extends ViewModel {
         messageResId.setValue(null);
 
     }
+
+    public void onGoogleClicked() {
+        System.out.println("VM: Google event fired");
+        launchGoogle.setValue(new UiEvent<>(null));
+    }
+
+    public void onGoogleIdTokenReceived(String idToken) {
+        isLoading.setValue(true);
+
+        AuthCredential cred = GoogleAuthProvider.getCredential(idToken, null);
+
+        repo.signInWithCredential(cred)
+                .addOnSuccessListener(r -> {
+                    // שלב 1: שולפים את המשתמש מתוך תוצאת ההתחברות (AuthResult)
+                    com.google.firebase.auth.FirebaseUser firebaseUser = r.getUser();
+                    String uid = repo.getCurrentUid();
+
+                    if (uid == null || firebaseUser == null) {
+                        stopLoading();
+                        messageResId.setValue(R.string.error_authentication);
+                        return;
+                    }
+
+                    // שלב 2: הכנת הנתונים כולל השם והאימייל מגוגל
+                    HashMap<String, Object> userData = new HashMap<>();
+                    userData.put("userType", "USER");
+                    userData.put("createdAt", System.currentTimeMillis());
+                    userData.put("fullName", firebaseUser.getDisplayName()); // השם המלא
+                    userData.put("email", firebaseUser.getEmail());          // כתובת המייל
+
+                    if (firebaseUser.getPhotoUrl() != null) {
+                        userData.put("profileImageUrl", firebaseUser.getPhotoUrl().toString());
+                    }
+
+                    // שלב 3: יצירת המסמך ב-Firestore אם הוא חסר
+                    repo.createUserDocIfMissing(uid, userData)
+                            .addOnSuccessListener(v -> checkUserType(uid))
+                            .addOnFailureListener(e -> {
+                                stopLoading();
+                                messageResId.setValue(R.string.error_generic);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    stopLoading();
+                    messageResId.setValue(R.string.error_google_login_failed);
+                });
+    }
+
+
+
 
 
 }

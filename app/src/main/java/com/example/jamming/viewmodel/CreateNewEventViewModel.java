@@ -23,8 +23,8 @@ import java.util.List;
  * and communication with repositories.
  */
 public class CreateNewEventViewModel extends ViewModel {
-    private final AuthRepository authRepo;
-    private final EventRepository eventRepository;
+    private AuthRepository authRepo;
+    private EventRepository eventRepository;
 
     /**
      * Default constructor used in production.

@@ -222,7 +222,7 @@ public class EditEventViewModel extends ViewModel {
     }
 
 
-    /* ===== Save changes ===== */
+
     /**
      * Validates all input fields and updates the event in the repository.
      * Reports validation errors using EventField for precise UI feedback.

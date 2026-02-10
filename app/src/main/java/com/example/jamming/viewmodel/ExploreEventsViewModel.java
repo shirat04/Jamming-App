@@ -236,37 +236,5 @@ public class ExploreEventsViewModel extends ViewModel {
     public interface FilterUpdater {
         void update(EventFilter filter);
     }
-
-    /**
-     * Checks whether a date range is valid.
-     * If one of the bounds is null, the range is considered valid (no filter).
-     * Otherwise, the end date must not be earlier than the start date.
-     */
-    public boolean isValidDateRange(Long start, Long end) {
-        if (start == null || end == null) return true;
-        return end >= start;
-    }
-
-    /**
-     * Checks whether capacity and available-spots ranges are valid.
-     * Values must be non-negative, and max must be >= min when both are provided.
-     * Null values mean "no constraint".
-     *
-     *  * @param minA Minimum available spots (may be null = no lower bound)
-     *  * @param maxA Maximum available spots (may be null = no upper bound)
-     *  * @param minC Minimum total capacity (may be null = no lower bound)
-     *  * @param maxC Maximum total capacity (may be null = no upper bound)
-     *  * @return true if all provided ranges are valid, false otherwise.
-     */
-    public boolean isValidCapacityRange(Integer minA, Integer maxA, Integer minC, Integer maxC) {
-        if (minA != null && minA < 0) return false;
-        if (maxA != null && maxA < 0) return false;
-        if (minC != null && minC < 0) return false;
-        if (maxC != null && maxC < 0) return false;
-        if (minA != null && maxA != null && maxA < minA) return false;
-        if (minC != null && maxC != null && maxC < minC) return false;
-        return true;
-    }
-
 }
 

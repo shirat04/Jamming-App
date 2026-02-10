@@ -1,4 +1,4 @@
-package com.example.jamming.view.navigation;
+package com.example.jamming.navigation;
 
 import android.content.Intent;
 

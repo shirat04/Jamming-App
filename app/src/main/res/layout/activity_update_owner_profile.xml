@@ -2,23 +2,13 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F2F4F7">
 
-    <!-- Progress Bar Overlay -->
-    <ProgressBar
-        android:id="@+id/updateProgressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:elevation="10dp"/>
 
-    <!-- Content ScrollView -->
+    <!-- 🟡 CONTENT -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -33,189 +23,76 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Owner Header Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            android:background="@android:color/white"
+            android:padding="12dp"
+            android:elevation="4dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:contentDescription="@string/todo"
+                android:src="@android:drawable/sym_def_app_icon"
+                android:layout_marginEnd="12dp"/>
+
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@android:color/white"
-                android:padding="16dp"
-                android:elevation="4dp"
-                android:layout_marginBottom="24dp"
-                android:gravity="center_vertical">
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-                <ImageView
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:src="@drawable/default_profile_image"
-                    android:scaleType="centerCrop"
-                    android:layout_marginEnd="16dp"
-                    android:contentDescription="Profile Image"/>
-
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Edit Business Profile"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:textColor="#333333"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Update your business information"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginTop="4dp"/>
-                </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_name"
+                    android:textStyle="bold"
+                    android:textSize="18sp"/>
             </LinearLayout>
 
-            <!-- Form Section Title -->
-            <TextView
+            </LinearLayout>
+            <!-- Full Name / Business Name -->
+            <EditText
+                android:id="@+id/inputName"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Business Information"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#666666"
-                android:layout_marginBottom="12dp"
-                android:layout_marginStart="4dp"/>
-
-            <!-- Business/Owner Name Input -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_height="50dp"
                 android:hint="Business / Owner Name"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                android:padding="12dp"
+                android:layout_marginBottom="12dp"/>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/inputName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPersonName|textCapWords"
-                    android:maxLines="1"
-                    android:drawableStart="@android:drawable/ic_menu_myplaces"
-                    android:drawablePadding="12dp"
-                    android:drawableTint="#666666"/>
-            </com.google.android.material.textfield.TextInputLayout>
+            <!-- Email (read only) -->
+            <EditText
+                android:id="@+id/inputEmail"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Email"
+                android:enabled="false"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp"/>
 
-            <!-- Email Input (Read-Only) -->
-            <com.google.android.material.textfield.TextInputLayout
+            <!-- Phone -->
+            <EditText
+                android:id="@+id/inputPhone"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Phone Number"
+                android:inputType="phone"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Save Button -->
+            <Button
+                android:id="@+id/btnSaveProfile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:hint="Email Address"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:helperText="Email cannot be changed"
-                app:helperTextTextColor="#999999">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/inputEmail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textEmailAddress"
-                    android:maxLines="1"
-                    android:enabled="false"
-                    android:textColor="#999999"
-                    android:drawableStart="@android:drawable/ic_dialog_email"
-                    android:drawablePadding="12dp"
-                    android:drawableTint="#999999"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Phone Input -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:hint="Phone Number (Optional)"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/inputPhone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="phone"
-                    android:maxLines="1"
-                    android:drawableStart="@android:drawable/stat_sys_phone_call"
-                    android:drawablePadding="12dp"
-                    android:drawableTint="#666666"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Username Input -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:hint="Username"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:helperText="3-20 characters (letters, numbers, underscore)"
-                app:helperTextTextColor="#666666">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/inputUsername"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:drawableStart="@android:drawable/ic_menu_sort_by_size"
-                    android:drawablePadding="12dp"
-                    android:drawableTint="#666666"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Buttons Section -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp"
-                android:gravity="center">
-
-                <!-- Cancel Button -->
-                <Button
-                    android:id="@+id/btnCancel"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    android:text="Cancel"
-                    android:textSize="16sp"
-                    android:textColor="#666666"
-                    android:backgroundTint="@android:color/white"
-                    android:elevation="2dp"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
-
-                <!-- Save Changes Button -->
-                <Button
-                    android:id="@+id/btnSaveChanges"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:text="Save Changes"
-                    android:textSize="16sp"
-                    android:textColor="@android:color/white"
-                    android:backgroundTint="#007AFF"
-                    android:elevation="4dp"/>
-            </LinearLayout>
-
-            <!-- Info Text -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Your changes will be saved immediately and synced across all devices"
-                android:textSize="12sp"
-                android:textColor="#999999"
-                android:gravity="center"
-                android:layout_marginTop="16dp"
-                android:padding="12dp"/>
+                android:text="Save Changes"
+                android:textSize="18sp"
+                android:textColor="@android:color/white"/>
 
         </LinearLayout>
     </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

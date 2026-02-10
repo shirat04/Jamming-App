@@ -7,11 +7,12 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+
 
 /**
  * Repository responsible for managing user-related data.
@@ -64,18 +65,6 @@ public class UserRepository {
         });
     }
 
-    /**
-     * Retrieves a user profile by username.
-     *
-     * @param username Username to search for
-     * @return Task containing the query result
-     */
-    public Task<QuerySnapshot> getUserByUsername(String username) {
-        return db.collection("users")
-                .whereEqualTo("username", username)
-                .limit(1)
-                .get();
-    }
 
     /**
      * Updates a single field in the user's document.
@@ -219,5 +208,40 @@ public class UserRepository {
                 .document(uid)
                 .delete();
     }
+
+    /**
+     * Creates a user document if it does not already exist.
+     * Used after Google / social login.
+     *
+     * @param uid User ID
+     * @param email User email (optional)
+     * @param fullName User display name (optional)
+     */
+    public Task<Void> createUserIfMissing(String uid, String email, String fullName) {
+        return db.collection("users").document(uid).get()
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        return Tasks.forException(task.getException());
+                    }
+
+                    DocumentSnapshot doc = task.getResult();
+
+                    // if user already exists
+                    if (doc != null && doc.exists()) {
+                        return Tasks.forResult(null);
+                    }
+
+                    // create new user
+                    HashMap<String, Object> data = new HashMap<>();
+                    data.put("email", email);
+                    data.put("fullName", fullName);
+                    data.put("userType", "USER");
+                    data.put("createdAt", FieldValue.serverTimestamp());
+                    data.put("registeredEventIds", new ArrayList<>());
+
+                    return db.collection("users").document(uid).set(data);
+                });
+    }
+
 
 }

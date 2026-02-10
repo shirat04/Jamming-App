@@ -1,5 +1,6 @@
 package com.example.jamming.view;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -11,8 +12,10 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.model.MusicGenre;
-import com.example.jamming.view.navigation.UserMenuHandler;
+import com.example.jamming.navigation.UserMenuHandler;
+import com.example.jamming.repository.EventRepository;
 import com.example.jamming.utils.DateUtils;
+import com.example.jamming.utils.NotificationHelper;
 import com.example.jamming.viewmodel.MyEventUserViewModel;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +42,8 @@ public class MyEventUserActivity extends BaseActivity {
 
     // Helper responsible for handling navigation drawer menu actions
     private UserMenuHandler menuHandler;
+
+
 
 
     /**
@@ -242,5 +247,9 @@ public class MyEventUserActivity extends BaseActivity {
     protected boolean onMenuItemSelected(int itemId) {
         return menuHandler.handle(itemId);
     }
+
+    // בתוך EventViewModel.java
+
+
 
 }

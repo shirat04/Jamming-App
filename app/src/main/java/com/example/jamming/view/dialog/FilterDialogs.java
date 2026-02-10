@@ -7,15 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-
 import com.example.jamming.R;
 import com.example.jamming.model.MusicGenre;
-import com.example.jamming.utils.DateUtils;
 import com.google.android.material.slider.Slider;
-
+import com.example.jamming.utils.DateUtils;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,54 +18,29 @@ import java.util.Set;
 /**
  * Utility class responsible for displaying filter dialogs
  * and returning user selections via callbacks.
- *
+
  * The class contains only UI-related logic and does not hold state.
  */
-public final class FilterDialogs {
+public class FilterDialogs {
 
-    private FilterDialogs() {}
-
-    /* ===== Temporary holders for lambdas ===== */
-
-    static class TimeRangeTmp {
-        int start;
-        int end;
-    }
-
-    static class DateRangeTmp {
-        long start;
-        long end;
-    }
-
-    /* ===== Callbacks ===== */
-
-    // Callback for multi-selection of music genres
-    public interface GenresCallback {
-        void onSelected(Set<MusicGenre> selected);
-    }
+    //Callback for multi-selection of music genres
+    public interface GenresCallback { void onSelected(Set<MusicGenre> selected);}
 
     // Callback for selecting a time range (minutes from midnight)
-    public interface TimeRangeCallback {
-        void onSelected(Integer startMinute, Integer endMinute);
-    }
+    public interface TimeRangeCallback { void onSelected(Integer startMinute, Integer endMinute);}
 
-    // Callback for selecting a date range in milliseconds
-    public interface DateRangeCallback {
-        void onSelected(Long startMillis, Long endMillis);
-    }
+    //Callback for selecting a date range in milliseconds
+    public interface DateRangeCallback { void onSelected(Long startMillis, Long endMillis);}
 
-    // Callback for combined capacity filtering
+    //Callback for combined capacity filtering
     public interface CapacityCombinedCallback {
         void onSelected(Integer minAvailable, Integer maxAvailable, Integer minCapacity, Integer maxCapacity);
     }
 
-    // Callback for distance-based filtering
-    public interface DistanceCallback {
-        void onSelected(double lat, double lng, int radiusKm);
-    }
+    //Callback for distance-based filtering
+    public interface DistanceCallback { void onSelected(double lat, double lng, int radiusKm);}
 
     /* ===================== MUSIC ===================== */
-
     // Displays a multi-choice dialog for selecting music genres.
     // Pre-selects currently active genres.
     public static void showMusic(
@@ -88,20 +58,21 @@ public final class FilterDialogs {
         }
 
         new AlertDialog.Builder(ctx)
-                .setTitle(R.string.select_genres)
-                .setMultiChoiceItems(displayNames, checked, (d, which, isChecked) -> checked[which] = isChecked)
-                .setPositiveButton(R.string.ok, (d, w) -> {
+                .setTitle("Select genres")
+                .setMultiChoiceItems(displayNames, checked, (d, which, isChecked) -> {
+                    checked[which] = isChecked;
+                })
+                .setPositiveButton("OK", (d, w) -> {
                     Set<MusicGenre> result = new HashSet<>();
                     for (int i = 0; i < allGenres.length; i++) {
                         if (checked[i]) {
                             result.add(allGenres[i]);
                         }
                     }
-                    callback.onSelected(result);
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+                    callback.onSelected(result);})
+                .setNegativeButton("Cancel", null).show();
     }
+
 
     /* ===================== TIME RANGE ===================== */
 
@@ -109,53 +80,48 @@ public final class FilterDialogs {
     // If a filter is already applied, displays the current range
     // and allows the user to change or clear it.
     public static void showTimeRange(
-            FragmentActivity activity,
+            androidx.fragment.app.FragmentManager fm,
+            Context ctx,
             Integer currentStartMinute,
             Integer currentEndMinute,
             TimeRangeCallback callback
     ) {
-        Context ctx = activity;
-        FragmentManager fm = activity.getSupportFragmentManager();
 
         if (currentStartMinute != null && currentEndMinute != null) {
             new AlertDialog.Builder(ctx)
-                    .setTitle(R.string.current_time_filter)
+                    .setTitle("Current time filter")
                     .setMessage(DateUtils.formatTimeRange(currentStartMinute, currentEndMinute))
-                    .setPositiveButton(R.string.change, (d, w) ->
-                            openTimePickers(fm, ctx, currentStartMinute, currentEndMinute, callback))
-                    .setNegativeButton(R.string.clear, (d, w) -> callback.onSelected(null, null))
-                    .setNeutralButton(R.string.cancel, null)
-                    .show();
+
+                    .setPositiveButton("Change", (d, w) -> {
+                        openTimePickers(fm, currentStartMinute, currentEndMinute, callback);
+                    })
+                    .setNegativeButton("Clear", (d, w) -> {
+                        callback.onSelected(null, null);
+                    })
+                    .setNeutralButton("Cancel", null).show();
             return;
         }
-
-        openTimePickers(fm, ctx, null, null, callback);
+        openTimePickers(fm, null, null, callback);
     }
 
     // Opens two sequential time pickers (start → end).
+    // Uses arrays to allow mutation inside lambda expressions.
     private static void openTimePickers(
-            FragmentManager fm,
-            Context ctx,
+            androidx.fragment.app.FragmentManager fm,
             Integer startMinute,
             Integer endMinute,
             TimeRangeCallback callback
     ) {
-        TimeRangeTmp range = new TimeRangeTmp();
-        range.start = startMinute != null ? startMinute : 18 * 60;
-        range.end   = endMinute   != null ? endMinute   : 23 * 60;
+        final int[] start = { startMinute != null ? startMinute : 18 * 60 };
+        final int[] end   = { endMinute != null ? endMinute : 23 * 60 };
 
-        TimePickerDialogFragment.newInstance((h, m) -> {
-                    range.start = h * 60 + m;
-
-                    TimePickerDialogFragment.newInstance((h2, m2) -> {
-                                range.end = h2 * 60 + m2;
-                                callback.onSelected(range.start, range.end);
-                            }, ctx.getString(R.string.select_end_time))
-                            .show(fm, "timeEnd");
-
-                }, ctx.getString(R.string.select_start_time))
-                .show(fm, "timeStart");
+        TimePickerDialogFragment.newInstance((h, m) -> {start[0] = h * 60 + m;
+                    TimePickerDialogFragment.newInstance((h2, m2) -> { end[0] = h2 * 60 + m2;
+                                callback.onSelected(start[0], end[0]); },
+                            "Select end time").show(fm, "timeEnd"); },
+                "Select start time").show(fm, "timeStart");
     }
+
 
     /* ===================== DATE RANGE ===================== */
 
@@ -163,54 +129,54 @@ public final class FilterDialogs {
     // If a date range is already selected, displays it
     // and allows the user to change or clear the filter.
     public static void showDateRange(
-            FragmentActivity activity,
+            androidx.fragment.app.FragmentManager fm,
+            Context ctx,
             Long currentStart,
             Long currentEnd,
             DateRangeCallback callback
     ) {
-        Context ctx = activity;
-        FragmentManager fm = activity.getSupportFragmentManager();
-
         if (currentStart != null && currentEnd != null) {
             new AlertDialog.Builder(ctx)
-                    .setTitle(R.string.current_date_filter)
+                    .setTitle("Current date filter")
                     .setMessage(DateUtils.formatOnlyDate(currentStart) + " – " + DateUtils.formatOnlyDate(currentEnd))
-                    .setPositiveButton(R.string.change, (d, w) ->
-                            openDatePickers(fm, ctx, currentStart, currentEnd, callback))
-                    .setNegativeButton(R.string.clear, (d, w) -> callback.onSelected(null, null))
-                    .setNeutralButton(R.string.cancel, null)
-                    .show();
+                    .setPositiveButton("Change", (d, w) -> {
+                        openDatePickers(fm, ctx, currentStart, currentEnd, callback);
+                    })
+                    .setNegativeButton("Clear", (d, w) -> {
+                        callback.onSelected(null, null);
+                    })
+                    .setNeutralButton("Cancel", null).show();
             return;
         }
-
         openDatePickers(fm, ctx, null, null, callback);
     }
 
     // Opens two sequential date pickers (start → end).
+    // The selected range is normalized to full-day boundaries.
     private static void openDatePickers(
-            FragmentManager fm,
+            androidx.fragment.app.FragmentManager fm,
             Context ctx,
             Long startMillis,
             Long endMillis,
             DateRangeCallback callback
     ) {
-        DateRangeTmp range = new DateRangeTmp();
-        long now = System.currentTimeMillis();
-        range.start = startMillis != null ? startMillis : now;
-        range.end   = endMillis   != null ? endMillis   : now;
+        final long[] start = { startMillis != null ? startMillis : System.currentTimeMillis() };
+        final long[] end   = { endMillis != null ? endMillis : System.currentTimeMillis() };
 
         DatePickerDialogFragment.newInstance(
-                (y, mo, d) -> {
-                    range.start = toStartOfDayMillis(y, mo, d);
-
+                (y, mo, d) -> {start[0] = toStartOfDayMillis(y, mo, d);
                     DatePickerDialogFragment.newInstance((y2, mo2, d2) -> {
-                                range.end = toEndOfDayMillis(y2, mo2, d2);
-                                callback.onSelected(range.start, range.end);
-                            }, ctx.getString(R.string.select_end_date))
-                            .show(fm, "dateEnd");
-                },
-                ctx.getString(R.string.select_start_date)
-        ).show(fm, "dateStart");
+                                end[0] = toEndOfDayMillis(y2, mo2, d2);
+
+                                if (end[0] < start[0]) {
+                                    new AlertDialog.Builder(ctx)
+                                            .setMessage("End date must be after start date")
+                                            .setPositiveButton("OK", null).show();
+                                    return;
+                                }
+                                callback.onSelected(start[0], end[0]); },
+                            "Select end date").show(fm, "dateEnd"); },
+                "Select start date").show(fm, "dateStart");
     }
 
     // Converts a selected date to the beginning of the day (00:00:00)
@@ -229,7 +195,7 @@ public final class FilterDialogs {
         return c.getTimeInMillis();
     }
 
-    /* ===================== CAPACITY ===================== */
+    /* ===================== CAPACITY (AVAILABLE SPOTS, MAXIMUM SPOTS) ===================== */
 
     // Displays a combined capacity filter dialog
     // for available spots and total event capacity.
@@ -241,7 +207,8 @@ public final class FilterDialogs {
             Integer curMaxCapacity,
             CapacityCombinedCallback callback
     ) {
-        View v = LayoutInflater.from(ctx).inflate(R.layout.activity_dialog_capacity_filter, null);
+        View v = LayoutInflater.from(ctx)
+                .inflate(R.layout.activity_dialog_capacity_filter, null);
 
         EditText minAvail = v.findViewById(R.id.inputMinAvailable);
         EditText maxAvail = v.findViewById(R.id.inputMaxAvailable);
@@ -254,28 +221,39 @@ public final class FilterDialogs {
         if (curMaxCapacity != null)  maxCap.setText(String.valueOf(curMaxCapacity));
 
         new AlertDialog.Builder(ctx)
-                .setTitle(R.string.seat_filtering)
+                .setTitle("Seat Filtering")
                 .setView(v)
-                .setPositiveButton(R.string.ok, (d, w) -> {
+                .setPositiveButton("OK", (d, w) -> {
+
                     Integer minA = parseIntOrNull(minAvail.getText().toString());
                     Integer maxA = parseIntOrNull(maxAvail.getText().toString());
                     Integer minC = parseIntOrNull(minCap.getText().toString());
                     Integer maxC = parseIntOrNull(maxCap.getText().toString());
 
+                    if (minA != null && maxA != null && maxA < minA) {
+                        showError(ctx, "Incorrect range of available seats");
+                        return;
+                    }
+                    if (minC != null && maxC != null && maxC < minC) {
+                        showError(ctx, "Invalid event size range");
+                        return;
+                    }
+
                     callback.onSelected(minA, maxA, minC, maxC);
                 })
-                .setNegativeButton(R.string.cancel, null)
+                .setNegativeButton("Cancel", null)
                 .show();
     }
-
     private static Integer parseIntOrNull(String s) {
-        try {
-            s = s.trim();
-            if (s.isEmpty()) return null;
-            return Integer.parseInt(s);
-        } catch (NumberFormatException e) {
-            return null;
-        }
+        s = s.trim();
+        return s.isEmpty() ? null : Integer.parseInt(s);
+    }
+
+    private static void showError(Context ctx, String message) {
+        new AlertDialog.Builder(ctx)
+                .setMessage(message)
+                .setPositiveButton("OK", null)
+                .show();
     }
 
     /* ===================== DISTANCE ===================== */
@@ -290,9 +268,8 @@ public final class FilterDialogs {
     ) {
         if (currentLocation == null) {
             new AlertDialog.Builder(ctx)
-                    .setMessage(R.string.no_location)
-                    .setPositiveButton(R.string.ok, null)
-                    .show();
+                    .setMessage("No location is currently available. Make sure location permissions are enabled.")
+                    .setPositiveButton("OK", null).show();
             return;
         }
 
@@ -302,16 +279,16 @@ public final class FilterDialogs {
 
         int startRadius = currentRadius != null ? currentRadius : 10;
         slider.setValue(startRadius);
-        label.setText(ctx.getString(R.string.distance_km, startRadius));
+        label.setText("Distance: " + startRadius + " km");
 
-        slider.addOnChangeListener((s, value, fromUser) ->
-                label.setText(ctx.getString(R.string.distance_km, Math.round(value)))
-        );
+        slider.addOnChangeListener((s, value, fromUser) -> {
+            label.setText("Distance: " + Math.round(value) + " km");
+        });
 
         new AlertDialog.Builder(ctx)
-                .setTitle(R.string.filter_by_distance)
+                .setTitle("Filter by distance")
                 .setView(v)
-                .setPositiveButton(R.string.ok, (d, w) -> {
+                .setPositiveButton("OK", (d, w) -> {
                     int radius = Math.round(slider.getValue());
                     callback.onSelected(
                             currentLocation.getLatitude(),
@@ -319,7 +296,6 @@ public final class FilterDialogs {
                             radius
                     );
                 })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+                .setNegativeButton("Cancel", null).show();
     }
 }

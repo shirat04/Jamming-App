@@ -27,7 +27,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.bumptech.glide.Glide;
 import com.example.jamming.R;
 import com.example.jamming.model.User;
-import com.example.jamming.view.navigation.UserMenuHandler;
+import com.example.jamming.navigation.UserMenuHandler;
 import com.example.jamming.viewmodel.UserProfileViewModel;
 
 import java.io.File;
@@ -212,11 +212,6 @@ public class UserProfileActivity extends BaseActivity {
             if (buttonView.isPressed()) {
                 viewModel.updateNotificationsEnabled(isChecked);
             }
-        });
-
-        rowEditProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(this, UpdateUserProfileActivity.class);
-            startActivity(intent);
         });
 
         // Logout

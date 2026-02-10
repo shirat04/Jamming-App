@@ -11,7 +11,7 @@ import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.model.EventFilter;
 import com.example.jamming.model.MusicGenre;
-import com.example.jamming.view.navigation.UserMenuHandler;
+import com.example.jamming.navigation.UserMenuHandler;
 import com.example.jamming.utils.MapUiHelper;
 import com.example.jamming.view.dialog.FilterDialogs;
 import com.example.jamming.viewmodel.ExploreEventsViewModel;
@@ -53,6 +53,7 @@ public class ExploreEventsActivity extends BaseMapActivity {
 
     // Drawer/menu handler
     private UserMenuHandler menuHandler;
+    private UserMenuHandler userMenuHandler;
 
     // Back press handling (double press to exit)
     private long lastBackPressTime = 0;
@@ -67,6 +68,18 @@ public class ExploreEventsActivity extends BaseMapActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        com.example.jamming.viewmodel.MyEventUserViewModel notificationsViewModel =
+                new androidx.lifecycle.ViewModelProvider(this).get(com.example.jamming.viewmodel.MyEventUserViewModel.class);
+
+
+        String userId = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+
+        notificationsViewModel.startNotificationService(userId, this);
+
+
+
         // Setup the base layout with navigation drawer and this screen's content
         setupBase(
                 R.menu.user_menu,
@@ -76,16 +89,17 @@ public class ExploreEventsActivity extends BaseMapActivity {
         // Initialize UI and map
         initViews();
         initMap();
-
-        // Initialize ViewModel and menu handler
-        viewModel = new ViewModelProvider(this).get(ExploreEventsViewModel.class);
-        menuHandler = new UserMenuHandler(this);
+        userMenuHandler = new UserMenuHandler(this);
+        setupNavigation();
+        // Initialize ViewModel and menu handler (זה ה-ViewModel הראשי של המסך)
+        viewModel = new androidx.lifecycle.ViewModelProvider(this).get(com.example.jamming.viewmodel.ExploreEventsViewModel.class);
+        // menuHandler = new com.example.jamming.utils.UserMenuHandler(this);
 
         // Bind UI to ViewModel state
         observeViewModel();
         setupListeners();
 
-        // Initialize filter (loads last saved filter if exists, otherwise default)
+        // Initialize filter
         viewModel.initFilter();
 
         // Load initial data
@@ -93,8 +107,36 @@ public class ExploreEventsActivity extends BaseMapActivity {
         viewModel.loadUserName();
         setupBackPressedHandler();
 
-    }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) !=
+                    android.content.pm.PackageManager.PERMISSION_GRANTED) {
 
+
+                androidx.core.app.ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
+    }
+    private void setupNavigation() {
+        // תיקון 1: שימוש ב-ID הנכון מה-XML שלך (navigationView)
+        com.google.android.material.navigation.NavigationView navigationView = findViewById(R.id.navigationView);
+
+        if (navigationView != null) {
+            navigationView.setNavigationItemSelectedListener(item -> {
+                // שימוש במחלקה שלך לטיפול בלחיצה
+                boolean handled = userMenuHandler.handle(item.getItemId());
+
+                if (handled) {
+                    // תיקון 2: שימוש ב-ID הנכון מה-XML שלך (drawerLayout)
+                    androidx.drawerlayout.widget.DrawerLayout drawer = findViewById(R.id.drawerLayout);
+                    if (drawer != null) {
+                        drawer.closeDrawers();
+                    }
+                }
+                return handled;
+            });
+        }
+    }
     /**
      * Called when the Activity comes to the foreground.
      * Used here to refresh the events list to ensure up-to-date data
@@ -165,19 +207,11 @@ public class ExploreEventsActivity extends BaseMapActivity {
                     eventFilter.getMaxAvailableSpots(),
                     eventFilter.getMinCapacity(),
                     eventFilter.getMaxCapacity(),
-                    (minA, maxA, minC, maxC) -> {
-                        if (!viewModel.isValidCapacityRange(minA, maxA, minC, maxC)) {
-                            Toast.makeText(this, R.string.invalid_capacity_range, Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        viewModel.updateFilter(filter -> {
-                            filter.setAvailableSpotsRange(minA, maxA);
-                            filter.setCapacityRange(minC, maxC);
-                        });
-                    }
-            );
+                    (minA, maxA, minC, maxC) ->
+                            viewModel.updateFilter(filter -> {
+                                filter.setAvailableSpotsRange(minA, maxA);
+                                filter.setCapacityRange(minC, maxC);}));
         });
-
 
         // Music genre filter
         filterMusic.setOnClickListener(v -> {
@@ -195,36 +229,20 @@ public class ExploreEventsActivity extends BaseMapActivity {
             EventFilter eventFilter = viewModel.getFilter().getValue();
             if (eventFilter == null) return;
 
-            FilterDialogs.showTimeRange(
-                    this,
-                    eventFilter.getStartMinute(),
-                    eventFilter.getEndMinute(),
+            FilterDialogs.showTimeRange(getSupportFragmentManager(), this, eventFilter.getStartMinute(), eventFilter.getEndMinute(),
                     (start, end) ->
-                            viewModel.updateFilter(filter -> filter.setTimeRange(start, end))
-            );
+                            viewModel.updateFilter(filter -> filter.setTimeRange(start, end)));
         });
-
-
 
         // Date range filter
         filterDate.setOnClickListener(v -> {
             EventFilter eventFilter = viewModel.getFilter().getValue();
             if (eventFilter == null) return;
 
-            FilterDialogs.showDateRange(
-                    this,
-                    eventFilter.getStartDateMillis(),
-                    eventFilter.getEndDateMillis(),
-                    (start, end) -> {
-                        if (!viewModel.isValidDateRange(start, end)) {
-                            Toast.makeText(this, R.string.end_after_start, Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        viewModel.updateFilter(filter -> filter.setDateRange(start, end));
-                    }
-            );
+            FilterDialogs.showDateRange(getSupportFragmentManager(), this, eventFilter.getStartDateMillis(), eventFilter.getEndDateMillis(),
+                    (start, end) ->
+                            viewModel.updateFilter(filter -> filter.setDateRange(start, end)));
         });
-
 
         // Distance filter (requires last known location)
         filterDistance.setOnClickListener(v -> {

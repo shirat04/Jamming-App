@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "977440631678",
+    "project_id": "jamming-6d4f5",
+    "storage_bucket": "jamming-6d4f5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:977440631678:android:770a445a68a8e9ff15e12f",
+        "android_client_info": {
+          "package_name": "com.example.jamming"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "977440631678-8fvrchtc932ujqaku7al173phirguvjc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jamming",
+            "certificate_hash": "d08653ab62e04ebed4901ef7137968cecc247389"
+          }
+        },
+        {
+          "client_id": "977440631678-s345p3o8d46qi5k8fv4mg6u4lp9fam3d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCdW5QupaYo_YD5O9axD_i29uKLqAlyAI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "977440631678-s345p3o8d46qi5k8fv4mg6u4lp9fam3d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

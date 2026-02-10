@@ -89,4 +89,14 @@ public class Event {
         return maxCapacity - reserved;
     }
 
+
+    private java.util.List<String> participants;
+
+    public java.util.List<String> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(java.util.List<String> participants) {
+        this.participants = participants;
+    }
 }

@@ -4,342 +4,86 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.jamming.R;
 import com.example.jamming.model.Event;
-import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.EventRepository;
-import com.example.jamming.repository.UserRepository;
+import com.google.firebase.auth.FirebaseAuth;
 
-/**
- * ViewModel for the Event Details screen.
- *
- * Responsible for:
- * - Loading event data
- * - Handling registration and cancellation logic
- * - Exposing UI state via LiveData according to MVVM architecture
- */
+import java.util.List;
+
 public class EventDetailViewModel extends ViewModel {
 
-    // Repositories used for data access and business logic
-    private final EventRepository eventRepository;
-    private final UserRepository userRepository;
-    private final AuthRepository authRepository;
+    private final EventRepository repository;
+    private final MutableLiveData<Event> event = new MutableLiveData<>();
+    private final MutableLiveData<String> error = new MutableLiveData<>();
 
-    /**
-     * Default constructor used in production.
-     * Initializes repositories with their default implementations.
-     */
+    // 1. המשתנה החדש שמחזיק את סטטוס ההרשמה
+    private final MutableLiveData<Boolean> isRegistered = new MutableLiveData<>(false);
+
+    private final String currentUserId;
+
     public EventDetailViewModel() {
-        this(new EventRepository(), new UserRepository(), new AuthRepository());
-    }
-
-    /**
-     * Constructor used mainly for testing (dependency injection).
-     */
-    public EventDetailViewModel(
-            EventRepository eventRepository,
-            UserRepository userRepository,
-            AuthRepository authRepository
-    ) {
-        this.eventRepository = eventRepository;
-        this.userRepository = userRepository;
-        this.authRepository = authRepository;
-    }
-
-    /**
-     * One-time UI events used for showing messages such as Toasts.
-     */
-    public enum UiEvent {
-        REGISTER_SUCCESS,
-        CANCEL_SUCCESS,
-        ALREADY_REGISTERED
-    }
-
-    // Holds the current event data
-    private final MutableLiveData<Event> eventLiveData = new MutableLiveData<>();
-
-    // Holds the current registration-related UI state
-    private final MutableLiveData<RegistrationUiState> registrationUiState = new MutableLiveData<>();
-
-    // Holds error messages to be displayed in the UI
-    private final MutableLiveData<Integer> errorMessageResId = new MutableLiveData<>();
-
-    // Indicates whether data is currently loading
-    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(true);
-
-    // One-time UI events (success / already registered)
-    private final MutableLiveData<UiEvent> uiEvent = new MutableLiveData<>();
-    public LiveData<UiEvent> getUiEvent() { return uiEvent; }
-    public LiveData<Boolean> getIsLoading() {return isLoading;}
-    public LiveData<Event> getEventLiveData() { return eventLiveData; }
-    public LiveData<RegistrationUiState> getRegistrationUiState() { return registrationUiState; }
-    public LiveData<Integer> getErrorMessageResId() { return errorMessageResId; }
-
-    // Currently loaded event ID (used to avoid unnecessary reloads)
-    private String eventId;
-
-
-    /**
-     * Loads event details and updates UI state accordingly.
-     *
-     * @param eventId ID of the event to load
-     */
-    public void loadEvent(String eventId) {
-        if (eventId == null || eventId.equals(this.eventId)) {
-            return;
+        repository = new EventRepository();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        } else {
+            currentUserId = null;
         }
-        isLoading.postValue(true);
-        this.eventId = eventId;
+    }
 
+    // טעינת אירוע ובדיקה האם המשתמש כבר רשום אליו
+    public void loadEvent(String eventId) {
+        repository.getEventById(eventId).addOnSuccessListener(documentSnapshot -> {
+            Event loadedEvent = documentSnapshot.toObject(Event.class);
+            if (loadedEvent != null) {
+                loadedEvent.setId(documentSnapshot.getId());
+                event.setValue(loadedEvent);
 
-        eventRepository.getEventById(eventId)
-                .addOnSuccessListener(doc -> {
-                    if (!doc.exists()) {
-                        errorMessageResId.postValue(R.string.error_event_not_found);
-                        return;
-                    }
+                // 2. בדיקה: האם המשתמש שלי נמצא ברשימת המשתתפים?
+                checkIfRegistered(loadedEvent);
+            }
+        }).addOnFailureListener(e -> {
+            error.setValue(e.getMessage());
+        });
+    }
 
-                    Event event = doc.toObject(Event.class);
-                    if (event == null) {
-                        errorMessageResId.postValue(R.string.error_event_invalid_data);
-                        return;
-                    }
+    // פונקציית עזר לבדיקת הרשמה
+    private void checkIfRegistered(Event event) {
+        if (currentUserId == null) return;
 
-                    eventLiveData.postValue(event);
+        List<String> participants = event.getParticipants();
+        if (participants != null && participants.contains(currentUserId)) {
+            isRegistered.setValue(true);
+        } else {
+            isRegistered.setValue(false);
+        }
+    }
 
-                    String uid = authRepository.getCurrentUid();
-                    if (uid == null) {
-                        errorMessageResId.postValue(R.string.error_user_not_logged_in);
-                        registrationUiState.postValue(null);
-                        return;
-                    }
+    public void registerToEvent() {
+        Event currentEvent = event.getValue();
+        if (currentEvent == null || currentUserId == null) return;
 
-                    // Check if the user is already registered to this event
-                    userRepository.getRegisteredEvents(uid)
-                            .addOnSuccessListener(events -> {
-                                boolean registered = events.contains(eventId);
-                                updateRegistrationState(event, registered);
-                                isLoading.postValue(false);
-                            })
-                            .addOnFailureListener(e -> {
-                                updateRegistrationState(event, false);
-                                isLoading.postValue(false);
-                            });
-
+        repository.registerUserIfCapacityAvailable(currentEvent.getId(), currentUserId)
+                .addOnSuccessListener(aVoid -> {
+                    // עדכון מוצלח
+                    isRegistered.setValue(true);
+                    // רענון האירוע כדי לראות את מספרי המקומות מתעדכנים
+                    loadEvent(currentEvent.getId());
                 })
                 .addOnFailureListener(e -> {
-                    errorMessageResId.postValue(R.string.error_failed_to_load_event);
-                    isLoading.postValue(false);
+                    error.setValue("Registration failed: " + e.getMessage());
                 });
-
-
     }
 
-
-    /**
-     * Attempts to register the current user to the event.
-     */
-    public void registerToEvent() {
-        Event event = eventLiveData.getValue();
-        if (event == null) {
-            errorMessageResId.postValue(R.string.error_event_not_found);
-            return;
-        }
-
-        if (isEventExpired(event)) {
-            errorMessageResId.postValue(R.string.error_event_already_ended);
-            return;
-        }
-
-        String uid = authRepository.getCurrentUid();
-        if (uid == null) {
-            errorMessageResId.postValue(R.string.error_user_not_logged_in);
-            return;
-        }
-
-        // Check if user is already registered
-        userRepository.getRegisteredEvents(uid)
-                .addOnSuccessListener(events -> {
-
-                    if (events.contains(eventId)) {
-                        uiEvent.postValue(UiEvent.ALREADY_REGISTERED);
-                        updateRegistrationState(event, true);
-                        return;
-                    }
-
-                    // Try to register user if capacity allows
-                    eventRepository.registerUserIfCapacityAvailable(eventId, uid)
-                            .addOnSuccessListener(v -> {
-                                uiEvent.postValue(UiEvent.REGISTER_SUCCESS);
-
-                                // Reload event to update capacity and UI
-                                eventRepository.getEventById(eventId)
-                                        .addOnSuccessListener(doc -> {
-                                            Event refreshed = doc.toObject(Event.class);
-                                            if (refreshed != null) {
-                                                eventLiveData.postValue(refreshed);
-                                                updateRegistrationState(refreshed, true);
-                                            }
-                                        });
-                            })
-                            .addOnFailureListener(e -> {
-                                if ("EVENT_FULL".equals(e.getMessage())) {
-                                    errorMessageResId.postValue(R.string.error_event_full);
-                                } else {
-                                    errorMessageResId.postValue(R.string.error_registration_failed);                                }
-                            });
-
-                });
-
-
+    // 3. הפונקציה שהייתה חסרה לך!
+    public LiveData<Boolean> getRegistrationStatus() {
+        return isRegistered;
     }
 
-
-    /**
-     * Cancels the current user's registration to the event.
-     */
-    public void cancelRegistration() {
-        Event event = eventLiveData.getValue();
-        if (event == null) return;
-
-        if (isEventExpired(event)) {
-            errorMessageResId.postValue(R.string.error_event_already_ended);
-            return;
-        }
-
-        String uid = authRepository.getCurrentUid();
-        if (uid == null) {
-            errorMessageResId.postValue(R.string.error_user_not_logged_in);
-            return;
-        }
-
-        userRepository.unregisterEventForUser(uid, eventId)
-                .addOnSuccessListener(unused -> {
-
-                    // Decrease reserved count after successful cancellation
-                    eventRepository.decrementReserved(eventId)
-                            .addOnSuccessListener(v -> {
-                                uiEvent.postValue(UiEvent.CANCEL_SUCCESS);
-
-                                // Reload event data
-                                eventRepository.getEventById(eventId)
-                                        .addOnSuccessListener(doc -> {
-                                            Event refreshed = doc.toObject(Event.class);
-                                            if (refreshed != null) {
-                                                eventLiveData.postValue(refreshed);
-                                                updateRegistrationState(refreshed, false);
-                                            }
-                                        });
-
-                            })
-                            .addOnFailureListener(e ->
-                                    errorMessageResId.postValue(R.string.error_update_event_capacity_failed)
-                            );
-                })
-                .addOnFailureListener(e ->
-                        errorMessageResId.postValue(R.string.error_cancel_registration_failed)
-                );
+    public LiveData<Event> getEvent() {
+        return event;
     }
 
-    /**
-     * Updates the registration-related UI state based on event status and user registration.
-     */
-    private void updateRegistrationState(Event event, boolean isRegistered) {
-        boolean isPast = isEventExpired(event);
-        boolean isFull = event.getReserved() >= event.getMaxCapacity();
-
-        if (isPast) {
-            registrationUiState.postValue(
-                    new RegistrationUiState(
-                            false,
-                            false,
-                            R.string.status_event_ended,
-                            null
-                    )
-            );
-            return;
-        }
-
-        if (isRegistered) {
-            registrationUiState.postValue(
-                    new RegistrationUiState(
-                            false,
-                            true,
-                            R.string.status_registered,
-                            isFull ? R.string.status_sold_out : null
-                    )
-            );
-            return;
-        }
-
-        if (isFull) {
-            registrationUiState.postValue(
-                    new RegistrationUiState(
-                            false,
-                            false,
-                            R.string.status_sold_out,
-                            null
-                    )
-            );
-            return;
-        }
-
-        registrationUiState.postValue(
-                new RegistrationUiState(
-                        true,
-                        false,
-                        R.string.action_register_for_event,
-                        null
-                )
-        );
+    public LiveData<String> getError() {
+        return error;
     }
-
-    /**
-     * Checks whether the event date has already passed.
-     */
-    private boolean isEventExpired(Event event) {
-        return event.getDateTime() < System.currentTimeMillis();
-    }
-
-    /**
-     * Represents the UI state related to event registration.
-     */
-    public static class RegistrationUiState {
-        public final boolean canRegister;
-        public final boolean canCancel;
-        public final int mainText;     // Registered / Register / Ended
-        public final Integer secondaryText; // SOLD OUT / null
-
-        public RegistrationUiState(
-                boolean canRegister,
-                boolean canCancel,
-                int mainText,
-                Integer secondaryText
-        ) {
-            this.canRegister = canRegister;
-            this.canCancel = canCancel;
-            this.mainText = mainText;
-            this.secondaryText = secondaryText;
-        }
-    }
-
-    /**
-     * Clears the current one-time UI event.
-     * This is typically called by the View after the event was handled
-     * (e.g., after showing a Toast), to prevent the same event from being
-     * re-consumed on configuration changes or re-observation.
-     */
-    public void clearUiEvent() {
-        uiEvent.setValue(null);
-    }
-
-    /**
-     * Clears the current error message.
-     * This is used after the View has displayed the error (e.g., in a Toast),
-     * to avoid showing the same error again when the observer is triggered.
-     */
-    public void clearErrorMessage() {
-        errorMessageResId.setValue(null);
-    }
-
 }

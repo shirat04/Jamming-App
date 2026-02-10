@@ -1,6 +1,7 @@
 package com.example.jamming.repository;
 import com.example.jamming.model.Event;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
@@ -220,14 +221,76 @@ public class EventRepository {
                 throw new RuntimeException("EVENT_FULL");
             }
 
-            transaction.update(eventRef,
-                    "reserved", FieldValue.increment(1));
+            // update num reserved
+            transaction.update(eventRef, "reserved", FieldValue.increment(1));
 
-            transaction.update(userRef,
-                    "registeredEventIds", FieldValue.arrayUnion(eventId));
+            // update num available
+            transaction.update(eventRef, "availableSpots", FieldValue.increment(-1));
+
+
+            //update participants list
+            transaction.update(eventRef, "participants", FieldValue.arrayUnion(uid));
+
+            // update user's registered events
+            transaction.update(userRef, "registeredEventIds", FieldValue.arrayUnion(eventId));
 
             return null;
         });
+    }
+
+    //interface on event change listener
+    public interface OnEventChangeListener {
+        void onEventChanged(String title, String message);
+    }
+
+    // util func to save notification to history
+    private void saveNotificationToHistory(String userId, String title, String message) {
+        java.util.Map<String, Object> notifMap = new java.util.HashMap<>();
+        notifMap.put("title", title);
+        notifMap.put("message", message);
+        notifMap.put("timestamp", System.currentTimeMillis());
+
+        // add notifMap to user's notifications on db
+        db.collection("users")
+                .document(userId)
+                .collection("notifications")
+                .add(notifMap);
+    }
+
+    public void listenToUserEvents(String userId, OnEventChangeListener listener) {
+        db.collection("events")
+                .whereArrayContains("participants", userId) // מאזין רק לאירועים שנרשמתי אליהם
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null || snapshots == null) return;
+
+                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                        Event event = dc.getDocument().toObject(Event.class);
+                        String title = "";
+                        String message = "";
+                        boolean notify = false;
+
+                        // זיהוי שינוי
+                        if (dc.getType() == DocumentChange.Type.MODIFIED) {
+                            title = "Event Update";
+                            message = "The event '" + event.getName() + "' details have changed.";
+                            notify = true;
+                        }
+                        // זיהוי ביטול
+                        else if (dc.getType() == DocumentChange.Type.REMOVED) {
+                            title = "Event Cancelled";
+                            message = "The event '" + event.getName() + "' was cancelled.";
+                            notify = true;
+                        }
+
+                        if (notify) {
+                            // message on phone
+                            listener.onEventChanged(title, message);
+
+                            // add notification in db
+                            saveNotificationToHistory(userId, title, message);
+                        }
+                    }
+                });
     }
 
 

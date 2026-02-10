@@ -1,5 +1,7 @@
 package com.example.jamming.viewmodel;
 
+import android.content.Context;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -7,6 +9,8 @@ import com.example.jamming.model.Event;
 import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.EventRepository;
 import com.example.jamming.repository.UserRepository;
+import com.example.jamming.utils.NotificationHelper;
+
 import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.List;
@@ -249,6 +253,16 @@ public class MyEventUserViewModel extends ViewModel {
         result.addAll(past);
 
         return result;
+    }
+    public void startNotificationService(String userId, Context context) {
+
+        eventRepository.listenToUserEvents(userId, (title, message) -> {
+
+
+            com.example.jamming.utils.NotificationHelper.showNotification(context, title, message);
+
+            getMyEvents();
+        });
     }
 
 }

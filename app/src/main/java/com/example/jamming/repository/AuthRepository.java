@@ -8,6 +8,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.Map;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FirebaseUser;
+
 
 /**
  * Repository responsible for authentication and user account management.
@@ -149,5 +152,27 @@ public class AuthRepository {
         }
         return Tasks.forException(new Exception("No user logged in"));
     }
+
+    /**
+     * Signs in using a federated provider credential (Google/Facebook/Apple, etc.).
+     *
+     * @param credential Provider credential
+     * @return Task containing the authentication result
+     */
+    public Task<AuthResult> signInWithCredential(AuthCredential credential) {
+        return auth.signInWithCredential(credential);
+    }
+
+    public Task<Void> createUserDocIfMissing(String uid, Map<String, Object> defaults) {
+        return db.collection("users").document(uid).get()
+                .continueWithTask(t -> {
+                    if (!t.isSuccessful()) return Tasks.forException(t.getException());
+                    DocumentSnapshot doc = t.getResult();
+                    if (doc != null && doc.exists()) return Tasks.forResult(null);
+                    return db.collection("users").document(uid).set(defaults);
+                });
+    }
+
+
 
 }

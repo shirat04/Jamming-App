@@ -3,6 +3,8 @@ package com.example.jamming.view;
 import android.os.Bundle;
 import android.content.Intent;
 import com.example.jamming.utils.FormTextWatcher;
+
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,6 +15,22 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.viewmodel.LoginViewModel;
 import com.example.jamming.model.UserType;
+
+import com.google.android.gms.common.SignInButton;
+
+import android.content.Intent;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+
+
+
+
 
 /**
  * Activity responsible for handling the login screen UI.
@@ -35,6 +53,41 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private Button loginBtn, registerBtn;
     private TextView errorText, forgotPassword;
+    private SignInButton googleBtn;
+    private GoogleSignInClient googleClient;
+
+    private void setupGoogleClient() {
+        String webClientId = getString(R.string.default_web_client_id);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(webClientId)
+                .requestEmail()
+                .build();
+
+        googleClient = GoogleSignIn.getClient(this, gso);
+    }
+
+    private final ActivityResultLauncher<Intent> googleLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getData() == null) return;
+
+                try {
+                    GoogleSignInAccount acc =
+                            GoogleSignIn.getSignedInAccountFromIntent(result.getData())
+                                    .getResult(ApiException.class);
+
+                    String idToken = acc.getIdToken();
+                    if (idToken != null) {
+                        viewModel.onGoogleIdTokenReceived(idToken);
+                    }
+
+                } catch (ApiException e) {
+                    Log.e("GoogleSignIn", "signInResult:failed code=" + e.getStatusCode());
+                }
+            });
+
+
+
 
     /**
      * Called when the Activity is created.
@@ -47,10 +100,13 @@ public class LoginActivity extends AppCompatActivity {
 
         initViews();
         viewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        setupGoogleClient();
+
 
         setupClearErrorOnInput();
         setupListeners();
         observeViewModel();
+
     }
 
     /**
@@ -64,6 +120,7 @@ public class LoginActivity extends AppCompatActivity {
         errorText = findViewById(R.id.errorTextView);
         forgotPassword = findViewById(R.id.forgotPasswordText);
         progressBar = findViewById(R.id.loginProgressBar);
+        googleBtn = findViewById(R.id.googleSignInButton);
     }
 
     /**
@@ -87,6 +144,14 @@ public class LoginActivity extends AppCompatActivity {
         registerBtn.setOnClickListener(v ->
                 startActivity(new Intent(this, RegisterActivity.class))
         );
+
+        googleBtn.setOnClickListener(v -> {
+            errorText.setText("Google button clicked");
+            errorText.setVisibility(View.VISIBLE);
+            viewModel.onGoogleClicked();
+        });
+
+
     }
 
     /**
@@ -108,6 +173,9 @@ public class LoginActivity extends AppCompatActivity {
 
         // Observe loading state and update UI accordingly
         viewModel.getIsLoading().observe(this, isLoading -> {
+            googleBtn.setEnabled(!isLoading);
+            googleBtn.setAlpha(isLoading ? 0.6f : 1f);
+
             progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
             loginBtn.setEnabled(!isLoading);
             loginBtn.setAlpha(isLoading ? 0.6f : 1f);
@@ -126,6 +194,18 @@ public class LoginActivity extends AppCompatActivity {
 
             finish();
         });
+
+        viewModel.getLaunchGoogle().observe(this, ev -> {
+            if (ev == null) return;
+
+
+            ev.getContentIfNotHandled();
+
+            googleLauncher.launch(googleClient.getSignInIntent());
+        });
+
+
+
     }
 
     /**
