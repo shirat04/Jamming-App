@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.jamming.R;
-import com.example.jamming.model.Event;
 import com.example.jamming.model.UserType;
 import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.repository.UserRepository;
@@ -172,8 +171,6 @@ public class LoginViewModel extends ViewModel {
 
                     try {
                         UserType type = UserType.valueOf(typeStr);
-
-                        stopLoading();
                         userType.setValue(type);
 
                     } catch (IllegalArgumentException e) {

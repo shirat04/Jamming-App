@@ -3,6 +3,7 @@ package com.example.jamming.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.model.MusicGenre;
@@ -10,6 +11,7 @@ import com.example.jamming.repository.EventRepository;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.model.EventField;
 import com.example.jamming.utils.GenreUtils;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -75,7 +77,7 @@ public class EditEventViewModel extends ViewModel {
     private final MutableLiveData<Integer> successMessageRes = new MutableLiveData<>();
 
     /* ===== LiveData getters exposed to the View ===== */
-    public LiveData<Boolean> getEditingAllowed() {return editingAllowed;}
+    public LiveData<Boolean> getEditingAllowed() { return editingAllowed; }
     public LiveData<Integer> getSuccessMessageRes() { return successMessageRes; }
     public LiveData<String> getTitle() { return title; }
     public LiveData<String> getDescription() { return description; }
@@ -84,11 +86,12 @@ public class EditEventViewModel extends ViewModel {
     public LiveData<String> getTimeText() { return timeText; }
     public LiveData<String> getCapacityText() { return capacityText; }
     public LiveData<String> getGenresText() { return genresText; }
-    public Calendar getDateTime() {return dateTime;}
+    public Calendar getDateTime() { return dateTime; }
     public LiveData<EventField> getErrorField() { return errorField; }
     public LiveData<Integer> getErrorMessageRes() { return errorMessageRes; }
 
     /* ===== Event loading ===== */
+
     /**
      * Loads an event from the repository and initializes the ViewModel state.
      */
@@ -106,6 +109,7 @@ public class EditEventViewModel extends ViewModel {
                         errorMessageRes.setValue(R.string.error_failed_to_load_event);
                         return;
                     }
+
                     // Determine whether editing is still allowed
                     editingAllowed.setValue(isEditingAllowed(event));
 
@@ -136,7 +140,6 @@ public class EditEventViewModel extends ViewModel {
                     dateTime.setTimeInMillis(event.getDateTime());
                     dateText.setValue(DateUtils.formatOnlyDate(event.getDateTime()));
                     timeText.setValue(DateUtils.formatOnlyTime(event.getDateTime()));
-
                 })
                 .addOnFailureListener(e ->
                         errorMessageRes.setValue(R.string.error_loading_event_he));
@@ -155,6 +158,7 @@ public class EditEventViewModel extends ViewModel {
     }
 
     /* ===== Location handling ===== */
+
     public void onLocationSelected(double lat, double lng, String address) {
         this.lat = lat;
         this.lng = lng;
@@ -168,6 +172,7 @@ public class EditEventViewModel extends ViewModel {
     }
 
     /* ===== Date & Time handling ===== */
+
     public void setDate(int year, int month, int day) {
         dateTime.set(Calendar.YEAR, year);
         dateTime.set(Calendar.MONTH, month);
@@ -184,6 +189,7 @@ public class EditEventViewModel extends ViewModel {
     }
 
     /* ===== Genre handling ===== */
+
     public void toggleGenre(MusicGenre genre, boolean checked) {
         if (genre == null) return;
 
@@ -221,7 +227,7 @@ public class EditEventViewModel extends ViewModel {
         return event.getDateTime() >= System.currentTimeMillis();
     }
 
-
+    /* ===== Save changes ===== */
 
     /**
      * Validates all input fields and updates the event in the repository.
@@ -229,10 +235,12 @@ public class EditEventViewModel extends ViewModel {
      */
     public void saveChanges() {
         errorField.setValue(null);
+
         if (eventId == null) {
             errorMessageRes.setValue(R.string.error_missing_event_id);
             return;
         }
+
         if (!Boolean.TRUE.equals(editingAllowed.getValue())) {
             errorMessageRes.setValue(R.string.error_edit_past_event);
             return;
@@ -245,15 +253,8 @@ public class EditEventViewModel extends ViewModel {
         if (t.isEmpty()) { errorField.setValue(EventField.TITLE); return; }
         if (d.isEmpty()) { errorField.setValue(EventField.DESCRIPTION); return; }
         if (address == null || address.trim().isEmpty()) { errorField.setValue(EventField.LOCATION); return; }
-        if (dateText.getValue() == null || dateText.getValue().isEmpty()) {
-            errorField.setValue(EventField.DATE);
-            return;
-        }
-
-        if (timeText.getValue() == null || timeText.getValue().isEmpty()) {
-            errorField.setValue(EventField.TIME);
-            return;
-        }
+        if (dateText.getValue() == null || dateText.getValue().isEmpty()) { errorField.setValue(EventField.DATE); return; }
+        if (timeText.getValue() == null || timeText.getValue().isEmpty()) { errorField.setValue(EventField.TIME); return; }
 
         long now = System.currentTimeMillis();
         long selectedTime = dateTime.getTimeInMillis();
@@ -272,6 +273,7 @@ public class EditEventViewModel extends ViewModel {
             errorField.setValue(EventField.CAPACITY);
             return;
         }
+
         if (genres.isEmpty()) { errorField.setValue(EventField.GENRE); return; }
 
         // Build update map

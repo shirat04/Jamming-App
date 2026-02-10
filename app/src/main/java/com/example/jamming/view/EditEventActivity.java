@@ -10,15 +10,18 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.lifecycle.ViewModelProvider;
+
 import com.example.jamming.R;
 import com.example.jamming.model.MusicGenre;
 import com.example.jamming.navigation.OwnerMenuHandler;
 import com.example.jamming.utils.FormTextWatcher;
 import com.example.jamming.viewmodel.EditEventViewModel;
 import com.google.android.material.snackbar.Snackbar;
+
 import java.util.Calendar;
 
 /**
@@ -51,8 +54,7 @@ public class EditEventActivity extends BaseActivity {
                             double lng = result.getData().getDoubleExtra("lng", 0);
                             String address = result.getData().getStringExtra("address");
 
-                                viewModel.onLocationSelected(lat, lng, address);
-
+                            viewModel.onLocationSelected(lat, lng, address);
                         }
                     }
             );
@@ -170,7 +172,6 @@ public class EditEventActivity extends BaseActivity {
                     genreText.requestFocus();
                     break;
             }
-
         });
 
         // Observe general error messages (string resource IDs) and show them as a Snackbar
@@ -191,7 +192,6 @@ public class EditEventActivity extends BaseActivity {
                 finish();
             }
         });
-
 
         // Observe whether editing is allowed (e.g., prevent editing past events)
         viewModel.getEditingAllowed().observe(this, allowed -> {
@@ -235,6 +235,7 @@ public class EditEventActivity extends BaseActivity {
         etLocation.setOnClickListener(v ->
                 mapPickerLauncher.launch(new Intent(this, MapPickerActivity.class))
         );
+
         // Open genre selection dialog
         genreText.setOnClickListener(v -> openGenreDialog());
 
@@ -256,9 +257,7 @@ public class EditEventActivity extends BaseActivity {
         // Save or cancel actions
         btnSave.setOnClickListener(v -> viewModel.saveChanges());
         cancelText.setOnClickListener(v -> finish());
-
     }
-
 
     /**
      * Opens a multi-choice dialog for selecting music genres.
@@ -292,7 +291,6 @@ public class EditEventActivity extends BaseActivity {
                 (view, y, m, d) -> {
                     viewModel.setDate(y, m, d);
                     etDate.setError(null);
-
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),

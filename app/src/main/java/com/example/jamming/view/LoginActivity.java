@@ -146,7 +146,6 @@ public class LoginActivity extends AppCompatActivity {
         );
 
         googleBtn.setOnClickListener(v -> {
-            errorText.setText("Google button clicked");
             errorText.setVisibility(View.VISIBLE);
             viewModel.onGoogleClicked();
         });

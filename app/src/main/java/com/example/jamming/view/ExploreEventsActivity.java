@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.widget.TextView;
 import androidx.activity.OnBackPressedCallback;
 import androidx.core.view.GravityCompat;
-import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.model.EventFilter;
