@@ -1,184 +1,192 @@
 package com.example.jamming.view;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.ImageView;
 import android.widget.Toast;
+import android.os.Bundle;
+import android.widget.TextView;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
+import com.example.jamming.model.MusicGenre;
 import com.example.jamming.navigation.UserMenuHandler;
+import com.example.jamming.utils.DateUtils;
 import com.example.jamming.viewmodel.EventDetailViewModel;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
 
-public class EventDetailActivity extends BaseActivity {
-
-    private UserMenuHandler menuHandler;
+public class EventDetailActivity extends BaseActivity  {
     private EventDetailViewModel viewModel;
-    private FirebaseFirestore db;
-    private ListenerRegistration eventListener; // משתנה לשמירת המאזין לשינויים בזמן אמת
-    private String currentEventId;
 
-    // רכיבי המסך
-    private TextView titleTv, dateTv, locationTv, descriptionTv, spotsTv;
+    private TextView titleEvent, dateTextView,  locationTextView, eventDescription, capacityEvent, generEevet, soldOutLabel;
+
     private Button registerBtn, cancelRegistrationBtn;
+    private LinearLayout contentLayout;
+    private UserMenuHandler menuHandler;
+
+    private ImageView eventImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setupBase(
+                R.menu.user_menu,
+                R.layout.activity_event_detail
+        );
+        hideRightActions();
 
-        // 1. הגדרת הבסיס והתפריט
-        setupBase(R.menu.user_menu, R.layout.activity_event_detail);
-        hideRightActions(); // הסתרת כפתורים עליונים אם צריך
-
-        menuHandler = new UserMenuHandler(this);
-        db = FirebaseFirestore.getInstance();
-        viewModel = new ViewModelProvider(this).get(EventDetailViewModel.class);
-
-        // 2. הפעלת התפריט הצדדי (חשוב!)
-        setupNavigation();
-
-        // 3. חיבור לרכיבי המסך (Binding)
         initUI();
 
-        // 4. חילוץ ה-ID של האירוע
-        currentEventId = getIntent().getStringExtra("EVENT_ID");
+        viewModel = new ViewModelProvider(this).get(EventDetailViewModel.class);
+        menuHandler = new UserMenuHandler(this);
 
-        // ניסיון גיבוי: אם הגיע כאובייקט שלם, נחלץ ממנו את ה-ID
-        if (currentEventId == null) {
-            Event passedEvent = (Event) getIntent().getSerializableExtra("event");
-            if (passedEvent != null) {
-                currentEventId = passedEvent.getId();
-            }
-        }
+        observeViewModel();
 
-        // בדיקת תקינות
-        if (currentEventId == null || currentEventId.isEmpty()) {
-            Toast.makeText(this, "Error: Event not found", Toast.LENGTH_SHORT).show();
+        String eventId = getIntent().getStringExtra("EVENT_ID");
+        if (eventId == null || eventId.isEmpty()) {
+            Toast.makeText(this, "Something went wrong. Event ID is missing.", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
+        viewModel.loadEvent(eventId);
 
-        // 5. טעינת נתונים ראשונית ל-ViewModel (בשביל סטטוס ההרשמה)
-        viewModel.loadEvent(currentEventId);
+        registerBtn.setOnClickListener(v -> viewModel.registerToEvent());
+        cancelRegistrationBtn.setOnClickListener(v -> {
+            showCancelRegistrationDialog();
+        });
 
-        // 6. === התיקון הקריטי: האזנה לשינויים בזמן אמת מ-Firebase ===
-        listenToEventChanges(currentEventId);
-
-        // 7. הגדרת כפתורים (הרשמה/ביטול)
-        setupButtons();
-
-        // מעקב אחרי ViewModel לשינויים בסטטוס הרשמה (האם הכפתור צריך להיות "הירשם" או "בטל")
-        observeRegistrationStatus();
     }
+
 
     private void initUI() {
-        titleTv = findViewById(R.id.eventTitle);
-        dateTv = findViewById(R.id.eventDate);
-        locationTv = findViewById(R.id.eventLocation);
-        descriptionTv = findViewById(R.id.eventDescription);
-        spotsTv = findViewById(R.id.eventSpots);
+        titleEvent = findViewById(R.id.titleEvent);
+        locationTextView = findViewById(R.id.locationTextView);
+        dateTextView = findViewById(R.id.dateTextView);
+        eventDescription = findViewById(R.id.eventDescription);
+        capacityEvent = findViewById(R.id.capacityEvent);
+        generEevet = findViewById(R.id.genreTextView);
+        registerBtn = findViewById(R.id.registerBtn);
+        soldOutLabel = findViewById(R.id.soldOutLabel);
+        cancelRegistrationBtn = findViewById(R.id.CancelRegistrationBtn);
+        eventImage = findViewById(R.id.eventImage);
+        contentLayout = findViewById(R.id.contentLayout);
 
-        registerBtn = findViewById(R.id.btnRegister); // ודאי שה-ID תואם ל-XML שלך
-        cancelRegistrationBtn = findViewById(R.id.btnCancelRegistration); // כנ"ל
     }
 
-    // פונקציה שמאזינה למסמך הספציפי ב-Firebase ומעדכנת את המסך
-    private void listenToEventChanges(String eventId) {
-        eventListener = db.collection("events").document(eventId)
-                .addSnapshotListener((snapshot, e) -> {
-                    if (e != null || snapshot == null || !snapshot.exists()) {
-                        return; // טיפול בשגיאות
-                    }
+    private void observeViewModel() {
 
-                    // המרת המידע העדכני לאובייקט
-                    Event updatedEvent = snapshot.toObject(Event.class);
-                    if (updatedEvent != null) {
-                        updatedEvent.setId(snapshot.getId()); // חשוב לשמור על ה-ID
-                        // עדכון המסך עם המידע החדש ביותר!
-                        updateUI(updatedEvent);
-                    }
-                });
-    }
+        viewModel.getEventLiveData().observe(this, event -> {
+            if (event == null) return;
 
-    // פונקציה לעדכון הטקסטים במסך
-    private void updateUI(Event event) {
-        if (titleTv != null) titleTv.setText(event.getName());
-        if (locationTv != null) locationTv.setText(event.getAddress());
-        if (descriptionTv != null) descriptionTv.setText(event.getDescription());
+            displayEventData(event);
+        });
 
-        if (dateTv != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
-            dateTv.setText(sdf.format(new Date(event.getDateTime())));
-        }
-
-        if (spotsTv != null) {
-            spotsTv.setText("Spots left: " + event.getAvailableSpots());
-        }
-    }
-
-    private void setupButtons() {
-        if (registerBtn != null) {
-            registerBtn.setOnClickListener(v -> viewModel.registerToEvent());
-        }
-        if (cancelRegistrationBtn != null) {
-            cancelRegistrationBtn.setOnClickListener(v -> {
-                // לוגיקה לביטול הרשמה (דיאלוג וכו')
-                // אם יש לך פונקציה כזו, קראי לה כאן. לדוגמה:
-                // showCancelRegistrationDialog();
-                Toast.makeText(this, "Cancel logic here", Toast.LENGTH_SHORT).show();
-            });
-        }
-    }
-
-    private void observeRegistrationStatus() {
-        // כאן אנחנו מקשיבים ל-ViewModel כדי לדעת איזה כפתור להציג (הירשם או בטל)
-        viewModel.getRegistrationStatus().observe(this, isRegistered -> {
-            if (isRegistered) {
-                if (registerBtn != null) registerBtn.setVisibility(View.GONE);
-                if (cancelRegistrationBtn != null) cancelRegistrationBtn.setVisibility(View.VISIBLE);
+        viewModel.getIsLoading().observe(this, loading -> {
+            if (loading != null && loading) {
+                contentLayout.setVisibility(View.GONE);
             } else {
-                if (registerBtn != null) registerBtn.setVisibility(View.VISIBLE);
-                if (cancelRegistrationBtn != null) cancelRegistrationBtn.setVisibility(View.GONE);
+                contentLayout.setVisibility(View.VISIBLE);
             }
         });
+
+        viewModel.getErrorMessage().observe(this, msg -> {
+            if (msg != null) {
+                Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+            }
+        });
+
+        viewModel.getUiEvent().observe(this, event -> {
+            if (event == null) return;
+
+            switch (event) {
+                case REGISTER_SUCCESS:
+                    Toast.makeText(this, "You're registered! 🎉", Toast.LENGTH_SHORT).show();
+                    break;
+                case CANCEL_SUCCESS:
+                    Toast.makeText(this, "Registration canceled", Toast.LENGTH_SHORT).show();
+                    break;
+                case ALREADY_REGISTERED:
+                    Toast.makeText(this, "You're already registered", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        });
+
+
+
+        viewModel.getRegistrationUiState().observe(this, state -> {
+            if (state == null) return;
+
+            registerBtn.setEnabled(state.canRegister);
+            cancelRegistrationBtn.setEnabled(state.canCancel);
+            registerBtn.setText(state.mainText);
+            cancelRegistrationBtn.setVisibility(state.canCancel ? View.VISIBLE : View.GONE);
+
+
+            if (state.secondaryText != null) {
+                soldOutLabel.setText(state.secondaryText);
+                soldOutLabel.setVisibility(View.VISIBLE);
+            } else {
+                soldOutLabel.setVisibility(View.GONE);
+            }
+        });
+
+
+
     }
 
-    // הפונקציה שמפעילה את התפריט הצדדי
-    private void setupNavigation() {
-        com.google.android.material.navigation.NavigationView navigationView = findViewById(R.id.navigationView);
-        if (navigationView != null) {
-            navigationView.setNavigationItemSelectedListener(item -> {
-                boolean handled = menuHandler.handle(item.getItemId());
-                if (handled) {
-                    androidx.drawerlayout.widget.DrawerLayout drawer = findViewById(R.id.drawerLayout);
-                    if (drawer != null) drawer.closeDrawers();
-                }
-                return handled;
-            });
-        }
+    private void showCancelRegistrationDialog() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Cancel Registration")
+                .setMessage("Are you sure you want to cancel your registration for the event?")
+                .setPositiveButton("Yes, cancel", (dialog, which) -> {
+                    viewModel.cancelRegistration();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
     }
 
-    // חשוב: ניתוק המאזין כשיוצאים מהמסך כדי לחסוך סוללה
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (eventListener != null) {
-            eventListener.remove();
+    private void displayEventData(Event event) {
+
+        titleEvent.setText(event.getName());
+        locationTextView.setText(event.getAddress());
+
+        String dateTimeText =
+                DateUtils.formatOnlyDate(event.getDateTime())
+                        + " • "
+                        + DateUtils.formatOnlyTime(event.getDateTime());
+
+        dateTextView.setText(dateTimeText);
+
+
+        eventDescription.setText(event.getDescription());
+
+        String capacity = " Participants: " + event.getReserved() + " / " + event.getMaxCapacity() ;
+        capacityEvent.setText(capacity);
+
+        List<MusicGenre> genres = event.getMusicGenresEnum();
+
+        if (genres == null || genres.isEmpty()) {
+            generEevet.setText("No genre specified");
+        } else {
+            List<String> names = new ArrayList<>();
+            for (MusicGenre gener : genres) {
+                names.add(gener.getDisplayName());
+            }
+            generEevet.setText(String.join(" , ", names));
         }
+
+
     }
 
     @Override
     protected boolean onMenuItemSelected(int itemId) {
         return menuHandler.handle(itemId);
     }
+
 }
