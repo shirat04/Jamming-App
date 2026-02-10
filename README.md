@@ -67,19 +67,33 @@ Additionally, the project uses Utility classes (e.g., for date handling, locatio
 
 ---
 
-## Testing
+## Testing & Quality Assurance
 
-- **Unit Tests:**  
-  Implemented mainly for ViewModels to test:
-  - Input validation  
-  - Business logic (e.g., genre selection)  
-  - Successful event creation with mocked repositories  
+This project includes **automated tests** focused on the user interface and the data layer to ensure correctness, stability, and reliability.
 
-- **UI Tests (Espresso):**  
-  Implemented for the Create Event screen to verify:
-  - Successful event creation flow  
-  - Validation errors on empty/invalid input  
-  - Proper UI state after fixing errors  
+### UI Tests (Espresso)
+- UI tests are implemented using **Espresso** to verify:
+  - End-to-end user flows such as **successful event creation**  
+  - Proper display of **validation errors** for empty or invalid input  
+  - Correct **UI state updates** after user interactions  
+- The tests focus on the main screens and critical user journeys.
+
+### Repository Tests
+- Tests are implemented for the **Repository layer** to verify:
+  - Correct handling of data operations  
+  - Proper interaction with the underlying data sources (e.g., Firebase or fake/mocked implementations)  
+  - Expected behavior in success and failure scenarios  
+- This helps ensure that the **data access logic** works correctly and is isolated from the UI.
+
+### Test Coverage Focus
+- Critical UI flows on the main screens  
+- Validation and error handling scenarios in the UI  
+- Core data operations in the Repository layer  
+
+Overall, the testing strategy focuses on covering the **most important user flows** and the **data layer logic**, improving reliability and reducing regressions.
+
+---
+
 
 - **Build System:** Gradle  
 
