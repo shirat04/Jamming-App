@@ -15,7 +15,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- שם האירוע -->
         <TextView
             android:id="@+id/myEventTitle"
             android:layout_width="wrap_content"
@@ -39,7 +38,6 @@
             android:visibility="gone"/>
 
 
-        <!-- מיקום -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -66,7 +64,7 @@
                 android:textSize="16sp"
                 android:includeFontPadding="false"/>
         </LinearLayout>
-        <!-- תאריך ושעה -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -94,7 +92,6 @@
                 android:includeFontPadding="false"/>
         </LinearLayout>
 
-        <!-- ז'אנר -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -122,7 +119,6 @@
                 android:includeFontPadding="false"/>
         </LinearLayout>
 
-        <!-- קיבולת / מספר מושבים -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -130,7 +126,6 @@
             android:gravity="center_vertical"
             android:layout_marginTop="6dp">
 
-            <!-- אימוג'י -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -142,7 +137,6 @@
                 android:layout_width="8dp"
                 android:layout_height="wrap_content" />
 
-            <!-- טקסט קיבולת -->
             <TextView
                 android:id="@+id/myEventCapacity"
                 android:layout_width="wrap_content"
@@ -152,16 +146,13 @@
                 android:includeFontPadding="false"/>
         </LinearLayout>
 
-        <!-- סטטוס -->
 
-        <!-- קו מפריד -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#E0E0E0"
             android:layout_marginVertical="12dp" />
 
-        <!-- כפתורים -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

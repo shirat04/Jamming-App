@@ -26,7 +26,7 @@
         android:id="@+id/emptyMessageText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="עוד לא נרשמת לאירועים 🙂"
+        android:text="You haven't registered for events yet."
         android:textSize="18sp"
         android:textColor="#555555"
         android:gravity="center"

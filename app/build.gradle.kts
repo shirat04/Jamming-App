@@ -104,7 +104,6 @@ dependencies {
 }
 configurations.all {
     resolutionStrategy {
-        // כופה שימוש בגרסה אחידה של Protobuf כדי למנוע התנגשות עם Firebase
         force("com.google.protobuf:protobuf-javalite:3.25.1")
     }
 }

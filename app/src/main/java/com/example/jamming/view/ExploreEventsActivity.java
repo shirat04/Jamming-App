@@ -99,7 +99,6 @@ public class ExploreEventsActivity extends BaseMapActivity {
         initMap();
         userMenuHandler = new UserMenuHandler(this);
         setupNavigation();
-        // Initialize ViewModel and menu handler (זה ה-ViewModel הראשי של המסך)
         viewModel = new androidx.lifecycle.ViewModelProvider(this).get(com.example.jamming.viewmodel.ExploreEventsViewModel.class);
         // menuHandler = new com.example.jamming.utils.UserMenuHandler(this);
 
@@ -126,16 +125,13 @@ public class ExploreEventsActivity extends BaseMapActivity {
         }
     }
     private void setupNavigation() {
-        // תיקון 1: שימוש ב-ID הנכון מה-XML שלך (navigationView)
         com.google.android.material.navigation.NavigationView navigationView = findViewById(R.id.navigationView);
 
         if (navigationView != null) {
             navigationView.setNavigationItemSelectedListener(item -> {
-                // שימוש במחלקה שלך לטיפול בלחיצה
                 boolean handled = userMenuHandler.handle(item.getItemId());
 
                 if (handled) {
-                    // תיקון 2: שימוש ב-ID הנכון מה-XML שלך (drawerLayout)
                     androidx.drawerlayout.widget.DrawerLayout drawer = findViewById(R.id.drawerLayout);
                     if (drawer != null) {
                         drawer.closeDrawers();

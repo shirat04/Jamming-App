@@ -309,5 +309,8 @@
     <string name="error_generic">error</string>
     <string name="error_google_login_failed">error google login</string>
     <string name="default_web_client_id">977440631678-s345p3o8d46qi5k8fv4mg6u4lp9fam3d.apps.googleusercontent.com</string>
+    <string name="error_capacity_too_small">
+    Capacity cannot be lower than the number of already registered participants
+</string>
 
 </resources>

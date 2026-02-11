@@ -39,7 +39,6 @@ public class ExploreEventsActivityTest {
 
     @Test
     public void testMapContainerIsDisplayed() {
-         // המתנה ארוכה לטעינת המפה באמולטור איטי
         onView(withId(R.id.mapContainer))
                 .check(matches(isDisplayed()));
     }

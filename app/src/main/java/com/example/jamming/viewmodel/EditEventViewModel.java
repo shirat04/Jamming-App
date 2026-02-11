@@ -90,7 +90,8 @@ public class EditEventViewModel extends ViewModel {
     public LiveData<EventField> getErrorField() { return errorField; }
     public LiveData<Integer> getErrorMessageRes() { return errorMessageRes; }
 
-    /* ===== Event loading ===== */
+    private int currentReserved = 0;
+
 
     /**
      * Loads an event from the repository and initializes the ViewModel state.
@@ -109,6 +110,8 @@ public class EditEventViewModel extends ViewModel {
                         errorMessageRes.setValue(R.string.error_failed_to_load_event);
                         return;
                     }
+
+                    currentReserved = event.getReserved();
 
                     // Determine whether editing is still allowed
                     editingAllowed.setValue(isEditingAllowed(event));
@@ -271,6 +274,11 @@ public class EditEventViewModel extends ViewModel {
             if (cap <= 0) throw new NumberFormatException();
         } catch (Exception e) {
             errorField.setValue(EventField.CAPACITY);
+            return;
+        }
+        if (cap < currentReserved) {
+            errorField.setValue(EventField.CAPACITY);
+            errorMessageRes.setValue(R.string.error_capacity_too_small);
             return;
         }
 

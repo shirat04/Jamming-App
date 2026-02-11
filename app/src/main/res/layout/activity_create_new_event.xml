@@ -15,7 +15,6 @@
             android:gravity="center_horizontal">
 
 
-            <!-- שדה: שם אירוע -->
             <EditText
                 android:id="@+id/eventNameInput"
                 android:layout_width="match_parent"
@@ -63,7 +62,7 @@
                     android:src="@drawable/outline_map_24"/>
 
             </LinearLayout>
-            <!-- הפס שמתחת למיקום -->
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -72,7 +71,6 @@
                 android:layout_marginBottom="10dp"/>
 
 
-            <!-- שדה: תאריך -->
             <EditText
                 android:id="@+id/dateInput"
                 android:layout_width="match_parent"
@@ -88,7 +86,6 @@
                 android:inputType="none"
                 tools:ignore="KeyboardInaccessibleWidget,TextFields" />
 
-            <!-- שדה: שעה -->
             <EditText
                 android:id="@+id/timeInput"
                 android:layout_width="match_parent"
@@ -105,7 +102,6 @@
 
                 tools:ignore="KeyboardInaccessibleWidget" />
 
-            <!-- בחירת ז'אנר -->
             <TextView
                 android:id="@+id/genreSpinner"
                 android:layout_width="match_parent"
@@ -127,7 +123,6 @@
                 android:layout_marginTop="-8dp"
                 android:layout_marginBottom="10dp"/>
 
-            <!-- שדה: קהל מקסימלי -->
             <EditText
                 android:id="@+id/eventCapacityInput"
                 android:layout_width="match_parent"
@@ -147,7 +142,6 @@
                 android:inputType="textMultiLine"
                 android:padding="12dp" />
 
-            <!-- כפתור ביטול -->
             <Button
                 android:id="@+id/publishEventBtn"
                 android:layout_width="match_parent"

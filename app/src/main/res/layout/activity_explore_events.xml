@@ -42,7 +42,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <!-- כפתור מרחק -->
                 <Button
                     android:id="@+id/filterDistance"
                     style="?attr/borderlessButtonStyle"
@@ -54,7 +53,6 @@
                     android:textColor="@android:color/white"
                     android:textSize="20sp"/>
 
-                <!-- כפתור תאריך -->
                 <Button
                     android:id="@+id/filterDate"
                     style="?attr/borderlessButtonStyle"
@@ -66,7 +64,6 @@
                     android:textColor="@android:color/white"
                     android:textSize="20sp"/>
 
-                <!-- כפתור שעה -->
                 <Button
                     android:id="@+id/filterTime"
                     style="?attr/borderlessButtonStyle"
@@ -78,7 +75,6 @@
                     android:textColor="@android:color/white"
                     android:textSize="20sp"/>
 
-                <!-- כפתור מוזיקה -->
                 <Button
                     android:id="@+id/filterMusic"
                     style="?attr/borderlessButtonStyle"
@@ -90,7 +86,6 @@
                     android:textColor="@android:color/white"
                     android:textSize="20sp"/>
 
-                <!-- כפתור גודל -->
                 <Button
                     android:id="@+id/filterCapacity"
                     style="?attr/borderlessButtonStyle"
@@ -107,7 +102,6 @@
     </HorizontalScrollView>
 
 
-    <!-- 🟢 תת־פילטרים טקסטואליים -->
     <LinearLayout
         android:id="@+id/textFilters"
         android:layout_width="0dp"
@@ -167,7 +161,7 @@
         android:id="@+id/emptyText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="אין אירועים להצגה"
+        android:text="No events to display"
         android:textSize="18sp"
         android:textColor="#777777"
         android:background="@android:color/white"

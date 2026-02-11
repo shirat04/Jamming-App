@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- שורת חיפוש -->
     <LinearLayout
         android:id="@+id/searchContainer"
         android:layout_width="0dp"
@@ -22,7 +21,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="חיפוש מקום או כתובת"
+            android:hint="Search for a place or address"
             android:padding="12dp"
             android:background="@android:drawable/edit_text" />
 
@@ -33,13 +32,12 @@
             android:layout_marginStart="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_menu_search"
-            android:contentDescription="חיפוש"
+            android:contentDescription="Search"
             app:tint="#0B375E" />
 
     </LinearLayout>
 
 
-    <!-- המפה -->
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -50,12 +48,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchContainer" />
 
-    <!-- כפתור אישור -->
     <Button
         android:id="@+id/confirmLocationBtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="אישור מיקום"
+        android:text="Use this location"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
