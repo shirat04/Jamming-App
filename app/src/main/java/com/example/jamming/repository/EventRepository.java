@@ -1,12 +1,14 @@
 package com.example.jamming.repository;
 import com.example.jamming.model.Event;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
@@ -238,6 +240,55 @@ public class EventRepository {
         });
     }
 
+    // --- התחלת קוד התראות למנהל ---
+
+    public void startMonitoringAllMyEvents(String ownerId) {
+        // מביא את כל האירועים ששייכים למנהל המחובר
+        db.collection("events")
+                .whereEqualTo("ownerId", ownerId)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null || snapshots == null) return;
+
+                    // עובר על כל האירועים של המנהל אחד אחד
+                    for (com.google.firebase.firestore.DocumentSnapshot doc : snapshots.getDocuments()) {
+                        Event event = doc.toObject(Event.class);
+                        if (event != null) {
+
+                            // הלוגיקה המוכרת שלנו: בדיקה אם מלא
+                            int currentJoined = event.getReserved();
+                            int maxCapacity = event.getMaxCapacity();
+
+                            if (currentJoined >= maxCapacity && maxCapacity > 0) {
+                                // אם מלא - שולח התראה לבעלים
+                                saveNotificationToOwner(ownerId, event.getName());
+                            }
+                        }
+                    }
+                });
+    }
+
+    // ודאי שהפונקציה הזו גם מדפיסה הצלחה/כישלון
+    private void saveNotificationToOwner(String targetOwnerId, String eventName) {
+        java.util.Map<String, Object> notification = new java.util.HashMap<>();
+        notification.put("title", "האירוע שלך מלא!");
+        notification.put("message", "האירוע '" + eventName + "' הגיע למכסה.");
+        notification.put("timestamp", com.google.firebase.Timestamp.now());
+
+        db.collection("users").document(targetOwnerId)
+                .collection("notifications")
+                .add(notification)
+                .addOnSuccessListener(docRef -> {
+                    android.util.Log.d("DEBUG_NOTIF", "5. SUCCESS! Notification written to DB.");
+                })
+                .addOnFailureListener(e -> {
+                    android.util.Log.e("DEBUG_NOTIF", "6. FAILURE writing to DB: " + e.getMessage());
+                });
+    }
+
+
+
+    // --- סוף קוד התראות למנהל ---
+
     //interface on event change listener
     public interface OnEventChangeListener {
         void onEventChanged(String title, String message);
@@ -291,6 +342,26 @@ public class EventRepository {
                         }
                     }
                 });
+    }
+
+
+    public void loadOwnerNotifications(String ownerId, final OnNotificationsLoadedCallback callback) {
+        db.collection("users").document(ownerId).collection("notifications")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null || value == null) return;
+
+                    List<Map<String, Object>> list = new ArrayList<>();
+                    for (DocumentSnapshot doc : value.getDocuments()) {
+                        list.add(doc.getData());
+                    }
+                    callback.onLoaded(list);
+                });
+    }
+
+
+    public interface OnNotificationsLoadedCallback {
+        void onLoaded(List<Map<String, Object>> notifications);
     }
 
 

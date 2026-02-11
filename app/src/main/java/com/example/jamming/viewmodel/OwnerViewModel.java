@@ -167,5 +167,10 @@ public class OwnerViewModel extends ViewModel {
     }
 
 
+    public void startCapacityMonitoring(String ownerId) {
+        eventRepo.startMonitoringAllMyEvents(ownerId);
+    }
+
+
 
 }

@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.jamming.R;
 import com.example.jamming.model.Event;
 import com.example.jamming.navigation.OwnerMenuHandler;
+import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.utils.GenreUtils;
 import androidx.activity.OnBackPressedCallback;
@@ -71,6 +72,19 @@ public class OwnerActivity extends BaseActivity {
 
         // Register custom back-press behavior
         setupBackPressedHandler();
+
+        String currentUserId = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // --- הנה התיקון: אנחנו קוראים לפונקציה כדי שתתחיל לעבוד ---
+        if (viewModel != null) {
+            android.util.Log.d("DEBUG_NOTIF", "Calling function for ID: " + currentUserId);
+
+            // אם יש לך ViewModel:
+            viewModel.startCapacityMonitoring(currentUserId);
+
+        } else {
+            android.util.Log.e("DEBUG_NOTIF", "Event ID is NULL in Activity!");
+        }
     }
 
     /**
