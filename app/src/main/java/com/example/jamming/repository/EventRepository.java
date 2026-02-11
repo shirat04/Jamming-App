@@ -239,28 +239,39 @@ public class EventRepository {
             return null;
         });
     }
+    public interface OnEventFullListener {
+        void onEventFull(String eventId, String eventName);
+    }
 
     // --- התחלת קוד התראות למנהל ---
 
-    public void startMonitoringAllMyEvents(String ownerId) {
-        // מביא את כל האירועים ששייכים למנהל המחובר
+    public void startMonitoringAllMyEvents(String ownerId, OnEventFullListener listener) {
         db.collection("events")
                 .whereEqualTo("ownerId", ownerId)
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null || snapshots == null) return;
 
-                    // עובר על כל האירועים של המנהל אחד אחד
-                    for (com.google.firebase.firestore.DocumentSnapshot doc : snapshots.getDocuments()) {
-                        Event event = doc.toObject(Event.class);
-                        if (event != null) {
+                    // שינוי קריטי: עוברים על DocumentChanges במקום על snapshots.getDocuments()
+                    for (com.google.firebase.firestore.DocumentChange dc : snapshots.getDocumentChanges()) {
 
-                            // הלוגיקה המוכרת שלנו: בדיקה אם מלא
-                            int currentJoined = event.getReserved();
-                            int maxCapacity = event.getMaxCapacity();
+                        // בדיקה: האם זה שינוי שקרה עכשיו (MODIFIED)?
+                        // אנחנו מתעלמים מ-ADDED שקורה כשפותחים את המסך
+                        if (dc.getType() == com.google.firebase.firestore.DocumentChange.Type.MODIFIED) {
 
-                            if (currentJoined >= maxCapacity && maxCapacity > 0) {
-                                // אם מלא - שולח התראה לבעלים
-                                saveNotificationToOwner(ownerId, event.getName());
+                            Event event = dc.getDocument().toObject(Event.class);
+                            if (event != null) {
+                                int currentJoined = event.getReserved();
+                                int maxCapacity = event.getMaxCapacity();
+
+                                if (currentJoined >= maxCapacity && maxCapacity > 0) {
+                                    // שמירה ל-DB
+                                    saveNotificationToOwner(ownerId, event.getName());
+
+                                    // דיווח ל-ViewModel
+                                    if (listener != null) {
+                                        listener.onEventFull(dc.getDocument().getId(), event.getName());
+                                    }
+                                }
                             }
                         }
                     }

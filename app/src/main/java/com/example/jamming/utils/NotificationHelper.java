@@ -34,4 +34,30 @@ public class NotificationHelper {
 
         notificationManager.notify((int) System.currentTimeMillis(), builder.build());
     }
+
+    public static void showOwnerNotification(Context context, String title, String message) {
+        // השם של הערוץ חייב להיות חדש (למשל v2) כדי שהטלפון יאפשר קול מחדש
+        String channelId = "owner_alerts_v2";
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    channelId,
+                    "Event Full Updates",
+                    NotificationManager.IMPORTANCE_HIGH // זה מה שמחזיר את הקול והווילון
+            );
+            manager.createNotificationChannel(channel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setAutoCancel(true);
+
+        // מזהה ייחודי כדי שההתראה לא תיעלם/תידרס
+        manager.notify((int) System.currentTimeMillis(), builder.build());
+    }
 }

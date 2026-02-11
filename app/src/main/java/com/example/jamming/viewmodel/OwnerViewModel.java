@@ -11,7 +11,9 @@ import com.example.jamming.repository.EventRepository;
 import com.example.jamming.repository.UserRepository;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * ViewModel responsible for managing the owner's main screen.
@@ -67,7 +69,7 @@ public class OwnerViewModel extends ViewModel {
 
     /** List of past events created by the owner */
     private final MutableLiveData<List<Event>> pastEvents = new MutableLiveData<>();
-
+    private static final Set<String> notifiedEvents = new HashSet<>();
 
     /** Read-only accessors for the View */
     public LiveData<String> getOwnerName() { return ownerName; }
@@ -167,8 +169,26 @@ public class OwnerViewModel extends ViewModel {
     }
 
 
-    public void startCapacityMonitoring(String ownerId) {
-        eventRepo.startMonitoringAllMyEvents(ownerId);
+    // המשתנה הזה "זוכר" על איזה אירוע כבר הודענו היום
+
+
+    public void startCapacityMonitoring(String ownerId, EventRepository.OnEventFullListener listener) {
+        eventRepo.startMonitoringAllMyEvents(ownerId, (eventId, eventName) -> {
+
+            // 2. הבדיקה הקריטית: האם ה-ID הזה כבר ברשימה?
+            if (!notifiedEvents.contains(eventId)) {
+
+                // 3. אם לא - הוסף אותו עכשיו כדי שבפעם הבאה (שינוי שעה) הוא ייחסם
+                notifiedEvents.add(eventId);
+
+                if (listener != null) {
+                    listener.onEventFull(eventId, eventName);
+                }
+            } else {
+                // כאן הקוד עובר כשיש שינוי שעה - והוא פשוט לא עושה כלום!
+                android.util.Log.d("DEBUG", "Blocked duplicate notification for: " + eventName);
+            }
+        });
     }
 
 

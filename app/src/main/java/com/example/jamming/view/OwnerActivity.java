@@ -16,6 +16,8 @@ import com.example.jamming.repository.AuthRepository;
 import com.example.jamming.utils.DateUtils;
 import com.example.jamming.utils.GenreUtils;
 import androidx.activity.OnBackPressedCallback;
+
+import com.example.jamming.utils.NotificationHelper;
 import com.example.jamming.viewmodel.OwnerViewModel;
 
 /**
@@ -44,6 +46,7 @@ public class OwnerActivity extends BaseActivity {
     // State for "double back to exit" behavior
     private long lastBackPressTime = 0;
     private static final long BACK_PRESS_INTERVAL = 2000;
+    private OwnerViewModel ownerViewModel;
 
     /**
      * Activity creation lifecycle method.
@@ -61,6 +64,7 @@ public class OwnerActivity extends BaseActivity {
         // Initialize ViewModel and menu handler
         viewModel = new ViewModelProvider(this).get(OwnerViewModel.class);
         menuHandler = new OwnerMenuHandler(this);
+        ownerViewModel = new ViewModelProvider(this).get(OwnerViewModel.class);
 
         // Initialize UI, observers, and listeners
         initViews();
@@ -75,16 +79,10 @@ public class OwnerActivity extends BaseActivity {
 
         String currentUserId = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // --- הנה התיקון: אנחנו קוראים לפונקציה כדי שתתחיל לעבוד ---
-        if (viewModel != null) {
-            android.util.Log.d("DEBUG_NOTIF", "Calling function for ID: " + currentUserId);
-
-            // אם יש לך ViewModel:
-            viewModel.startCapacityMonitoring(currentUserId);
-
-        } else {
-            android.util.Log.e("DEBUG_NOTIF", "Event ID is NULL in Activity!");
-        }
+        ownerViewModel.startCapacityMonitoring(currentUserId, (id, name) -> {
+            // קריאה לפונקציה החדשה שיצרנו בסעיף 1
+            NotificationHelper.showOwnerNotification(this, "אירוע מלא!", "האירוע " + name + " הגיע למכסה.");
+        });
     }
 
     /**
