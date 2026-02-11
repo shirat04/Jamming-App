@@ -72,10 +72,19 @@ public class ExploreEventsActivity extends BaseMapActivity {
                 new androidx.lifecycle.ViewModelProvider(this).get(com.example.jamming.viewmodel.MyEventUserViewModel.class);
 
 
-        String userId = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+        // 1. Get the user object safely
+        com.google.firebase.auth.FirebaseUser currentUser =
+                com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
 
+// 2. Check if the user is NOT null before calling getUid()
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+            notificationsViewModel.startNotificationService(userId, this);
+        } else {
+            // If there is no user, we don't start the service or we redirect to login
+            android.util.Log.e("ExploreEvents", "No user found! Notification service skipped.");
+        }
 
-        notificationsViewModel.startNotificationService(userId, this);
 
 
 

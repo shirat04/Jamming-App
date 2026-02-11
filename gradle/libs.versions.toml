@@ -16,6 +16,8 @@ cardview = "1.0.0"
 maps = "3.1.0-beta"
 mockito = "5.5.0"
 coreTesting = "2.2.0"
+rules = "1.7.0"
+espressoIntents = "3.7.0"
 
 
 [libraries]
@@ -41,6 +43,8 @@ androidx-cardview = { group = "androidx.cardview", name = "cardview", version.re
 maps = { group = "com.google.android.libraries.maps", name = "maps", version.ref = "maps" }
 mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 androidx-core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "coreTesting" }
+androidx-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
+androidx-espresso-intents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espressoIntents" }
 
 
 [plugins]

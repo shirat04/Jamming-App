@@ -77,12 +77,17 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.cardview)
+    implementation(libs.androidx.rules)
+    implementation(libs.androidx.espresso.intents)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1") {
+        exclude(group = "com.google.protobuf", module = "protobuf-lite")
+        exclude(group = "com.google.protobuf", module = "protobuf-javalite")
+    }
     testImplementation(libs.mockito.core)
     testImplementation(libs.androidx.core.testing)
     debugImplementation(libs.androidx.compose.ui.tooling)
@@ -94,4 +99,12 @@ dependencies {
     annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
     implementation ("com.google.firebase:firebase-storage")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
+    androidTestImplementation("org.hamcrest:hamcrest:2.2")
+    androidTestImplementation("androidx.test:core-ktx:1.6.1")
+}
+configurations.all {
+    resolutionStrategy {
+        // כופה שימוש בגרסה אחידה של Protobuf כדי למנוע התנגשות עם Firebase
+        force("com.google.protobuf:protobuf-javalite:3.25.1")
+    }
 }

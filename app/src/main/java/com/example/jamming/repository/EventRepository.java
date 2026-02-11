@@ -243,7 +243,7 @@ public class EventRepository {
         void onEventFull(String eventId, String eventName);
     }
 
-    // --- התחלת קוד התראות למנהל ---
+
 
     public void startMonitoringAllMyEvents(String ownerId, OnEventFullListener listener) {
         db.collection("events")
@@ -251,11 +251,10 @@ public class EventRepository {
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null || snapshots == null) return;
 
-                    // שינוי קריטי: עוברים על DocumentChanges במקום על snapshots.getDocuments()
+
                     for (com.google.firebase.firestore.DocumentChange dc : snapshots.getDocumentChanges()) {
 
-                        // בדיקה: האם זה שינוי שקרה עכשיו (MODIFIED)?
-                        // אנחנו מתעלמים מ-ADDED שקורה כשפותחים את המסך
+
                         if (dc.getType() == com.google.firebase.firestore.DocumentChange.Type.MODIFIED) {
 
                             Event event = dc.getDocument().toObject(Event.class);
@@ -264,10 +263,10 @@ public class EventRepository {
                                 int maxCapacity = event.getMaxCapacity();
 
                                 if (currentJoined >= maxCapacity && maxCapacity > 0) {
-                                    // שמירה ל-DB
+
                                     saveNotificationToOwner(ownerId, event.getName());
 
-                                    // דיווח ל-ViewModel
+
                                     if (listener != null) {
                                         listener.onEventFull(dc.getDocument().getId(), event.getName());
                                     }
@@ -278,7 +277,7 @@ public class EventRepository {
                 });
     }
 
-    // ודאי שהפונקציה הזו גם מדפיסה הצלחה/כישלון
+
     private void saveNotificationToOwner(String targetOwnerId, String eventName) {
         java.util.Map<String, Object> notification = new java.util.HashMap<>();
         notification.put("title", "האירוע שלך מלא!");
@@ -298,7 +297,7 @@ public class EventRepository {
 
 
 
-    // --- סוף קוד התראות למנהל ---
+
 
     //interface on event change listener
     public interface OnEventChangeListener {
@@ -331,13 +330,13 @@ public class EventRepository {
                         String message = "";
                         boolean notify = false;
 
-                        // זיהוי שינוי
+
                         if (dc.getType() == DocumentChange.Type.MODIFIED) {
                             title = "Event Update";
                             message = "The event '" + event.getName() + "' details have changed.";
                             notify = true;
                         }
-                        // זיהוי ביטול
+
                         else if (dc.getType() == DocumentChange.Type.REMOVED) {
                             title = "Event Cancelled";
                             message = "The event '" + event.getName() + "' was cancelled.";

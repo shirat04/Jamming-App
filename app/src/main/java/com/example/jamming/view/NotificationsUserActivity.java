@@ -17,7 +17,7 @@ public class NotificationsUserActivity extends BaseActivity {
 
     private UserMenuHandler menuHandler;
 
-    // משתנים חדשים עבור הרשימה
+
     private RecyclerView recyclerView;
     private View emptyView;
     private NotificationsAdapter adapter;
@@ -40,13 +40,13 @@ public class NotificationsUserActivity extends BaseActivity {
         recyclerView = findViewById(R.id.notificationsRecyclerView);
         emptyView = findViewById(R.id.emptyView);
 
-        // הגדרת ה-RecyclerView
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         notificationList = new ArrayList<>();
         adapter = new NotificationsAdapter(notificationList);
         recyclerView.setAdapter(adapter);
 
-        // 3. טעינת הנתונים מ-Firebase
+
         loadNotifications();
     }
 
@@ -66,7 +66,7 @@ public class NotificationsUserActivity extends BaseActivity {
                         notificationList.addAll(value.toObjects(NotificationModel.class));
                         adapter.notifyDataSetChanged();
 
-                        // אם אין התראות, נציג טקסט "ריק"
+
                         if (notificationList.isEmpty()) {
                             if (emptyView != null) emptyView.setVisibility(View.VISIBLE);
                             recyclerView.setVisibility(View.GONE);
@@ -78,7 +78,7 @@ public class NotificationsUserActivity extends BaseActivity {
                 });
     }
 
-    // זה נשאר כמו בקוד המקורי שלך כדי שהתפריט יעבוד
+
     @Override
     protected boolean onMenuItemSelected(int itemId) {
         return menuHandler.handle(itemId);

@@ -30,7 +30,7 @@ public class NotificationsOwnerActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 1. הגדרת התצוגה (חשוב: ודאי שבקובץ הזה יש RecyclerView!)
+
         setupBase(
                 R.menu.owner_menu,
                 R.layout.activity_notifications_owner
@@ -39,15 +39,14 @@ public class NotificationsOwnerActivity extends BaseActivity {
         setTitleText("Notifications");
         menuHandler = new OwnerMenuHandler(this);
 
-        // 2. מציאת הרשימה מהמסך הראשי
-        // ודאי שב-activity_notifications_owner.xml ה-ID הוא recyclerNotifications
+
         recyclerView = findViewById(R.id.recyclerNotifications);
 
         if (recyclerView != null) {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
         }
 
-        // 3. משיכת הנתונים מה-Firebase
+
         repository = new EventRepository();
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -55,7 +54,7 @@ public class NotificationsOwnerActivity extends BaseActivity {
             @Override
             public void onLoaded(List<Map<String, Object>> notifications) {
                 if (notifications != null) {
-                    // יצירת האדפטר שמחבר את המידע לקובץ העיצוב שלך
+
                     NotificationAdapter adapter = new NotificationAdapter(notifications);
                     recyclerView.setAdapter(adapter);
                 }
@@ -68,7 +67,7 @@ public class NotificationsOwnerActivity extends BaseActivity {
         return menuHandler.handle(itemId);
     }
 
-    // --- האדפטר: המחלקה שמחברת בין הנתונים לעיצוב שלך ---
+
     private class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
         private List<Map<String, Object>> data;
 
@@ -79,7 +78,7 @@ public class NotificationsOwnerActivity extends BaseActivity {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            // כאן אנחנו טוענים את קובץ ה-XML ששלחת לי (item_notification)
+
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_notification, parent, false);
             return new ViewHolder(view);
@@ -89,11 +88,11 @@ public class NotificationsOwnerActivity extends BaseActivity {
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Map<String, Object> item = data.get(position);
 
-            // שליפת הכותרת וההודעה
+
             String title = (String) item.get("title");
             String message = (String) item.get("message");
 
-            // טיפול בתאריך (המרה מ-Timestamp של פיירבייס לשעה יפה)
+
             String dateText = "";
             Object timestampObj = item.get("timestamp");
             if (timestampObj instanceof Timestamp) {
@@ -102,7 +101,7 @@ public class NotificationsOwnerActivity extends BaseActivity {
                 dateText = sdf.format(ts.toDate());
             }
 
-            // הצבה בשדות
+
             holder.textTitle.setText(title != null ? title : "התראה");
             holder.textMessage.setText(message != null ? message : "");
             holder.textDate.setText(dateText);
@@ -113,7 +112,7 @@ public class NotificationsOwnerActivity extends BaseActivity {
             return data.size();
         }
 
-        // המחלקה שמחזיקה את ה-IDs מהקובץ XML שלך
+
         class ViewHolder extends RecyclerView.ViewHolder {
             TextView textTitle, textMessage, textDate;
 

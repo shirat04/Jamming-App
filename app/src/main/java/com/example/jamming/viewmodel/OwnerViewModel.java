@@ -169,23 +169,23 @@ public class OwnerViewModel extends ViewModel {
     }
 
 
-    // המשתנה הזה "זוכר" על איזה אירוע כבר הודענו היום
+
 
 
     public void startCapacityMonitoring(String ownerId, EventRepository.OnEventFullListener listener) {
         eventRepo.startMonitoringAllMyEvents(ownerId, (eventId, eventName) -> {
 
-            // 2. הבדיקה הקריטית: האם ה-ID הזה כבר ברשימה?
+
             if (!notifiedEvents.contains(eventId)) {
 
-                // 3. אם לא - הוסף אותו עכשיו כדי שבפעם הבאה (שינוי שעה) הוא ייחסם
+
                 notifiedEvents.add(eventId);
 
                 if (listener != null) {
                     listener.onEventFull(eventId, eventName);
                 }
             } else {
-                // כאן הקוד עובר כשיש שינוי שעה - והוא פשוט לא עושה כלום!
+
                 android.util.Log.d("DEBUG", "Blocked duplicate notification for: " + eventName);
             }
         });

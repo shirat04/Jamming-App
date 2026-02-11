@@ -77,12 +77,18 @@ public class OwnerActivity extends BaseActivity {
         // Register custom back-press behavior
         setupBackPressedHandler();
 
-        String currentUserId = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        ownerViewModel.startCapacityMonitoring(currentUserId, (id, name) -> {
-            // קריאה לפונקציה החדשה שיצרנו בסעיף 1
-            NotificationHelper.showOwnerNotification(this, "אירוע מלא!", "האירוע " + name + " הגיע למכסה.");
-        });
+        com.google.firebase.auth.FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+
+        if (currentUser != null) {
+            String currentUserId = currentUser.getUid();
+            ownerViewModel.startCapacityMonitoring(currentUserId, (id, name) -> {
+                NotificationHelper.showOwnerNotification(this, "אירוע מלא!", "האירוע " + name + " הגיע למכסה.");
+            });
+        } else {
+
+            android.util.Log.d("OwnerActivity", "No user logged in, skipping capacity monitoring");
+        }
     }
 
     /**

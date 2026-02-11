@@ -260,7 +260,7 @@ public class LoginViewModel extends ViewModel {
 
         repo.signInWithCredential(cred)
                 .addOnSuccessListener(r -> {
-                    // שלב 1: שולפים את המשתמש מתוך תוצאת ההתחברות (AuthResult)
+
                     com.google.firebase.auth.FirebaseUser firebaseUser = r.getUser();
                     String uid = repo.getCurrentUid();
 
@@ -270,7 +270,7 @@ public class LoginViewModel extends ViewModel {
                         return;
                     }
 
-                    // שלב 2: הכנת הנתונים כולל השם והאימייל מגוגל
+
                     HashMap<String, Object> userData = new HashMap<>();
                     userData.put("userType", "USER");
                     userData.put("createdAt", System.currentTimeMillis());
@@ -281,7 +281,7 @@ public class LoginViewModel extends ViewModel {
                         userData.put("profileImageUrl", firebaseUser.getPhotoUrl().toString());
                     }
 
-                    // שלב 3: יצירת המסמך ב-Firestore אם הוא חסר
+
                     repo.createUserDocIfMissing(uid, userData)
                             .addOnSuccessListener(v -> checkUserType(uid))
                             .addOnFailureListener(e -> {

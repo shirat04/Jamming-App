@@ -99,7 +99,7 @@ public class CreateNewEventUiTest {
      * Filling all required fields and clicking publish should complete the flow successfully.
      */
     @Test
-    public void createEvent_success_activityFinishes() {
+    public void createEvent_success_activityFinishes() throws InterruptedException{
 
         // Arrange
         injectTestingViewModel(
@@ -117,7 +117,7 @@ public class CreateNewEventUiTest {
         fillCapacity("80");
         fillDescription("Live music event");
         clickPublish();
-
+        Thread.sleep(500);
         // Assert
         rule.getScenario().onActivity(activity ->
                 org.junit.Assert.assertTrue(activity.isFinishing())

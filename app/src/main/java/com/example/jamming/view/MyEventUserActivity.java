@@ -248,7 +248,7 @@ public class MyEventUserActivity extends BaseActivity {
         return menuHandler.handle(itemId);
     }
 
-    // בתוך EventViewModel.java
+
 
 
 
